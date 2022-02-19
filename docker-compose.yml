@@ -8,5 +8,6 @@ services:
       - "MYSQL_USER=backend"
       - "MYSQL_PASSWORD=password"
       - "MYSQL_ROOT_PASSWORD=secret"
+      - "TZ=Europe/Budapest"
     ports:
         - "33061:3306"

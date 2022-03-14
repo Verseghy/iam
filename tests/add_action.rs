@@ -4,7 +4,7 @@ use actix_web::{
     http::StatusCode,
     test::{call_service, TestRequest},
 };
-use entity::actions::{Entity as Actions};
+use entity::actions::Entity as Actions;
 use sea_orm::EntityTrait;
 use serde_json::json;
 

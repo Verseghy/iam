@@ -8,7 +8,7 @@ use serde_json::json;
 
 #[actix_web::test]
 async fn test_get_action() {
-    let mut app = utils::get_service().await;
+    let (mut app, _db) = utils::get_app().await;
 
     let req = TestRequest::get()
         .uri("/v1/action/post.create")

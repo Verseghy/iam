@@ -5,10 +5,8 @@ use actix_web::{
     test::{call_service, TestRequest},
 };
 use serde_json::json;
-use serial_test::serial;
 
 #[actix_web::test]
-#[serial]
 async fn test_get_action() {
     let mut app = utils::get_service().await;
 

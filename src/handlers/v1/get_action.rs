@@ -1,4 +1,4 @@
-use crate::entity::actions;
+use entity::actions;
 use actix_web::{http::StatusCode, route, web, Error, HttpResponse};
 use sea_orm::{entity::EntityTrait, query::QueryFilter, ColumnTrait, DatabaseConnection};
 use serde::Deserialize;

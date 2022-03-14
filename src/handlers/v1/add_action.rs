@@ -1,4 +1,4 @@
-use crate::entity::actions;
+use entity::actions;
 use actix_web::{http::StatusCode, route, web, Error, HttpResponse};
 use sea_orm::{
     entity::{
@@ -25,7 +25,8 @@ pub async fn add_action(
     let action = actions::ActiveModel {
         id: NotSet,
         name: Set(req.action),
-        secure: Set(req.secure as i8),
+        secure: Set(req.secure),
+        ..Default::default()
     };
 
     actions::Entity::insert(action)

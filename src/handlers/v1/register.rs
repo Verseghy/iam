@@ -3,7 +3,7 @@ use actix_web::{http::StatusCode, route, web, Error, HttpResponse};
 use entity::users;
 use sea_orm::{
     entity::{ActiveValue::Set, EntityTrait},
-    DatabaseConnection,
+    DatabaseConnection, DbErr,
 };
 use serde::Deserialize;
 use validator::Validate;
@@ -37,12 +37,10 @@ pub async fn register(
             ..Default::default()
         };
 
-        let res = users::Entity::insert(action).exec(db.get_ref()).await;
-
-        if let Err(_) = res {
-            Ok(HttpResponse::new(StatusCode::INTERNAL_SERVER_ERROR))
-        } else {
-            Ok(HttpResponse::new(StatusCode::OK))
+        match users::Entity::insert(action).exec(db.get_ref()).await {
+            Err(DbErr::Exec(_)) => Ok(HttpResponse::BadRequest().body("Email already exists")),
+            Err(_) => Ok(HttpResponse::new(StatusCode::INTERNAL_SERVER_ERROR)),
+            _ => Ok(HttpResponse::new(StatusCode::OK)),
         }
     } else {
         Ok(HttpResponse::new(StatusCode::INTERNAL_SERVER_ERROR))

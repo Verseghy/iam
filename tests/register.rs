@@ -103,3 +103,33 @@ async fn register_long_password() {
         StatusCode::BAD_REQUEST
     );
 }
+
+#[actix_web::test]
+async fn register_already_exists() {
+    let (mut app, _db) = utils::get_app().await;
+
+    let req = TestRequest::post()
+        .uri("/v1/register")
+        .set_json(json!({
+            "email": "test@test.test",
+            "name": "test",
+            "password": "test",
+        }))
+        .to_request();
+
+    assert_eq!(call_service(&mut app, req).await.status(), StatusCode::OK);
+
+    let req = TestRequest::post()
+        .uri("/v1/register")
+        .set_json(json!({
+            "email": "test@test.test",
+            "name": "test",
+            "password": "test",
+        }))
+        .to_request();
+
+    assert_eq!(
+        call_service(&mut app, req).await.status(),
+        StatusCode::BAD_REQUEST
+    );
+}

@@ -26,13 +26,26 @@ pub fn encrypt(password: &str) -> argon2::Result<String> {
 }
 
 pub fn validate(
-    hash_type: HashType,
-    hash: &String,
-    password: &String,
-) -> Result<bool, ValidateError> {
+    hash: &str,
+    password: &str,
+) -> Result<(bool, Option<argon2::Result<String>>), ValidateError> {
+    let hash_type = if hash.starts_with("$2y$") {
+        HashType::Bcrypt
+    } else if hash.starts_with("$argon2id")
+        || hash.starts_with("$argon2d")
+        || hash.starts_with("$argon2i")
+    {
+        HashType::Argon2
+    } else {
+        return Err(ValidateError::UnknownHashType);
+    };
+
     match hash_type {
-        HashType::Bcrypt => Ok(bcrypt::verify(password.as_bytes(), &hash)?),
-        HashType::Argon2 => Ok(argon2::verify_encoded(&hash, password.as_bytes())?),
+        HashType::Bcrypt => {
+            let rehashed_password = encrypt(password);
+            Ok((bcrypt::verify(password, hash)?, Some(rehashed_password)))
+        }
+        HashType::Argon2 => Ok((argon2::verify_encoded(hash, password.as_bytes())?, None)),
     }
 }
 
@@ -42,4 +55,6 @@ pub enum ValidateError {
     BCryptError(#[from] bcrypt::BcryptError),
     #[error("argon2 error")]
     Argon2Error(#[from] argon2::Error),
+    #[error("unknown hash type")]
+    UnknownHashType,
 }

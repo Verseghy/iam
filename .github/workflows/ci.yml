@@ -65,7 +65,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    container: rust:alpine
+    container: rust:latest
 
     services:
       mysql:

@@ -25,7 +25,7 @@ pub async fn register(
 ) -> Result<HttpResponse, Error> {
     let req = req.into_inner();
 
-    if let Err(_) = req.validate() {
+    if req.validate().is_err() {
         return Ok(HttpResponse::new(StatusCode::BAD_REQUEST));
     }
 

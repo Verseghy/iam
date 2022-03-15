@@ -66,6 +66,16 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: iam
+          MYSQL_ROOT_PASSWORD: secret
+          TZ: Europe/Budapest
+        ports:
+          - 3306:3306
+
     steps:
       - uses: actions/checkout@v2
       - id: install
@@ -81,3 +91,9 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
+          args: --test-threads 1
+        env:
+          DB_USERNAME: root
+          DB_PASSWORD: secret
+          DB_HOST: mysql:3306
+          DB_DATABASE: iam

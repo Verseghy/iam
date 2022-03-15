@@ -65,6 +65,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    container: rust:alpine
 
     services:
       mysql:
@@ -75,6 +76,11 @@ jobs:
           TZ: Europe/Budapest
         ports:
           - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
       - uses: actions/checkout@v2

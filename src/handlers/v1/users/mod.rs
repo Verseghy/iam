@@ -1,8 +1,8 @@
+mod invite;
 mod login;
 mod register;
-mod invite;
 
-use actix_web::web::{service, ServiceConfig};
+use actix_web::web::ServiceConfig;
 
 pub fn routes(config: &mut ServiceConfig) {
     config

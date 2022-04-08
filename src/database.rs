@@ -1,3 +1,4 @@
+use redis::aio::ConnectionManager;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use std::env::{var, VarError};
 
@@ -21,4 +22,15 @@ pub async fn connect() -> DatabaseConnection {
     tracing::info!("Connected to database");
 
     db
+}
+
+pub async fn connect_redis() -> ConnectionManager {
+    let client = redis::Client::open(var("REDIS_URL").expect("REDIS_URL not set"))
+        .map_err(|err| format!("failed to connect to redis: {:?}", err))
+        .unwrap();
+
+    ConnectionManager::new(client)
+        .await
+        .map_err(|err| format!("failed to connect to redis: {:?}", err))
+        .unwrap()
 }

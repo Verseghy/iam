@@ -10,16 +10,16 @@ use serde::Deserialize;
 use validator::Validate;
 
 #[derive(Deserialize, Debug, Validate)]
-pub struct RegisterRequest {
+pub struct LoginRequest {
     #[validate(email, length(max = 256))]
     email: String,
     #[validate(length(max = 256))]
     password: String,
 }
 
-#[route("/v1/login", method = "POST")]
+#[route("/login", method = "POST")]
 pub async fn login(
-    req: web::Json<RegisterRequest>,
+    req: web::Json<LoginRequest>,
     db: web::Data<DatabaseConnection>,
 ) -> Result<HttpResponse, LoginError> {
     let req = req.into_inner();

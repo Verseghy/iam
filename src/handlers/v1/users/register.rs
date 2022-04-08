@@ -18,7 +18,7 @@ pub struct RegisterRequest {
     password: String,
 }
 
-#[route("/v1/register", method = "POST")]
+#[route("/register", method = "POST")]
 pub async fn register(
     req: web::Json<RegisterRequest>,
     db: web::Data<DatabaseConnection>,

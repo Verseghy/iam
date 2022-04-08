@@ -3,6 +3,7 @@ use sea_schema::migration::{async_trait::async_trait, MigrationTrait};
 
 mod m20220311_151913_create_users;
 mod m20220311_152016_create_actions;
+mod m20220408_210000_create_invited_users;
 
 pub struct Migrator;
 
@@ -12,6 +13,7 @@ impl MigratorTrait for Migrator {
         vec![
             Box::new(m20220311_151913_create_users::Migration),
             Box::new(m20220311_152016_create_actions::Migration),
+            Box::new(m20220408_210000_create_invited_users::Migration),
         ]
     }
 }

@@ -24,6 +24,7 @@ chrono = "0.4.19"
 validator = { version = "0.14.0", features = ["derive"] }
 lettre = { version = "0.10.0-rc.5", default-features = false, features = ["smtp-transport", "tokio1-rustls-tls", "builder"] }
 redis = { version = "0.21.5", features = ["r2d2", "aio", "tokio-comp", "connection-manager"] }
+async-trait = "0.1.53"
 
 [dev-dependencies]
 actix-service = "2.0.2"

@@ -1,10 +1,9 @@
-use actix_web::{http::StatusCode, route, web, HttpResponse, ResponseError};
+use actix_web::{http::StatusCode, web, HttpResponse, ResponseError};
 use lettre::{
     message::{Mailbox, Message},
-    transport::smtp::{AsyncSmtpTransport, Error as SmtpError},
-    AsyncTransport, Tokio1Executor,
+    transport::smtp::Error as SmtpError,
+    AsyncTransport,
 };
-use rand::{distributions::Alphanumeric, Rng};
 use redis::AsyncCommands;
 use serde::Deserialize;
 use validator::Validate;
@@ -15,12 +14,15 @@ pub struct InviteRequest {
     email: String,
 }
 
-#[route("/invite", method = "POST")]
-pub async fn invite(
+pub async fn invite<R, S>(
     req: web::Json<InviteRequest>,
-    redis: web::Data<redis::aio::ConnectionManager>,
-    smtp_transport: web::Data<AsyncSmtpTransport<Tokio1Executor>>,
-) -> Result<HttpResponse, InviteError> {
+    redis: web::Data<R>,
+    smtp_transport: web::Data<S>,
+) -> Result<HttpResponse, InviteError>
+where
+    R: AsyncCommands + Clone,
+    S: AsyncTransport<Error = SmtpError> + Sync + Clone,
+{
     let req = req.into_inner();
     let mut redis = redis.get_ref().clone();
     let smtp_transport = smtp_transport.get_ref().clone();
@@ -34,11 +36,19 @@ pub async fn invite(
         return Err(InviteError::AlreadyExists);
     }
 
-    let token: String = rand::thread_rng()
-        .sample_iter(&Alphanumeric)
-        .take(32)
-        .map(char::from)
-        .collect();
+    #[cfg(test)]
+    let token = "TestToken123".to_string();
+
+    #[cfg(not(test))]
+    let token: String = {
+        use rand::{distributions::Alphanumeric, Rng};
+
+        rand::thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(32)
+            .map(char::from)
+            .collect()
+    };
 
     redis.set_ex(&key, &token, 60 * 60 * 24).await?;
 
@@ -53,9 +63,7 @@ pub async fn invite(
         .subject("Meghívó")
         .body(format!("token: {token}"))?;
 
-    let result = smtp_transport.send(email).await?;
-
-    tracing::debug!("{result:?}");
+    smtp_transport.send(email).await?;
 
     Ok(HttpResponse::new(StatusCode::OK))
 }
@@ -83,5 +91,33 @@ impl ResponseError for InviteError {
             Self::EmailError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::SmtpError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::mock::{assert_cmds, redis_cmd};
+    use actix_web::web;
+    use redis::Value;
+
+    #[actix_web::test]
+    async fn some_test() {
+        let redis = web::Data::new(crate::mock::MockRedis::new(vec![Value::Nil, Value::Okay]));
+        let smtp = web::Data::new(crate::mock::MockSmtpTransport::new(true));
+
+        let req = web::Json(InviteRequest {
+            email: "asd@asd.asd".to_owned(),
+        });
+
+        let _res = invite(req, redis.clone(), smtp.clone()).await;
+
+        assert_cmds(
+            &redis.cmds(),
+            &[
+                redis_cmd(&["EXISTS", "/invites/asd@asd.asd"]),
+                redis_cmd(&["SETEX", "/invites/asd@asd.asd", "86400", "TestToken123"]),
+            ],
+        );
     }
 }

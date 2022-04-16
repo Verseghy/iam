@@ -1,12 +1,12 @@
 use chrono::NaiveDateTime;
-use entity::actions::{Column, Entity};
+use entity::groups::{Column, Entity};
 use sea_schema::migration::prelude::*;
 
 pub struct Migration;
 
 impl MigrationName for Migration {
     fn name(&self) -> &str {
-        "m20220311_152016_create_actions"
+        "m20220416_053618_create_groups"
     }
 }
 
@@ -20,7 +20,6 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(ColumnDef::new(Column::Id).string().primary_key())
                     .col(ColumnDef::new(Column::Name).string_len(64).not_null())
-                    .col(ColumnDef::new(Column::Secure).boolean().not_null())
                     .col(
                         ColumnDef::new(Column::CreatedAt)
                             .date_time()

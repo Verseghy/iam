@@ -18,12 +18,7 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Entity)
                     .if_not_exists()
-                    .col(
-                        ColumnDef::new(Column::Id)
-                            .integer()
-                            .auto_increment()
-                            .primary_key(),
-                    )
+                    .col(ColumnDef::new(Column::Id).integer().primary_key())
                     .col(ColumnDef::new(Column::Name).string_len(256).not_null())
                     .col(
                         ColumnDef::new(Column::Email)

@@ -3,6 +3,10 @@ use sea_schema::migration::{async_trait::async_trait, MigrationTrait};
 
 mod m20220311_151913_create_users;
 mod m20220311_152016_create_actions;
+mod m20220416_053618_create_groups;
+mod m20220416_054159_create_pivot_actions_groups;
+mod m20220416_054659_create_pivot_actions_users;
+mod m20220416_054675935_create_pivot_users_groups;
 
 pub struct Migrator;
 
@@ -12,6 +16,10 @@ impl MigratorTrait for Migrator {
         vec![
             Box::new(m20220311_151913_create_users::Migration),
             Box::new(m20220311_152016_create_actions::Migration),
+            Box::new(m20220416_053618_create_groups::Migration),
+            Box::new(m20220416_054159_create_pivot_actions_groups::Migration),
+            Box::new(m20220416_054659_create_pivot_actions_users::Migration),
+            Box::new(m20220416_054675935_create_pivot_users_groups::Migration),
         ]
     }
 }

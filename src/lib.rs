@@ -1,6 +1,7 @@
 pub mod database;
 mod handlers;
 mod password;
+pub mod token;
 
 #[cfg(test)]
 pub(crate) mod mock;

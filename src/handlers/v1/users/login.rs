@@ -1,12 +1,14 @@
-use crate::password;
-use actix_web::{http::StatusCode, route, web, HttpResponse, ResponseError};
+use std::default::Default;
+use crate::{password, token};
+use actix_web::{http::StatusCode, route, web, ResponseError, Responder};
+use jsonwebtoken::{encode, EncodingKey, Header, errors::{Error as JWTError}, Algorithm};
 use entity::users;
 use sea_orm::{
     entity::{ActiveModelTrait, ColumnTrait, EntityTrait},
     query::QueryFilter,
     ActiveValue, DatabaseConnection, DbErr,
 };
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 use validator::Validate;
 
 #[derive(Deserialize, Debug, Validate)]
@@ -17,11 +19,17 @@ pub struct LoginRequest {
     password: String,
 }
 
+#[derive(Serialize, Debug)]
+pub struct LoginResponse {
+    token: String
+}
+
 #[route("/login", method = "POST")]
 pub async fn login(
     req: web::Json<LoginRequest>,
     db: web::Data<DatabaseConnection>,
-) -> Result<HttpResponse, LoginError> {
+    encoding_key: web::Data<EncodingKey>,
+) -> Result<impl Responder, LoginError> {
     let req = req.into_inner();
 
     req.validate().map_err(|_| LoginError::BadInputData)?;
@@ -37,7 +45,7 @@ pub async fn login(
         password::validate(&res.password, &req.password).map_err(LoginError::ValidationError)?;
 
     if let Some(Ok(hash)) = rehash {
-        let mut action: users::ActiveModel = res.into();
+        let mut action: users::ActiveModel = res.clone().into();
         action.password = ActiveValue::Set(hash);
 
         action
@@ -46,11 +54,20 @@ pub async fn login(
             .map_err(LoginError::DatabaseError)?;
     }
 
-    if valid {
-        Ok(HttpResponse::new(StatusCode::OK))
-    } else {
-        Err(LoginError::WrongPassword)
+    if !valid {
+        return Err(LoginError::WrongPassword);
     }
+
+    let claims = &token::Claims{
+        subject: res.id.to_string(),
+        ..Default::default()
+    };
+
+    let token = encode(&Header::new(Algorithm::RS256), claims, &encoding_key)?;
+
+    Ok(web::Json(LoginResponse{
+        token
+    }))
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -65,6 +82,8 @@ pub enum LoginError {
     ValidationError(password::ValidateError),
     #[error("wrong password")]
     WrongPassword,
+    #[error("failed to generate JWT token")]
+    TokenError(#[from] JWTError),
     // #[error("failed to rehash")]
     // FailedToRehash,
 }
@@ -77,6 +96,7 @@ impl ResponseError for LoginError {
             Self::BadInputData => StatusCode::BAD_REQUEST,
             Self::ValidationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::WrongPassword => StatusCode::UNAUTHORIZED,
+            Self::TokenError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             // Self::FailedToRehash => StatusCode::OK,
         }
     }

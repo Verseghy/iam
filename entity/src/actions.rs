@@ -6,7 +6,7 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "actions")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: i32,
+    pub id: String,
     pub name: String,
     pub secure: bool,
     pub created_at: DateTime,
@@ -20,6 +20,26 @@ pub enum Relation {}
 impl RelationTrait for Relation {
     fn def(&self) -> RelationDef {
         panic!("No RelationDef")
+    }
+}
+
+impl Related<super::users::Entity> for Entity {
+    fn to() -> RelationDef {
+        super::pivot_actions_users::Relation::User.def()
+    }
+
+    fn via() -> Option<RelationDef> {
+        Some(super::pivot_actions_users::Relation::Action.def().rev())
+    }
+}
+
+impl Related<super::groups::Entity> for Entity {
+    fn to() -> RelationDef {
+        super::pivot_actions_groups::Relation::Group.def()
+    }
+
+    fn via() -> Option<RelationDef> {
+        Some(super::pivot_actions_groups::Relation::Action.def().rev())
     }
 }
 

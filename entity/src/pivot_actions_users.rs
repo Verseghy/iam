@@ -3,7 +3,7 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
-#[sea_orm(table_name = "pivot_action_users")]
+#[sea_orm(table_name = "pivot_actions_users")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub action_id: String,

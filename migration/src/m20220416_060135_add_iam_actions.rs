@@ -65,12 +65,12 @@ impl MigrationTrait for Migration {
                     ])
                     .values_panic(vec![
                         format!("ActionID-{}", create_id()).into(),
-                        "iam.users.invite".into(),
+                        "iam.user.invite".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
                         format!("ActionID-{}", create_id()).into(),
-                        "iam.users.delete".into(),
+                        "iam.user.delete".into(),
                         true.into(),
                     ])
                     .values_panic(vec![

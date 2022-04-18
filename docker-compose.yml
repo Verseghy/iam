@@ -4,7 +4,7 @@ services:
   database:
     image: mysql:5.7
     environment:
-      - "MYSQL_DATABASE=backend"
+      - "MYSQL_DATABASE=iam"
       - "MYSQL_USER=backend"
       - "MYSQL_PASSWORD=password"
       - "MYSQL_ROOT_PASSWORD=secret"

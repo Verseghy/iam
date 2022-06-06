@@ -1,9 +1,9 @@
-use std::ops::Add;
 use std::default::Default;
+use std::ops::Add;
 
-use chrono::{Utc, Duration};
+use chrono::{Duration, Utc};
 use jsonwebtoken::{DecodingKey, EncodingKey};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -23,8 +23,8 @@ pub struct Claims {
 
 impl Default for Claims {
     fn default() -> Self {
-        Claims{
-            issuer: std::env::var("HOSTNAME").unwrap_or("dev".to_string()),
+        Claims {
+            issuer: std::env::var("HOSTNAME").unwrap_or_else(|_| "dev".to_string()),
             audience: vec!["https://verseghy-gimnazium.net".to_string()],
             expires_at: Utc::now().add(Duration::weeks(1)).timestamp(),
             not_before: Utc::now().timestamp(),
@@ -35,9 +35,19 @@ impl Default for Claims {
 }
 
 pub fn create_encoding_key() -> EncodingKey {
-    EncodingKey::from_rsa_pem(std::env::var("JWT_RSA_PRIVATE").expect("JWT_RSA_PRIVATE not set").as_ref()).expect("JWT_RSA_PRIVATE invalid")
+    EncodingKey::from_rsa_pem(
+        std::env::var("JWT_RSA_PRIVATE")
+            .expect("JWT_RSA_PRIVATE not set")
+            .as_ref(),
+    )
+    .expect("JWT_RSA_PRIVATE invalid")
 }
 
 pub fn create_decoding_key() -> DecodingKey {
-    DecodingKey::from_rsa_pem(std::env::var("JWT_RSA_PUBLIC").expect("JWT_RSA_PUBLIC not set").as_ref()).expect("JWT_RSA_PUBLIC invalid")
+    DecodingKey::from_rsa_pem(
+        std::env::var("JWT_RSA_PUBLIC")
+            .expect("JWT_RSA_PUBLIC not set")
+            .as_ref(),
+    )
+    .expect("JWT_RSA_PUBLIC invalid")
 }

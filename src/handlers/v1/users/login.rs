@@ -1,14 +1,14 @@
-use std::default::Default;
 use crate::{password, token};
-use actix_web::{http::StatusCode, route, web, ResponseError, Responder};
-use jsonwebtoken::{encode, EncodingKey, Header, errors::{Error as JWTError}, Algorithm};
+use actix_web::{http::StatusCode, route, web, Responder, ResponseError};
 use entity::users;
+use jsonwebtoken::{encode, errors::Error as JWTError, Algorithm, EncodingKey, Header};
 use sea_orm::{
     entity::{ActiveModelTrait, ColumnTrait, EntityTrait},
     query::QueryFilter,
     ActiveValue, DatabaseConnection, DbErr,
 };
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use std::default::Default;
 use validator::Validate;
 
 #[derive(Deserialize, Debug, Validate)]
@@ -21,7 +21,7 @@ pub struct LoginRequest {
 
 #[derive(Serialize, Debug)]
 pub struct LoginResponse {
-    token: String
+    token: String,
 }
 
 #[route("/login", method = "POST")]
@@ -58,16 +58,14 @@ pub async fn login(
         return Err(LoginError::WrongPassword);
     }
 
-    let claims = &token::Claims{
+    let claims = &token::Claims {
         subject: res.id.to_string(),
         ..Default::default()
     };
 
     let token = encode(&Header::new(Algorithm::RS256), claims, &encoding_key)?;
 
-    Ok(web::Json(LoginResponse{
-        token
-    }))
+    Ok(web::Json(LoginResponse { token }))
 }
 
 #[derive(Debug, thiserror::Error)]

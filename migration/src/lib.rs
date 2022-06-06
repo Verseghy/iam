@@ -1,5 +1,5 @@
-pub use sea_schema::migration::MigratorTrait;
-use sea_schema::migration::{async_trait::async_trait, MigrationTrait};
+pub use sea_orm_migration::MigratorTrait;
+use sea_orm_migration::{async_trait::async_trait, MigrationTrait};
 
 mod m20220311_151913_create_users;
 mod m20220311_152016_create_actions;

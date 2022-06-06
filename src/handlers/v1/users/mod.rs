@@ -2,6 +2,7 @@ mod invite;
 mod login;
 mod register;
 
+use crate::auth::permission::Permission;
 use actix_web::web::{self, ServiceConfig};
 use lettre::{AsyncSmtpTransport, Tokio1Executor};
 
@@ -9,11 +10,12 @@ pub fn routes(config: &mut ServiceConfig) {
     config
         .service(login::login)
         .service(register::register)
-        .route(
-            "/invite",
-            web::post().to(invite::invite::<
-                redis::aio::ConnectionManager,
-                AsyncSmtpTransport<Tokio1Executor>,
-            >),
+        .service(
+            web::resource("/invite")
+                .route(web::post().to(invite::invite::<
+                    redis::aio::ConnectionManager,
+                    AsyncSmtpTransport<Tokio1Executor>,
+                >))
+                .wrap(Permission::new(&["iam.user.invite"])),
         );
 }

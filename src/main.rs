@@ -42,10 +42,10 @@ fn create_smtp_transport() -> AsyncSmtpTransport<Tokio1Executor> {
     AsyncSmtpTransport::<Tokio1Executor>::starttls_relay(
         &std::env::var("SMTP_HOST").expect("SMTP_HOST not set"),
     )
-        .unwrap()
-        .credentials(Credentials::new(
-            std::env::var("SMTP_USERNAME").expect("SMTP_USERNAME not set"),
-            std::env::var("SMTP_PASSWORD").expect("SMTP_PASSWORD not set"),
-        ))
-        .build()
+    .unwrap()
+    .credentials(Credentials::new(
+        std::env::var("SMTP_USERNAME").expect("SMTP_USERNAME not set"),
+        std::env::var("SMTP_PASSWORD").expect("SMTP_PASSWORD not set"),
+    ))
+    .build()
 }

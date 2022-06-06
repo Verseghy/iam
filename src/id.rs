@@ -27,8 +27,7 @@ pub fn create_id() -> String {
     }
 
     Uuid::new_v1(timestamp, &buf)
-        .unwrap()
-        .to_hyphenated()
+        .as_hyphenated()
         .encode_lower(&mut Uuid::encode_buffer())
         .to_owned()
 }

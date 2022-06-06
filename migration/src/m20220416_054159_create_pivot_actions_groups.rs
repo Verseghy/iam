@@ -1,5 +1,5 @@
 use entity::pivot_actions_groups::{Column, Entity};
-use sea_schema::migration::prelude::*;
+use sea_orm_migration::prelude::*;
 
 pub struct Migration;
 

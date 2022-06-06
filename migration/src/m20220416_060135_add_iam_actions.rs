@@ -1,6 +1,6 @@
 use entity::actions::{Column, Entity};
 use iam::id::create_id;
-use sea_schema::migration::prelude::*;
+use sea_orm_migration::prelude::*;
 
 pub struct Migration;
 

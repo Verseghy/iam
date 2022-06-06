@@ -5,6 +5,7 @@ use lettre::{
     transport::smtp::{authentication::Credentials, AsyncSmtpTransport},
     Tokio1Executor,
 };
+use rand::{rngs::SmallRng, SeedableRng};
 use std::{io, net::SocketAddr};
 
 #[actix_web::main]
@@ -21,6 +22,7 @@ async fn main() -> io::Result<()> {
     let smtp_transport = Data::new(create_smtp_transport());
     let jwt_private = Data::new(token::create_encoding_key());
     let jwt_public = Data::new(token::create_decoding_key());
+    let rng = Data::new(SmallRng::from_entropy());
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3001));
     tracing::info!("Listening on port {}", addr.port());
@@ -31,6 +33,7 @@ async fn main() -> io::Result<()> {
             .app_data(smtp_transport.clone())
             .app_data(jwt_private.clone())
             .app_data(jwt_public.clone())
+            .app_data(rng.clone())
             .configure(routes)
     })
     .bind(addr)?

@@ -4,6 +4,7 @@ use lettre::{
     transport::smtp::Error as SmtpError,
     AsyncTransport,
 };
+use rand::{distributions::Alphanumeric, Rng};
 use redis::AsyncCommands;
 use serde::Deserialize;
 use validator::Validate;
@@ -14,14 +15,16 @@ pub struct InviteRequest {
     email: String,
 }
 
-pub async fn invite<R, S>(
+pub async fn invite<REDIS, SMTP, RNG>(
     req: web::Json<InviteRequest>,
-    redis: web::Data<R>,
-    smtp_transport: web::Data<S>,
+    redis: web::Data<REDIS>,
+    smtp_transport: web::Data<SMTP>,
+    rng: web::Data<RNG>,
 ) -> Result<HttpResponse, InviteError>
 where
-    R: AsyncCommands + Clone,
-    S: AsyncTransport<Error = SmtpError> + Sync + Clone,
+    REDIS: AsyncCommands + Clone,
+    SMTP: AsyncTransport<Error = SmtpError> + Sync + Clone,
+    RNG: Rng + Clone,
 {
     let req = req.into_inner();
     let mut redis = redis.get_ref().clone();
@@ -36,19 +39,12 @@ where
         return Err(InviteError::AlreadyExists);
     }
 
-    #[cfg(test)]
-    let token = "TestToken123".to_string();
-
-    #[cfg(not(test))]
-    let token: String = {
-        use rand::{distributions::Alphanumeric, Rng};
-
-        rand::thread_rng()
-            .sample_iter(&Alphanumeric)
-            .take(32)
-            .map(char::from)
-            .collect()
-    };
+    let token: String = (*rng.get_ref())
+        .clone()
+        .sample_iter(&Alphanumeric)
+        .take(32)
+        .map(char::from)
+        .collect();
 
     redis.set_ex(&key, &token, 60 * 60 * 24).await?;
 
@@ -99,24 +95,31 @@ mod test {
     use super::*;
     use crate::mock::{assert_cmds, redis_cmd};
     use actix_web::web;
+    use rand::rngs::mock::StepRng;
     use redis::Value;
 
     #[actix_web::test]
     async fn some_test() {
         let redis = web::Data::new(crate::mock::MockRedis::new(vec![Value::Nil, Value::Okay]));
         let smtp = web::Data::new(crate::mock::MockSmtpTransport::new(true));
+        let rng = web::Data::new(StepRng::new(0, 1));
 
         let req = web::Json(InviteRequest {
             email: "asd@asd.asd".to_owned(),
         });
 
-        let _res = invite(req, redis.clone(), smtp.clone()).await;
+        let _res = invite(req, redis.clone(), smtp.clone(), rng).await;
 
         assert_cmds(
             &redis.cmds(),
             &[
                 redis_cmd(&["EXISTS", "/invites/asd@asd.asd"]),
-                redis_cmd(&["SETEX", "/invites/asd@asd.asd", "86400", "TestToken123"]),
+                redis_cmd(&[
+                    "SETEX",
+                    "/invites/asd@asd.asd",
+                    "86400",
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                ]),
             ],
         );
     }

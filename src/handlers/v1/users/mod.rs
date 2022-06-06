@@ -15,6 +15,7 @@ pub fn routes(config: &mut ServiceConfig) {
                 .route(web::post().to(invite::invite::<
                     redis::aio::ConnectionManager,
                     AsyncSmtpTransport<Tokio1Executor>,
+                    rand::rngs::SmallRng,
                 >))
                 .wrap(Permission::new(&["iam.user.invite"])),
         );

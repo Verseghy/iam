@@ -188,3 +188,11 @@ impl ResponseError for ValidationError {
         }
     }
 }
+
+macro_rules! permissions {
+    ($($permission:literal),+ $(,)?) => {
+        $crate::auth::permission::Permission::new(&[$($permission),+])
+    }
+}
+
+pub(crate) use permissions;

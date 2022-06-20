@@ -1,15 +1,9 @@
-use crate::{password, token};
-use actix_web::{http::StatusCode, route, web, Responder, ResponseError};
-use entity::{actions, users};
-use jsonwebtoken::{encode, errors::Error as JWTError, Algorithm, EncodingKey, Header};
-use sea_orm::ActiveValue::Set;
-use sea_orm::{
-    entity::{ActiveModelTrait, ColumnTrait, EntityTrait},
-    query::QueryFilter,
-    ActiveValue, DatabaseConnection, DbErr,
-};
+use actix_web::{http::StatusCode, web, Responder, ResponseError};
+use entity::actions;
+
+use sea_orm::{entity::EntityTrait, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
-use std::default::Default;
+
 use validator::Validate;
 
 #[derive(Deserialize, Debug, Validate)]

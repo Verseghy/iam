@@ -6,7 +6,6 @@ mod put;
 
 use crate::auth::permission::permissions;
 use actix_web::web::{self, ServiceConfig};
-use lettre::{AsyncSmtpTransport, Tokio1Executor};
 
 pub fn routes(config: &mut ServiceConfig) {
     config

@@ -1,8 +1,10 @@
 use std::default::Default;
 use std::ops::Add;
 
+use actix_web::http::header::{HeaderMap, ToStrError, AUTHORIZATION};
 use chrono::{Duration, Utc};
-use jsonwebtoken::{DecodingKey, EncodingKey};
+use jsonwebtoken::{errors::Error as JWTError, Algorithm, DecodingKey, EncodingKey, Validation};
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -50,4 +52,46 @@ pub fn create_decoding_key() -> DecodingKey {
             .as_ref(),
     )
     .expect("JWT_RSA_PUBLIC invalid")
+}
+
+static VALIDATION: Lazy<Validation> = Lazy::new(|| {
+    let mut validation = Validation::new(Algorithm::RS256);
+    validation.set_audience(&["https://verseghy-gimnazium.net"]);
+    validation.leeway = 5;
+
+    validation
+});
+
+pub fn get_claims(
+    headers: &HeaderMap,
+    decoding_key: &DecodingKey,
+) -> Result<Claims, GetClaimsError> {
+    let header = headers
+        .get(AUTHORIZATION)
+        .ok_or(GetClaimsError::NoAuthorizationHeader)?
+        .to_str()?;
+
+    let token = match header.split_once(' ') {
+        Some((ty, token)) => {
+            if ty != "Bearer" {
+                Err(GetClaimsError::NotBearerToken)?
+            }
+            token
+        }
+        None => header,
+    };
+
+    Ok(jsonwebtoken::decode(token, decoding_key, &*VALIDATION)?.claims)
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum GetClaimsError {
+    #[error("no Authorization header")]
+    NoAuthorizationHeader,
+    #[error("not a utf-8 header")]
+    NotUTF8Header(#[from] ToStrError),
+    #[error("not bearer token")]
+    NotBearerToken,
+    #[error("invalid token")]
+    InvalidToken(#[from] JWTError),
 }

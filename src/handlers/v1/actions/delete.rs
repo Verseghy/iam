@@ -1,12 +1,16 @@
-use std::default::Default;
-use crate::{password, token};
-use actix_web::{http::StatusCode, route, web, ResponseError, Responder, HttpResponse};
-use jsonwebtoken::{encode, EncodingKey, Header, errors::{Error as JWTError}, Algorithm};
-use entity::actions;
-use sea_orm::{entity::{ActiveModelTrait, ColumnTrait, EntityTrait}, query::QueryFilter, ActiveValue, DatabaseConnection, DbErr, NotSet, Set};
-use serde::{Serialize, Deserialize};
-use validator::Validate;
 use crate::handlers::v1::actions::post::PostError::DatabaseError;
+use crate::{password, token};
+use actix_web::{http::StatusCode, route, web, HttpResponse, Responder, ResponseError};
+use entity::actions;
+use jsonwebtoken::{encode, errors::Error as JWTError, Algorithm, EncodingKey, Header};
+use sea_orm::{
+    entity::{ActiveModelTrait, ColumnTrait, EntityTrait},
+    query::QueryFilter,
+    ActiveValue, DatabaseConnection, DbErr, NotSet, Set,
+};
+use serde::{Deserialize, Serialize};
+use std::default::Default;
+use validator::Validate;
 
 #[derive(Deserialize, Debug)]
 pub struct DeleteActionRequest {
@@ -29,7 +33,7 @@ pub async fn delete(
 #[derive(Debug, thiserror::Error)]
 pub enum DeleteError {
     #[error("database error")]
-    DatabaseError(#[from]DbErr),
+    DatabaseError(#[from] DbErr),
 }
 
 impl ResponseError for DeleteError {

@@ -1,7 +1,7 @@
+mod actions;
 mod add_action;
 mod get_action;
 mod users;
-mod actions;
 
 use actix_web::web;
 use actix_web::web::ServiceConfig;

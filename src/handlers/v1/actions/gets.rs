@@ -1,15 +1,15 @@
-use std::default::Default;
 use crate::{password, token};
-use actix_web::{http::StatusCode, route, web, ResponseError, Responder};
-use jsonwebtoken::{encode, EncodingKey, Header, errors::{Error as JWTError}, Algorithm};
+use actix_web::{http::StatusCode, route, web, Responder, ResponseError};
 use entity::{actions, users};
+use jsonwebtoken::{encode, errors::Error as JWTError, Algorithm, EncodingKey, Header};
+use sea_orm::ActiveValue::Set;
 use sea_orm::{
     entity::{ActiveModelTrait, ColumnTrait, EntityTrait},
     query::QueryFilter,
     ActiveValue, DatabaseConnection, DbErr,
 };
-use sea_orm::ActiveValue::Set;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use std::default::Default;
 use validator::Validate;
 
 #[derive(Serialize, Debug)]
@@ -24,28 +24,25 @@ struct Action {
     secure: bool,
 }
 
-pub async fn gets(
-    db: web::Data<DatabaseConnection>,
-) -> Result<impl Responder, GetsError> {
-    let res = actions::Entity::find()
-        .all(db.get_ref())
-        .await?;
+pub async fn gets(db: web::Data<DatabaseConnection>) -> Result<impl Responder, GetsError> {
+    let res = actions::Entity::find().all(db.get_ref()).await?;
 
-    Ok(web::Json(GetsResponse{
-        actions: res.into_iter().map(|x| {
-            Action{
+    Ok(web::Json(GetsResponse {
+        actions: res
+            .into_iter()
+            .map(|x| Action {
                 id: x.id,
                 name: x.name,
-                secure: x.secure
-            }
-        }).collect()
+                secure: x.secure,
+            })
+            .collect(),
     }))
 }
 
 #[derive(Debug, thiserror::Error)]
 pub enum GetsError {
     #[error("database error")]
-    DatabaseError(#[from]DbErr),
+    DatabaseError(#[from] DbErr),
 }
 
 impl ResponseError for GetsError {

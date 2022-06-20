@@ -1,6 +1,4 @@
 mod actions;
-mod add_action;
-mod get_action;
 mod users;
 
 use actix_web::web;

@@ -1,7 +1,7 @@
 mod invite;
 mod login;
 
-use crate::auth::permission::permissions;
+use crate::auth::middleware::permissions;
 use actix_web::web::{self, ServiceConfig};
 use lettre::{AsyncSmtpTransport, Tokio1Executor};
 
@@ -13,6 +13,6 @@ pub fn routes(config: &mut ServiceConfig) {
                 AsyncSmtpTransport<Tokio1Executor>,
                 rand::rngs::SmallRng,
             >))
-            .wrap(permissions!("iam.user.invite")),
+            .wrap(permissions!["iam.user.invite"]),
     );
 }

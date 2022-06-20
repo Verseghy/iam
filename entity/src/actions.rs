@@ -46,7 +46,7 @@ impl Related<super::groups::Entity> for Entity {
 impl ActiveModelBehavior for ActiveModel {}
 
 impl Entity {
-    pub fn get_actions_for_user_id(id: String) -> Select<super::actions::Entity> {
+    pub fn get_actions_for_user_id(id: &str) -> Select<super::actions::Entity> {
         Self::find()
             .filter(super::users::Column::Id.eq(id))
             .join_rev(

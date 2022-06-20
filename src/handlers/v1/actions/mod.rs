@@ -4,7 +4,7 @@ mod gets;
 mod post;
 mod put;
 
-use crate::auth::permission::permissions;
+use crate::auth::middleware::permissions;
 use actix_web::web::{self, ServiceConfig};
 
 pub fn routes(config: &mut ServiceConfig) {

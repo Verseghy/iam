@@ -1,12 +1,12 @@
-mod get;
-mod put;
-mod post;
 mod delete;
+mod get;
 mod gets;
+mod post;
+mod put;
 
+use crate::auth::permission::permissions;
 use actix_web::web::{self, ServiceConfig};
 use lettre::{AsyncSmtpTransport, Tokio1Executor};
-use crate::auth::permission::permissions;
 
 pub fn routes(config: &mut ServiceConfig) {
     config

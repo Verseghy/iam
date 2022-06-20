@@ -30,6 +30,11 @@ impl MigrationTrait for Migration {
                     ])
                     .values_panic(vec![
                         format!("ActionID-{}", create_id()).into(),
+                        "iam.action.update".into(),
+                        true.into(),
+                    ])
+                    .values_panic(vec![
+                        format!("ActionID-{}", create_id()).into(),
                         "iam.action.list".into(),
                         true.into(),
                     ])

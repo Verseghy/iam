@@ -30,7 +30,7 @@ pub async fn run() -> io::Result<()> {
     tracing::info!("Listening on port {}", addr.port());
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allowed_origin("*");
+            .allow_any_origin();
 
         App::new()
             .app_data(database.clone())

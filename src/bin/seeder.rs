@@ -8,7 +8,7 @@ async fn main() {
     let db = database::connect().await;
 
     users::ActiveModel {
-        id: Set(create_id()),
+        id: Set(format!("UserID-{}", create_id())),
         name: Set("TestUser1".into()),
         email: Set("test@test.test".into()),
         password: Set(password::encrypt("test").unwrap()),
@@ -19,7 +19,7 @@ async fn main() {
     .unwrap();
 
     users::ActiveModel {
-        id: Set(create_id()),
+        id: Set(format!("UserID-{}", create_id())),
         name: Set("TestUser2".into()),
         email: Set("test2@test.test".into()),
         password: Set(password::encrypt("test").unwrap()),

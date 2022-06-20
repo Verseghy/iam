@@ -1,16 +1,12 @@
-use crate::token::Claims;
+use crate::token::{get_claims, GetClaimsError};
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
-    http::{
-        header::{ToStrError, AUTHORIZATION},
-        StatusCode,
-    },
+    http::StatusCode,
     web::Data,
     Error, HttpMessage, ResponseError,
 };
 use futures_util::future::LocalBoxFuture;
-use jsonwebtoken::{Algorithm, DecodingKey, Validation};
-use once_cell::sync::Lazy;
+use jsonwebtoken::DecodingKey;
 use sea_orm::DatabaseConnection;
 use std::future::{ready, Ready};
 
@@ -64,7 +60,11 @@ where
     forward_ready!(service);
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
-        let claims = get_claims(&req);
+        let decoding_key = req
+            .app_data::<Data<DecodingKey>>()
+            .expect("No DecodingKey!");
+
+        let claims = get_claims(req.headers(), decoding_key);
 
         let database = req
             .app_data::<Data<DatabaseConnection>>()
@@ -77,7 +77,8 @@ where
         let permissions = self.permissions;
 
         Box::pin(async move {
-            super::permission::check(claims?.subject.as_str(), permissions, database.get_ref())
+            let claims = claims.map_err(ValidationError::from)?;
+            super::permission::check(claims.subject.as_str(), permissions, database.get_ref())
                 .await
                 .map_err(ValidationError::from)?;
 
@@ -86,42 +87,10 @@ where
     }
 }
 
-static VALIDATION: Lazy<Validation> = Lazy::new(|| {
-    let mut validation = Validation::new(Algorithm::RS256);
-    validation.set_audience(&["https://verseghy-gimnazium.net"]);
-    validation.leeway = 5;
-
-    validation
-});
-
-fn get_claims(req: &ServiceRequest) -> Result<Claims, ValidationError> {
-    let header = req
-        .headers()
-        .get(AUTHORIZATION)
-        .ok_or(ValidationError::NoAuthorizationHeader)?
-        .to_str()?;
-
-    let token = header
-        .strip_prefix("Bearer: ")
-        .ok_or(ValidationError::NotBearerToken)?;
-
-    let decoding_key = req
-        .app_data::<Data<DecodingKey>>()
-        .expect("No decoding key!");
-
-    Ok(jsonwebtoken::decode(token, decoding_key, &*VALIDATION)?.claims)
-}
-
 #[derive(Debug, thiserror::Error)]
 enum ValidationError {
-    #[error("invalid token")]
-    InvalidToken(#[from] jsonwebtoken::errors::Error),
-    #[error("no authorization header")]
-    NoAuthorizationHeader,
-    #[error("not a utf-8 header")]
-    NotUTF8Header(#[from] ToStrError),
-    #[error("not Bearer token")]
-    NotBearerToken,
+    #[error("get claims error: {0}")]
+    GetClaimsError(#[from] GetClaimsError),
     #[error("check error: {0}")]
     CheckError(#[from] super::permission::CheckError),
 }
@@ -129,10 +98,10 @@ enum ValidationError {
 impl ResponseError for ValidationError {
     fn status_code(&self) -> StatusCode {
         match self {
-            Self::InvalidToken(_) => StatusCode::UNAUTHORIZED,
-            Self::NoAuthorizationHeader => StatusCode::BAD_REQUEST,
-            Self::NotUTF8Header(_) => StatusCode::BAD_REQUEST,
-            Self::NotBearerToken => StatusCode::BAD_REQUEST,
+            Self::GetClaimsError(GetClaimsError::InvalidToken(_)) => StatusCode::UNAUTHORIZED,
+            Self::GetClaimsError(GetClaimsError::NoAuthorizationHeader) => StatusCode::BAD_REQUEST,
+            Self::GetClaimsError(GetClaimsError::NotUTF8Header(_)) => StatusCode::BAD_REQUEST,
+            Self::GetClaimsError(GetClaimsError::NotBearerToken) => StatusCode::BAD_REQUEST,
             Self::CheckError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }

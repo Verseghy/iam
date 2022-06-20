@@ -3,6 +3,7 @@ name = "iam"
 version = "0.1.0"
 edition = "2021"
 publish = false
+default-run = "main"
 
 [workspace]
 members = [".", "./migration", "./entity"]
@@ -33,3 +34,11 @@ actix-cors = "0.6.1"
 
 [dev-dependencies]
 migration = { path = "./migration" }
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
+
+[[bin]]
+name = "seeder"
+path = "src/bin/seeder.rs"

@@ -1,8 +1,8 @@
 mod auth;
-mod database;
+pub mod database;
 mod handlers;
 pub mod id;
-mod password;
+pub mod password;
 mod token;
 
 #[cfg(test)]

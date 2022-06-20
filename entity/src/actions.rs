@@ -6,6 +6,7 @@ use sea_orm::{JoinType, QuerySelect};
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: String,
+    #[sea_orm(unique)]
     pub name: String,
     pub secure: bool,
     pub created_at: DateTime,

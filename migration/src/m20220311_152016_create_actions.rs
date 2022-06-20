@@ -19,7 +19,12 @@ impl MigrationTrait for Migration {
                     .table(Entity)
                     .if_not_exists()
                     .col(ColumnDef::new(Column::Id).string().primary_key())
-                    .col(ColumnDef::new(Column::Name).string_len(64).not_null())
+                    .col(
+                        ColumnDef::new(Column::Name)
+                            .string_len(64)
+                            .unique_key()
+                            .not_null(),
+                    )
                     .col(ColumnDef::new(Column::Secure).boolean().not_null())
                     .col(
                         ColumnDef::new(Column::CreatedAt)

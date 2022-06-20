@@ -4,7 +4,7 @@ use sea_orm::{JoinType, QuerySelect};
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
 #[sea_orm(table_name = "actions")]
 pub struct Model {
-    #[sea_orm(primary_key)]
+    #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
     #[sea_orm(unique)]
     pub name: String,

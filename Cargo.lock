@@ -1183,8 +1183,6 @@ checksum = "c4a1e36c821dbe04574f602848a19f742f4fb3c98d40449f11bcad18d6b17421"
 name = "iam"
 version = "0.1.0"
 dependencies = [
- "actix-http",
- "actix-service",
  "actix-web",
  "async-trait",
  "bcrypt",

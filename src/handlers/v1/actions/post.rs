@@ -1,15 +1,9 @@
-use crate::{password, token};
-use actix_web::{http::StatusCode, route, web, HttpResponse, Responder, ResponseError};
+use actix_web::{http::StatusCode, web, HttpResponse, Responder, ResponseError};
 use entity::actions;
-use jsonwebtoken::{encode, errors::Error as JWTError, Algorithm, EncodingKey, Header};
-use sea_orm::{
-    entity::{ActiveModelTrait, ColumnTrait, EntityTrait},
-    query::QueryFilter,
-    ActiveValue, DatabaseConnection, DbErr, NotSet, Set,
-};
-use serde::{Deserialize, Serialize};
+
+use sea_orm::{entity::EntityTrait, DatabaseConnection, DbErr, NotSet, Set};
+use serde::Deserialize;
 use std::default::Default;
-use validator::Validate;
 
 #[derive(Deserialize, Debug)]
 pub struct UpdateActionRequest {

@@ -1,16 +1,8 @@
-use crate::handlers::v1::actions::post::PostError::DatabaseError;
-use crate::{password, token};
-use actix_web::{http::StatusCode, route, web, HttpResponse, Responder, ResponseError};
+use actix_web::{http::StatusCode, web, HttpResponse, Responder, ResponseError};
 use entity::actions;
-use jsonwebtoken::{encode, errors::Error as JWTError, Algorithm, EncodingKey, Header};
-use sea_orm::{
-    entity::{ActiveModelTrait, ColumnTrait, EntityTrait},
-    query::QueryFilter,
-    ActiveValue, DatabaseConnection, DbErr, NotSet, Set,
-};
-use serde::{Deserialize, Serialize};
-use std::default::Default;
-use validator::Validate;
+
+use sea_orm::{entity::EntityTrait, DatabaseConnection, DbErr};
+use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 pub struct DeleteActionRequest {

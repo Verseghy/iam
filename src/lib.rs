@@ -8,8 +8,8 @@ mod token;
 #[cfg(test)]
 pub(crate) mod mock;
 
-use actix_web::{web::Data, App, HttpServer};
 use actix_cors::Cors;
+use actix_web::{web::Data, App, HttpServer};
 use handlers::routes;
 use lettre::{
     transport::smtp::{authentication::Credentials, AsyncSmtpTransport},
@@ -29,17 +29,16 @@ pub async fn run() -> io::Result<()> {
     let addr = SocketAddr::from(([0, 0, 0, 0], 3001));
     tracing::info!("Listening on port {}", addr.port());
     HttpServer::new(move || {
-        let cors = Cors::default()
-            .send_wildcard();
+        let cors = Cors::default().allow_any_origin().send_wildcard();
 
         App::new()
+            .wrap(cors)
             .app_data(database.clone())
             .app_data(redis.clone())
             .app_data(smtp_transport.clone())
             .app_data(jwt_private.clone())
             .app_data(jwt_public.clone())
             .app_data(rng.clone())
-            .wrap(cors)
             .configure(routes)
     })
     .bind(addr)?

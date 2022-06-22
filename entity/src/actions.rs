@@ -66,4 +66,8 @@ impl Entity {
                 super::pivot_users_groups::Relation::User.def(),
             )
     }
+
+    pub fn find_by_name(name: &str) -> Select<Entity> {
+        Self::find().filter(Column::Name.eq(name))
+    }
 }

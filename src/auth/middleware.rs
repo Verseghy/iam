@@ -1,3 +1,4 @@
+use super::permission::CheckError;
 use crate::token::{get_claims, GetClaimsError};
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
@@ -102,7 +103,8 @@ impl ResponseError for ValidationError {
             Self::GetClaimsError(GetClaimsError::NoAuthorizationHeader) => StatusCode::BAD_REQUEST,
             Self::GetClaimsError(GetClaimsError::NotUTF8Header(_)) => StatusCode::BAD_REQUEST,
             Self::GetClaimsError(GetClaimsError::NotBearerToken) => StatusCode::BAD_REQUEST,
-            Self::CheckError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::CheckError(CheckError::DatabaseError(_)) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::CheckError(CheckError::NoPermission(_)) => StatusCode::FORBIDDEN,
         }
     }
 }

@@ -3,7 +3,9 @@ use axum::http::{
     HeaderMap,
 };
 use chrono::{Duration, Utc};
-use jsonwebtoken::{errors::Error as JWTError, Algorithm, DecodingKey, EncodingKey, Validation};
+use jsonwebtoken::{
+    errors::Error as JWTError, Algorithm, DecodingKey, EncodingKey, Header, Validation,
+};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::default::Default;
@@ -47,8 +49,8 @@ static VALIDATION: Lazy<Validation> = Lazy::new(|| {
 });
 
 pub struct Jwt {
-    pub encoding: EncodingKey,
-    pub decoding: DecodingKey,
+    encoding: EncodingKey,
+    decoding: DecodingKey,
 }
 
 impl Jwt {
@@ -86,6 +88,10 @@ impl Jwt {
         };
 
         Ok(jsonwebtoken::decode(token, &self.decoding, &*VALIDATION)?.claims)
+    }
+
+    pub fn encode(&self, claims: &Claims) -> Result<String, JWTError> {
+        jsonwebtoken::encode(&Header::new(Algorithm::RS256), &claims, &self.encoding)
     }
 }
 

@@ -5,7 +5,7 @@ use axum::{
     Extension, Json,
 };
 use entity::users;
-use jsonwebtoken::{encode, errors::Error as JWTError, Algorithm, Header};
+use jsonwebtoken::errors::Error as JWTError;
 use sea_orm::{
     entity::{ActiveModelTrait, ColumnTrait, EntityTrait},
     query::QueryFilter,
@@ -56,12 +56,12 @@ pub async fn login(
         return Err(LoginError::WrongPassword);
     }
 
-    let claims = &token::Claims {
+    let claims = token::Claims {
         subject: res.id.to_string(),
         ..Default::default()
     };
 
-    let token = encode(&Header::new(Algorithm::RS256), claims, &shared.jwt.encoding)?;
+    let token = shared.jwt.encode(&claims)?;
 
     Ok(Json(LoginResponse { token }))
 }

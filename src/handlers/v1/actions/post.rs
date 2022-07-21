@@ -1,7 +1,11 @@
-use actix_web::{http::StatusCode, web, HttpResponse, Responder, ResponseError};
+use crate::shared::Shared;
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Extension, Json,
+};
 use entity::actions;
-
-use sea_orm::{entity::EntityTrait, DatabaseConnection, DbErr, NotSet, Set};
+use sea_orm::{entity::EntityTrait, DbErr, NotSet, Set};
 use serde::Deserialize;
 use std::default::Default;
 
@@ -12,12 +16,10 @@ pub struct UpdateActionRequest {
     secure: Option<bool>,
 }
 
-pub async fn post(
-    req: web::Json<UpdateActionRequest>,
-    db: web::Data<DatabaseConnection>,
-) -> Result<impl Responder, PostError> {
-    let req = req.into_inner();
-
+pub async fn update_action(
+    Extension(shared): Extension<Shared>,
+    Json(req): Json<UpdateActionRequest>,
+) -> Result<StatusCode, PostError> {
     let action = actions::ActiveModel {
         id: Set(req.id),
         name: if let Some(name) = req.name {
@@ -33,9 +35,9 @@ pub async fn post(
         ..Default::default()
     };
 
-    actions::Entity::update(action).exec(db.get_ref()).await?;
+    actions::Entity::update(action).exec(&shared.db).await?;
 
-    Ok(HttpResponse::new(StatusCode::OK))
+    Ok(StatusCode::OK)
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -44,10 +46,11 @@ pub enum PostError {
     DatabaseError(#[from] DbErr),
 }
 
-impl ResponseError for PostError {
-    fn status_code(&self) -> StatusCode {
-        match *self {
+impl IntoResponse for PostError {
+    fn into_response(self) -> Response {
+        let status_code = match self {
             Self::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        }
+        };
+        (status_code, self.to_string()).into_response()
     }
 }

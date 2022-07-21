@@ -1,18 +1,14 @@
 mod invite;
 mod login;
 
-use crate::auth::middleware::permissions;
-use actix_web::web::{self, ServiceConfig};
-use lettre::{AsyncSmtpTransport, Tokio1Executor};
+use crate::auth::permissions;
+use axum::{routing::post, Router};
 
-pub fn routes(config: &mut ServiceConfig) {
-    config.service(login::login).service(
-        web::resource("/invite")
-            .route(web::post().to(invite::invite::<
-                redis::aio::ConnectionManager,
-                AsyncSmtpTransport<Tokio1Executor>,
-                rand::rngs::SmallRng,
-            >))
-            .wrap(permissions!["iam.user.invite"]),
-    );
+pub fn routes() -> Router {
+    Router::new()
+        .route(
+            "/invite",
+            post(invite::invite).route_layer(permissions!["iam.user.invite"]),
+        )
+        .route("/login", post(login::login))
 }

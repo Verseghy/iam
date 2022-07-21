@@ -1,15 +1,13 @@
-use actix_web::{http::StatusCode, web, Responder, ResponseError};
+use crate::shared::Shared;
+use axum::{
+    extract::Path,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Extension, Json,
+};
 use entity::actions;
-
-use sea_orm::{entity::EntityTrait, DatabaseConnection, DbErr};
-use serde::{Deserialize, Serialize};
-
-use validator::Validate;
-
-#[derive(Deserialize, Debug, Validate)]
-pub struct GetRequest {
-    id: String,
-}
+use sea_orm::{entity::EntityTrait, DbErr};
+use serde::Serialize;
 
 #[derive(Serialize, Debug)]
 pub struct GetResponse {
@@ -17,19 +15,16 @@ pub struct GetResponse {
     name: String,
     secure: bool,
 }
-
-pub async fn get(
-    req: web::Query<GetRequest>,
-    db: web::Data<DatabaseConnection>,
-) -> Result<impl Responder, GetError> {
-    let req = req.into_inner();
-
-    let res = actions::Entity::find_by_id(req.id)
-        .one(db.get_ref())
+pub async fn get_action(
+    Extension(shared): Extension<Shared>,
+    Path(id): Path<String>,
+) -> Result<Json<GetResponse>, GetError> {
+    let res = actions::Entity::find_by_id(id)
+        .one(&shared.db)
         .await?
         .ok_or(GetError::NotFoundError)?;
 
-    Ok(web::Json(GetResponse {
+    Ok(Json(GetResponse {
         id: res.id,
         name: res.name,
         secure: res.secure,
@@ -44,11 +39,12 @@ pub enum GetError {
     NotFoundError,
 }
 
-impl ResponseError for GetError {
-    fn status_code(&self) -> StatusCode {
-        match *self {
+impl IntoResponse for GetError {
+    fn into_response(self) -> Response {
+        let status_code = match self {
             Self::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::NotFoundError => StatusCode::NOT_FOUND,
-        }
+        };
+        (status_code, self.to_string()).into_response()
     }
 }

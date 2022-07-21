@@ -1,7 +1,11 @@
-use actix_web::{http::StatusCode, web, Responder, ResponseError};
+use crate::shared::Shared;
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Extension, Json,
+};
 use entity::actions;
-
-use sea_orm::{entity::EntityTrait, DatabaseConnection, DbErr};
+use sea_orm::{entity::EntityTrait, DbErr};
 use serde::Serialize;
 
 #[derive(Serialize, Debug)]
@@ -16,10 +20,12 @@ struct Action {
     secure: bool,
 }
 
-pub async fn gets(db: web::Data<DatabaseConnection>) -> Result<impl Responder, GetsError> {
-    let res = actions::Entity::find().all(db.get_ref()).await?;
+pub async fn list_actions(
+    Extension(shared): Extension<Shared>,
+) -> Result<Json<GetsResponse>, GetsError> {
+    let res = actions::Entity::find().all(&shared.db).await?;
 
-    Ok(web::Json(GetsResponse {
+    Ok(Json(GetsResponse {
         actions: res
             .into_iter()
             .map(|x| Action {
@@ -37,10 +43,11 @@ pub enum GetsError {
     DatabaseError(#[from] DbErr),
 }
 
-impl ResponseError for GetsError {
-    fn status_code(&self) -> StatusCode {
-        match *self {
+impl IntoResponse for GetsError {
+    fn into_response(self) -> Response {
+        let status_code = match self {
             Self::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        }
+        };
+        (status_code, self.to_string()).into_response()
     }
 }

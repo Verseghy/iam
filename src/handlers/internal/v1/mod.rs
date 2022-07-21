@@ -1,8 +1,7 @@
 mod decision;
 
-use actix_web::web;
-use actix_web::web::ServiceConfig;
+use axum::{routing::post, Router};
 
-pub fn routes(config: &mut ServiceConfig) {
-    config.service(web::resource("/decision").route(web::post().to(decision::decision)));
+pub fn routes() -> Router {
+    Router::new().route("/decision", post(decision::decision))
 }

@@ -79,7 +79,7 @@ async fn add_user_to_group(db: &DbConn, user: &String, group: &String) {
     .unwrap();
 }
 
-#[actix_web::main]
+#[tokio::main]
 async fn main() {
     dotenv::dotenv().ok();
     let db = database::connect().await;

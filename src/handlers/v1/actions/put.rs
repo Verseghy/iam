@@ -1,9 +1,11 @@
-use crate::id::create_id;
-
-use actix_web::{http::StatusCode, web, Responder, ResponseError};
+use crate::{id::create_id, shared::Shared};
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Extension, Json,
+};
 use entity::actions;
-
-use sea_orm::{entity::EntityTrait, DatabaseConnection, DbErr, Set};
+use sea_orm::{entity::EntityTrait, DbErr, Set};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
@@ -18,12 +20,10 @@ pub struct AddActionResponse {
     id: String,
 }
 
-pub async fn put(
-    req: web::Json<AddActionRequest>,
-    db: web::Data<DatabaseConnection>,
-) -> Result<impl Responder, PutError> {
-    let req = req.into_inner();
-
+pub async fn add_action(
+    Extension(shared): Extension<Shared>,
+    Json(req): Json<AddActionRequest>,
+) -> Result<Json<AddActionResponse>, PutError> {
     let id = format!("ActionID-{}", create_id());
 
     let action = actions::ActiveModel {
@@ -33,9 +33,9 @@ pub async fn put(
         ..Default::default()
     };
 
-    actions::Entity::insert(action).exec(db.get_ref()).await?;
+    actions::Entity::insert(action).exec(&shared.db).await?;
 
-    Ok(web::Json(AddActionResponse { id }))
+    Ok(Json(AddActionResponse { id }))
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -44,10 +44,11 @@ pub enum PutError {
     DatabaseError(#[from] DbErr),
 }
 
-impl ResponseError for PutError {
-    fn status_code(&self) -> StatusCode {
-        match *self {
+impl IntoResponse for PutError {
+    fn into_response(self) -> Response {
+        let status_code = match self {
             Self::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        }
+        };
+        (status_code, self.to_string()).into_response()
     }
 }

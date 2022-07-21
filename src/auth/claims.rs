@@ -37,7 +37,7 @@ where
     fn call(&mut self, mut req: Request<Body>) -> Self::Future {
         let shared = req.extensions().get::<Shared>().expect("No Shared");
 
-        if let Ok(claims) = crate::token::get_claims(req.headers(), &shared.jwt.decoding) {
+        if let Ok(claims) = shared.jwt.get_claims(req.headers()) {
             req.extensions_mut().insert(Arc::new(claims));
         }
 

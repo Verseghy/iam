@@ -1,7 +1,8 @@
 use dotenv::dotenv;
+use std::error::Error;
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
     dotenv().ok();
 
     tracing_subscriber::fmt()

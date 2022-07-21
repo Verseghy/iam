@@ -4,29 +4,33 @@ mod gets;
 mod post;
 mod put;
 
-use crate::auth::middleware::permissions;
-use actix_web::web::{self, ServiceConfig};
+use crate::auth::permissions;
+use axum::{
+    handler::Handler,
+    routing::{get, MethodRouter},
+    Router,
+};
 
-pub fn routes(config: &mut ServiceConfig) {
-    config
-        .service(
-            web::resource("/action")
-                .route(web::get().to(get::get).wrap(permissions!["iam.action.get"]))
+pub fn routes() -> Router {
+    Router::new()
+        .nest("/action", {
+            Router::new()
                 .route(
-                    web::post()
-                        .to(post::post)
-                        .wrap(permissions!["iam.action.update"]),
+                    "/:action_id",
+                    get(get::get_action.layer(permissions!["iam.action.get"])),
                 )
-                .route(web::put().to(put::put).wrap(permissions!["iam.action.add"]))
                 .route(
-                    web::delete()
-                        .to(delete::delete)
-                        .wrap(permissions!["iam.action.delete"]),
-                ),
-        )
-        .service(
-            web::resource("/actions")
-                .route(web::get().to(gets::gets))
-                .wrap(permissions!["iam.action.list"]),
-        );
+                    "/",
+                    MethodRouter::new()
+                        .post(post::update_action.layer(permissions!["iam.action.update"]))
+                        .put(put::add_action.layer(permissions!["iam.action.add"]))
+                        .delete(delete::delete_action.layer(permissions!["iam.action.delete"])),
+                )
+        })
+        .nest("/actions", {
+            Router::new().route(
+                "/",
+                get(gets::list_actions).route_layer(permissions!["iam.action.list"]),
+            )
+        })
 }

@@ -1,7 +1,11 @@
-use actix_web::{http::StatusCode, web, HttpResponse, Responder, ResponseError};
+use crate::shared::Shared;
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Extension, Json,
+};
 use entity::actions;
-
-use sea_orm::{entity::EntityTrait, DatabaseConnection, DbErr};
+use sea_orm::{entity::EntityTrait, DbErr};
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
@@ -9,17 +13,15 @@ pub struct DeleteActionRequest {
     id: String,
 }
 
-pub async fn delete(
-    req: web::Json<DeleteActionRequest>,
-    db: web::Data<DatabaseConnection>,
-) -> Result<impl Responder, DeleteError> {
-    let req = req.into_inner();
-
+pub async fn delete_action(
+    Extension(shared): Extension<Shared>,
+    Json(req): Json<DeleteActionRequest>,
+) -> Result<StatusCode, DeleteError> {
     actions::Entity::delete_by_id(req.id)
-        .exec(db.get_ref())
+        .exec(&shared.db)
         .await?;
 
-    Ok(HttpResponse::new(StatusCode::OK))
+    Ok(StatusCode::OK)
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -28,10 +30,11 @@ pub enum DeleteError {
     DatabaseError(#[from] DbErr),
 }
 
-impl ResponseError for DeleteError {
-    fn status_code(&self) -> StatusCode {
-        match *self {
+impl IntoResponse for DeleteError {
+    fn into_response(self) -> Response {
+        let status_code = match self {
             Self::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        }
+        };
+        (status_code, self.to_string()).into_response()
     }
 }

@@ -1,8 +1,7 @@
 mod v1;
 
-use actix_web::web;
-use actix_web::web::ServiceConfig;
+use axum::Router;
 
-pub fn routes(config: &mut ServiceConfig) {
-    config.service(web::scope("/v1").configure(v1::routes));
+pub fn routes() -> Router {
+    Router::new().nest("/v1", v1::routes())
 }

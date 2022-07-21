@@ -1,11 +1,13 @@
-use std::default::Default;
-use std::ops::Add;
-
-use actix_web::http::header::{HeaderMap, ToStrError, AUTHORIZATION};
+use axum::http::{
+    header::{ToStrError, AUTHORIZATION},
+    HeaderMap,
+};
 use chrono::{Duration, Utc};
 use jsonwebtoken::{errors::Error as JWTError, Algorithm, DecodingKey, EncodingKey, Validation};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
+use std::default::Default;
+use std::ops::Add;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -36,7 +38,21 @@ impl Default for Claims {
     }
 }
 
-pub fn create_encoding_key() -> EncodingKey {
+pub struct Jwt {
+    pub encoding: EncodingKey,
+    pub decoding: DecodingKey,
+}
+
+impl Jwt {
+    pub fn new() -> Self {
+        Self {
+            encoding: create_encoding_key(),
+            decoding: create_decoding_key(),
+        }
+    }
+}
+
+fn create_encoding_key() -> EncodingKey {
     EncodingKey::from_rsa_pem(
         std::env::var("JWT_RSA_PRIVATE")
             .expect("JWT_RSA_PRIVATE not set")
@@ -45,7 +61,7 @@ pub fn create_encoding_key() -> EncodingKey {
     .expect("JWT_RSA_PRIVATE invalid")
 }
 
-pub fn create_decoding_key() -> DecodingKey {
+fn create_decoding_key() -> DecodingKey {
     DecodingKey::from_rsa_pem(
         std::env::var("JWT_RSA_PUBLIC")
             .expect("JWT_RSA_PUBLIC not set")

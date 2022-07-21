@@ -1,11 +1,15 @@
-use crate::{password, token};
-use actix_web::{http::StatusCode, route, web, Responder, ResponseError};
+use crate::{password, shared::Shared, token, validate::ValidatedJson};
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Extension, Json,
+};
 use entity::users;
-use jsonwebtoken::{encode, errors::Error as JWTError, Algorithm, EncodingKey, Header};
+use jsonwebtoken::{encode, errors::Error as JWTError, Algorithm, Header};
 use sea_orm::{
     entity::{ActiveModelTrait, ColumnTrait, EntityTrait},
     query::QueryFilter,
-    ActiveValue, DatabaseConnection, DbErr,
+    ActiveValue, DbErr,
 };
 use serde::{Deserialize, Serialize};
 use std::default::Default;
@@ -24,19 +28,13 @@ pub struct LoginResponse {
     token: String,
 }
 
-#[route("/login", method = "POST")]
 pub async fn login(
-    req: web::Json<LoginRequest>,
-    db: web::Data<DatabaseConnection>,
-    encoding_key: web::Data<EncodingKey>,
-) -> Result<impl Responder, LoginError> {
-    let req = req.into_inner();
-
-    req.validate().map_err(|_| LoginError::BadInputData)?;
-
+    Extension(shared): Extension<Shared>,
+    ValidatedJson(req): ValidatedJson<LoginRequest>,
+) -> Result<Json<LoginResponse>, LoginError> {
     let res = users::Entity::find()
         .filter(users::Column::Email.eq(req.email.clone()))
-        .one(db.get_ref())
+        .one(&shared.db)
         .await
         .map_err(LoginError::DatabaseError)?
         .ok_or(LoginError::NoUser)?;
@@ -49,7 +47,7 @@ pub async fn login(
         action.password = ActiveValue::Set(hash);
 
         action
-            .update(db.get_ref())
+            .update(&shared.db)
             .await
             .map_err(LoginError::DatabaseError)?;
     }
@@ -63,9 +61,9 @@ pub async fn login(
         ..Default::default()
     };
 
-    let token = encode(&Header::new(Algorithm::RS256), claims, &encoding_key)?;
+    let token = encode(&Header::new(Algorithm::RS256), claims, &shared.jwt.encoding)?;
 
-    Ok(web::Json(LoginResponse { token }))
+    Ok(Json(LoginResponse { token }))
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -74,8 +72,6 @@ pub enum LoginError {
     NoUser,
     #[error("database error")]
     DatabaseError(DbErr),
-    #[error("failed to validate input data")]
-    BadInputData,
     #[error("failed to validate password")]
     ValidationError(password::ValidateError),
     #[error("wrong password")]
@@ -86,16 +82,16 @@ pub enum LoginError {
     // FailedToRehash,
 }
 
-impl ResponseError for LoginError {
-    fn status_code(&self) -> StatusCode {
-        match *self {
+impl IntoResponse for LoginError {
+    fn into_response(self) -> Response {
+        let status_code = match self {
             Self::NoUser => StatusCode::UNAUTHORIZED,
             Self::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::BadInputData => StatusCode::BAD_REQUEST,
             Self::ValidationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::WrongPassword => StatusCode::UNAUTHORIZED,
             Self::TokenError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             // Self::FailedToRehash => StatusCode::OK,
-        }
+        };
+        (status_code, self.to_string()).into_response()
     }
 }

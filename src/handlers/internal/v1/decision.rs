@@ -1,11 +1,16 @@
 use crate::{
-    auth::permission::{self, CheckError},
-    token::{get_claims, GetClaimsError},
+    auth::{self, CheckError},
+    shared::Shared,
+    token::Claims,
 };
-use actix_web::{http::StatusCode, web, HttpRequest, HttpResponse, ResponseError};
-use jsonwebtoken::DecodingKey;
-use sea_orm::DatabaseConnection;
+use axum::{
+    debug_handler,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Extension, Json,
+};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 #[derive(Deserialize, Debug)]
 pub struct DecisionRequest {
@@ -22,40 +27,34 @@ pub struct DecisionResponse {
     failed: String,
 }
 
+#[debug_handler]
 pub async fn decision(
-    req: web::Json<DecisionRequest>,
-    http_req: HttpRequest,
-    db: web::Data<DatabaseConnection>,
-    decoding_key: web::Data<DecodingKey>,
-) -> Result<HttpResponse, DecisionError> {
-    let claims = get_claims(http_req.headers(), &decoding_key)?;
-    let permissions: Vec<&str> = req.action_list.iter().map(|x| x.name.as_str()).collect();
+    Extension(shared): Extension<Shared>,
+    Extension(claims): Extension<Arc<Claims>>,
+    Json(req): Json<DecisionRequest>,
+) -> Result<Response, DecisionError> {
+    let actions: Vec<&str> = req.action_list.iter().map(|x| x.name.as_str()).collect();
 
-    match permission::check(&claims.subject, &permissions, db.get_ref()).await {
+    match auth::check(&claims.subject, &actions, &shared.db).await {
         Err(CheckError::NoPermission(failed)) => {
-            Ok(HttpResponse::Forbidden().json(DecisionResponse { failed }))
+            Ok(Json(DecisionResponse { failed }).into_response())
         }
         Err(err) => Err(DecisionError::from(err)),
-        Ok(_) => Ok(HttpResponse::new(StatusCode::NO_CONTENT)),
+        Ok(_) => Ok(StatusCode::NO_CONTENT.into_response()),
     }
 }
 
 #[derive(Debug, thiserror::Error)]
 pub enum DecisionError {
-    #[error("get claims error: {0}")]
-    GetClaimsError(#[from] GetClaimsError),
     #[error("check error: {0}")]
     CheckError(#[from] CheckError),
 }
 
-impl ResponseError for DecisionError {
-    fn status_code(&self) -> StatusCode {
-        match *self {
-            Self::GetClaimsError(GetClaimsError::InvalidToken(_)) => StatusCode::UNAUTHORIZED,
-            Self::GetClaimsError(GetClaimsError::NoAuthorizationHeader) => StatusCode::BAD_REQUEST,
-            Self::GetClaimsError(GetClaimsError::NotUTF8Header(_)) => StatusCode::BAD_REQUEST,
-            Self::GetClaimsError(GetClaimsError::NotBearerToken) => StatusCode::BAD_REQUEST,
+impl IntoResponse for DecisionError {
+    fn into_response(self) -> Response {
+        let status_code = match self {
             Self::CheckError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        }
+        };
+        (status_code, self.to_string()).into_response()
     }
 }

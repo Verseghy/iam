@@ -54,8 +54,18 @@ pub struct Jwt {
 impl Jwt {
     pub fn new() -> Self {
         Self {
-            encoding: create_encoding_key(),
-            decoding: create_decoding_key(),
+            encoding: EncodingKey::from_rsa_pem(
+                std::env::var("JWT_RSA_PRIVATE")
+                    .expect("JWT_RSA_PRIVATE not set")
+                    .as_ref(),
+            )
+            .expect("JWT_RSA_PRIVATE invalid"),
+            decoding: DecodingKey::from_rsa_pem(
+                std::env::var("JWT_RSA_PUBLIC")
+                    .expect("JWT_RSA_PUBLIC not set")
+                    .as_ref(),
+            )
+            .expect("JWT_RSA_PUBLIC invalid"),
         }
     }
 
@@ -89,22 +99,4 @@ pub enum GetClaimsError {
     NotBearerToken,
     #[error("invalid token")]
     InvalidToken(#[from] JWTError),
-}
-
-fn create_encoding_key() -> EncodingKey {
-    EncodingKey::from_rsa_pem(
-        std::env::var("JWT_RSA_PRIVATE")
-            .expect("JWT_RSA_PRIVATE not set")
-            .as_ref(),
-    )
-    .expect("JWT_RSA_PRIVATE invalid")
-}
-
-fn create_decoding_key() -> DecodingKey {
-    DecodingKey::from_rsa_pem(
-        std::env::var("JWT_RSA_PUBLIC")
-            .expect("JWT_RSA_PUBLIC not set")
-            .as_ref(),
-    )
-    .expect("JWT_RSA_PUBLIC invalid")
 }

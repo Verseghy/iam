@@ -30,8 +30,10 @@ pub struct LoginResponse {
 
 pub async fn login(
     Extension(shared): Extension<Shared>,
-    ValidatedJson(req): ValidatedJson<LoginRequest>,
+    ValidatedJson(mut req): ValidatedJson<LoginRequest>,
 ) -> Result<Json<LoginResponse>, LoginError> {
+    req.email = req.email.to_lowercase();
+
     let res = users::Entity::find()
         .filter(users::Column::Email.eq(req.email.clone()))
         .one(&shared.db)

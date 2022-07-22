@@ -63,6 +63,8 @@ pub async fn login(
 
     let token = shared.jwt.encode(&claims)?;
 
+    crate::audit!(action = "login", user = res.id.to_string(),);
+
     Ok(Json(LoginResponse { token }))
 }
 

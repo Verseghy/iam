@@ -11,17 +11,33 @@ mod validate;
 #[cfg(test)]
 pub(crate) mod mock;
 
-use axum::{extract::Extension, http::header::AUTHORIZATION, Router, Server};
+use axum::{
+    error_handling::HandleErrorLayer,
+    extract::Extension,
+    http::{header::AUTHORIZATION, StatusCode},
+    response::{IntoResponse, Response},
+    BoxError, Router, Server,
+};
 use std::{
     error::Error,
     iter::once,
     net::{Ipv4Addr, SocketAddr},
+    time::Duration,
 };
-use tower::ServiceBuilder;
+use tower::{timeout::error::Elapsed, ServiceBuilder};
 use tower_http::{
     cors::{Any, CorsLayer},
     ServiceBuilderExt,
 };
+
+pub async fn handle_error(err: BoxError) -> Response {
+    if err.is::<Elapsed>() {
+        (StatusCode::REQUEST_TIMEOUT, "Request took too long").into_response()
+    } else {
+        tracing::error!("Internal server error: {}", err);
+        StatusCode::INTERNAL_SERVER_ERROR.into_response()
+    }
+}
 
 pub async fn run() -> Result<(), Box<dyn Error>> {
     let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 3001));
@@ -33,6 +49,8 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
         .allow_headers(Any);
 
     let middlewares = ServiceBuilder::new()
+        .layer(HandleErrorLayer::new(handle_error))
+        .timeout(Duration::from_secs(10))
         .sensitive_headers(once(AUTHORIZATION))
         .trace_for_http()
         .compression()

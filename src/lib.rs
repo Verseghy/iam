@@ -13,7 +13,6 @@ pub(crate) mod mock;
 
 use axum::{
     error_handling::HandleErrorLayer,
-    extract::Extension,
     http::{header::AUTHORIZATION, StatusCode},
     response::{IntoResponse, Response},
     BoxError, Router, Server,
@@ -56,13 +55,13 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
         .compression()
         .decompression()
         .layer(cors_layer)
+        .add_extension(shared)
         .layer(auth::GetClaimsLayer)
         .into_inner();
 
     let router = Router::new()
         .nest("/", handlers::routes())
-        .layer(middlewares)
-        .layer(Extension(shared));
+        .layer(middlewares);
 
     tracing::info!("Listening on port {}", addr.port());
 

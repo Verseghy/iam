@@ -11,7 +11,7 @@ members = [".", "./migration", "./entity"]
 [dependencies]
 entity = { path = "./entity" }
 sea-orm = { version = "0.9.1", default-features = false, features = ["runtime-actix-rustls", "sqlx-mysql", "macros", "mock"] }
-axum = { version = "0.5.13", features = ["http2", "macros"] }
+axum = { version = "0.5.13", features = ["http2", "macros", "headers"] }
 serde = { version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.81"
 dotenv = "0.15.0"

@@ -14,6 +14,7 @@ pub(crate) mod mock;
 use axum::{
     error_handling::HandleErrorLayer,
     http::{header::AUTHORIZATION, StatusCode},
+    middleware,
     response::{IntoResponse, Response},
     BoxError, Router, Server,
 };
@@ -56,7 +57,7 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
         .decompression()
         .layer(cors_layer)
         .add_extension(shared)
-        .layer(auth::GetClaimsLayer)
+        .layer(middleware::from_fn(auth::get_claims))
         .into_inner();
 
     let router = Router::new()

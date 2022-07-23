@@ -1,46 +1,32 @@
 use crate::shared::Shared;
-use hyper::{Body, Request};
-use std::{
-    sync::Arc,
-    task::{Context, Poll},
+use axum::{
+    extract::{RequestParts, TypedHeader},
+    headers::authorization::{Authorization, Bearer},
+    http::{Request, StatusCode},
+    middleware::Next,
+    response::Response,
 };
-use tower::{Layer, Service};
+use std::sync::Arc;
 
-#[derive(Clone)]
-pub struct GetClaimsLayer;
-
-impl<S> Layer<S> for GetClaimsLayer {
-    type Service = GetClaims<S>;
-
-    fn layer(&self, service: S) -> Self::Service {
-        GetClaims { service }
-    }
-}
-
-#[derive(Clone)]
-pub struct GetClaims<S> {
-    service: S,
-}
-
-impl<S> Service<Request<Body>> for GetClaims<S>
+pub async fn get_claims<B>(request: Request<B>, next: Next<B>) -> Result<Response, StatusCode>
 where
-    S: Service<Request<Body>>,
+    B: Send,
 {
-    type Response = S::Response;
-    type Error = S::Error;
-    type Future = S::Future;
+    let mut request_parts = RequestParts::new(request);
+    let token = request_parts
+        .extract::<TypedHeader<Authorization<Bearer>>>()
+        .await;
+    let shared = request_parts
+        .extensions()
+        .get::<Shared>()
+        .expect("No Shared");
 
-    fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
-        self.service.poll_ready(cx)
-    }
-
-    fn call(&mut self, mut req: Request<Body>) -> Self::Future {
-        let shared = req.extensions().get::<Shared>().expect("No Shared");
-
-        if let Ok(claims) = shared.jwt.get_claims(req.headers()) {
-            req.extensions_mut().insert(Arc::new(claims));
+    if let Ok(token) = token {
+        if let Ok(claims) = shared.jwt.get_claims(token.token()) {
+            request_parts.extensions_mut().insert(Arc::new(claims));
         }
-
-        self.service.call(req)
     }
+
+    let request = request_parts.try_into_request().expect("body extracted");
+    Ok(next.run(request).await)
 }

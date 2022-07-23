@@ -1,7 +1,3 @@
-use axum::http::{
-    header::{ToStrError, AUTHORIZATION},
-    HeaderMap,
-};
 use chrono::{Duration, Utc};
 use jsonwebtoken::{
     errors::Error as JWTError, Algorithm, DecodingKey, EncodingKey, Header, Validation,
@@ -71,38 +67,11 @@ impl Jwt {
         }
     }
 
-    pub fn get_claims(&self, headers: &HeaderMap) -> Result<Claims, GetClaimsError> {
-        let header = headers
-            .get(AUTHORIZATION)
-            .ok_or(GetClaimsError::NoAuthorizationHeader)?
-            .to_str()?;
-
-        let token = match header.split_once(' ') {
-            Some((ty, token)) => {
-                if ty != "Bearer" {
-                    Err(GetClaimsError::NotBearerToken)?
-                }
-                token
-            }
-            None => header,
-        };
-
+    pub fn get_claims(&self, token: &str) -> Result<Claims, JWTError> {
         Ok(jsonwebtoken::decode(token, &self.decoding, &*VALIDATION)?.claims)
     }
 
     pub fn encode(&self, claims: &Claims) -> Result<String, JWTError> {
         jsonwebtoken::encode(&Header::new(Algorithm::RS256), &claims, &self.encoding)
     }
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum GetClaimsError {
-    #[error("no Authorization header")]
-    NoAuthorizationHeader,
-    #[error("not a utf-8 header")]
-    NotUTF8Header(#[from] ToStrError),
-    #[error("not bearer token")]
-    NotBearerToken,
-    #[error("invalid token")]
-    InvalidToken(#[from] JWTError),
 }

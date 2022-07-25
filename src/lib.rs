@@ -39,6 +39,24 @@ pub async fn handle_error(err: BoxError) -> Response {
     }
 }
 
+pub async fn shutdown_signals() {
+    #[cfg(unix)]
+    {
+        use tokio::signal::unix::{signal, SignalKind};
+
+        signal(SignalKind::terminate())
+            .expect("fail to set signal handler")
+            .recv()
+            .await
+            .expect("fail SIGTERM")
+    }
+
+    #[cfg(not(unix))]
+    {
+        std::future::pending().await
+    }
+}
+
 pub async fn run() -> Result<(), Box<dyn Error>> {
     let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 3001));
     let shared = shared::create_shared().await;
@@ -68,5 +86,6 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
 
     Ok(Server::bind(&addr)
         .serve(router.into_make_service())
+        .with_graceful_shutdown(shutdown_signals())
         .await?)
 }

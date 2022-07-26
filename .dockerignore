@@ -4,3 +4,4 @@ target
 .dockerignore
 Dockerfile
 migrations
+audit.json

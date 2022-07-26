@@ -1,11 +1,11 @@
-use crate::shared::Shared;
+use crate::{shared::Shared, util::set_option};
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
     Extension, Json,
 };
 use entity::actions;
-use sea_orm::{entity::EntityTrait, DbErr, NotSet, Set};
+use sea_orm::{entity::EntityTrait, DbErr, Set};
 use serde::Deserialize;
 use std::default::Default;
 
@@ -22,16 +22,8 @@ pub async fn update_action(
 ) -> Result<StatusCode, PostError> {
     let action = actions::ActiveModel {
         id: Set(req.id),
-        name: if let Some(name) = req.name {
-            Set(name)
-        } else {
-            NotSet
-        },
-        secure: if let Some(secure) = req.secure {
-            Set(secure)
-        } else {
-            NotSet
-        },
+        name: set_option(req.name),
+        secure: set_option(req.secure),
         ..Default::default()
     };
 

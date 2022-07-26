@@ -1,0 +1,8 @@
+[package]
+name = "common"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono = { version = "0.4.19", features = ["clock"], default-features = false }
+uuid = { version = "1.1.1", features = ["v1"] }

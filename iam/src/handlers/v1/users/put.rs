@@ -1,53 +1,61 @@
-use crate::{id::create_id, shared::Shared};
+use crate::{password, shared::Shared};
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
     Extension, Json,
 };
-use entity::actions;
+use common::create_id;
+use entity::users;
 use sea_orm::{entity::EntityTrait, DbErr, Set};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
 #[derive(Deserialize, Debug)]
-pub struct AddActionRequest {
-    action: String,
-    secure: bool,
+pub struct AddUserRequest {
+    name: String,
+    email: String,
+    password: String,
 }
 
 #[derive(Serialize, Debug)]
-pub struct AddActionResponse {
+pub struct AddUserResponse {
     id: String,
 }
 
-pub async fn add_action(
+pub async fn add_user(
     Extension(shared): Extension<Shared>,
-    Json(req): Json<AddActionRequest>,
-) -> Result<Json<AddActionResponse>, PutError> {
-    let id = format!("ActionID-{}", create_id());
+    Json(req): Json<AddUserRequest>,
+) -> Result<Json<AddUserResponse>, PutError> {
+    let id = format!("UserID-{}", create_id());
 
-    let action = actions::ActiveModel {
+    let hash = password::encrypt(&req.password)?;
+
+    let user = users::ActiveModel {
         id: Set(id.clone()),
-        name: Set(req.action),
-        secure: Set(req.secure),
+        name: Set(req.name),
+        email: Set(req.email),
+        password: Set(hash),
         ..Default::default()
     };
 
-    actions::Entity::insert(action).exec(&shared.db).await?;
+    users::Entity::insert(user).exec(&shared.db).await?;
 
-    Ok(Json(AddActionResponse { id }))
+    Ok(Json(AddUserResponse { id }))
 }
 
 #[derive(Debug, thiserror::Error)]
 pub enum PutError {
     #[error("database error")]
     DatabaseError(#[from] DbErr),
+    #[error("unknown error")]
+    HashError(#[from] argon2::Error),
 }
 
 impl IntoResponse for PutError {
     fn into_response(self) -> Response {
         let status_code = match self {
             Self::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::HashError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         };
         (status_code, self.to_string()).into_response()
     }

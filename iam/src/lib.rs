@@ -2,7 +2,6 @@ mod audit;
 mod auth;
 pub mod database;
 mod handlers;
-pub mod id;
 pub mod password;
 mod shared;
 mod token;

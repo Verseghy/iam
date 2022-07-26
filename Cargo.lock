@@ -582,6 +582,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "common"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "uuid",
+]
+
+[[package]]
 name = "concurrent-queue"
 version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1125,6 +1133,7 @@ dependencies = [
  "axum",
  "bcrypt",
  "chrono",
+ "common",
  "dotenv",
  "entity",
  "futures-util",
@@ -1146,7 +1155,6 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-subscriber",
- "uuid",
  "validator",
 ]
 
@@ -1357,8 +1365,8 @@ name = "migration"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "common",
  "entity",
- "iam",
  "sea-orm-migration",
  "tokio",
 ]

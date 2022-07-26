@@ -1,9 +1,10 @@
-use crate::{id::create_id, shared::Shared};
+use crate::shared::Shared;
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
     Extension, Json,
 };
+use common::create_id;
 use entity::groups;
 use sea_orm::{entity::EntityTrait, DbErr, Set};
 use serde::{Deserialize, Serialize};

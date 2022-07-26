@@ -70,6 +70,26 @@ impl MigrationTrait for Migration {
                     ])
                     .values_panic(vec![
                         format!("ActionID-{}", create_id()).into(),
+                        "iam.user.add".into(),
+                        true.into(),
+                    ])
+                    .values_panic(vec![
+                        format!("ActionID-{}", create_id()).into(),
+                        "iam.user.get".into(),
+                        true.into(),
+                    ])
+                    .values_panic(vec![
+                        format!("ActionID-{}", create_id()).into(),
+                        "iam.user.list".into(),
+                        true.into(),
+                    ])
+                    .values_panic(vec![
+                        format!("ActionID-{}", create_id()).into(),
+                        "iam.user.update".into(),
+                        true.into(),
+                    ])
+                    .values_panic(vec![
+                        format!("ActionID-{}", create_id()).into(),
                         "iam.user.invite".into(),
                         true.into(),
                     ])

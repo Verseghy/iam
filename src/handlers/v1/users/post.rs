@@ -1,11 +1,11 @@
-use crate::{password, shared::Shared};
+use crate::{password, shared::Shared, util::set_option};
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
     Extension, Json,
 };
 use entity::users;
-use sea_orm::{entity::EntityTrait, ActiveValue, DbErr, Set, Value};
+use sea_orm::{entity::EntityTrait, DbErr, Set};
 use serde::Deserialize;
 use std::default::Default;
 
@@ -15,16 +15,6 @@ pub struct UpdateUserRequest {
     name: Option<String>,
     email: Option<String>,
     password: Option<String>,
-}
-
-fn set<T>(value: Option<T>) -> ActiveValue<T>
-where
-    T: Into<Value>,
-{
-    match value {
-        Some(v) => ActiveValue::Set(v),
-        None => ActiveValue::NotSet,
-    }
 }
 
 pub async fn update_user(
@@ -38,9 +28,9 @@ pub async fn update_user(
 
     let user = users::ActiveModel {
         id: Set(req.id.clone()),
-        name: set(req.name),
-        email: set(req.email),
-        password: set(hash),
+        name: set_option(req.name),
+        email: set_option(req.email),
+        password: set_option(hash),
         ..Default::default()
     };
 

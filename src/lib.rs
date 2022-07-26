@@ -6,6 +6,7 @@ pub mod id;
 pub mod password;
 mod shared;
 mod token;
+mod util;
 mod validate;
 
 #[cfg(test)]

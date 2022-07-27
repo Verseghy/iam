@@ -1,9 +1,10 @@
-use crate::{password, shared::Shared, token, validate::ValidatedJson};
+use crate::{shared::Shared, token, validate::ValidatedJson};
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
     Extension, Json,
 };
+use common::password;
 use entity::users;
 use jsonwebtoken::errors::Error as JWTError;
 use sea_orm::{

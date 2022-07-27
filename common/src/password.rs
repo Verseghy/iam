@@ -18,7 +18,9 @@ pub enum HashType {
     Argon2,
 }
 
-pub fn encrypt(password: &str) -> argon2::Result<String> {
+pub type HashError = argon2::Error;
+
+pub fn encrypt(password: &str) -> Result<String, HashError> {
     let mut salt = [0u8; 16];
     rand::thread_rng().fill(&mut salt);
 

@@ -1,8 +1,8 @@
 use common::create_id;
+use common::{database, password};
 use entity::{
     actions, groups, pivot_actions_groups, pivot_actions_users, pivot_users_groups, users,
 };
-use iam::{database, password};
 use sea_orm::{ActiveModelTrait, ActiveValue::*, DbConn};
 
 async fn create_user(db: &DbConn, name: &str, email: &str, password: &str) -> String {

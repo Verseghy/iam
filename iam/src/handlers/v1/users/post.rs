@@ -23,7 +23,7 @@ pub async fn update_user(
     Json(req): Json<UpdateUserRequest>,
 ) -> Result<StatusCode, PostError> {
     let hash = match req.password {
-        Some(pwd) => Some(password::encrypt(&pwd)?),
+        Some(pwd) => Some(password::hash(&pwd)?),
         None => None,
     };
 

@@ -20,7 +20,7 @@ pub enum HashType {
 
 pub type HashError = argon2::Error;
 
-pub fn encrypt(password: &str) -> Result<String, HashError> {
+pub fn hash(password: &str) -> Result<String, HashError> {
     let mut salt = [0u8; 16];
     rand::thread_rng().fill(&mut salt);
 
@@ -28,14 +28,14 @@ pub fn encrypt(password: &str) -> Result<String, HashError> {
 }
 
 pub fn validate(
-    hash: &str,
+    hashed: &str,
     password: &str,
 ) -> Result<(bool, Option<argon2::Result<String>>), ValidateError> {
-    let hash_type = if hash.starts_with("$2y$") {
+    let hash_type = if hashed.starts_with("$2y$") {
         HashType::Bcrypt
-    } else if hash.starts_with("$argon2id")
-        || hash.starts_with("$argon2d")
-        || hash.starts_with("$argon2i")
+    } else if hashed.starts_with("$argon2id")
+        || hashed.starts_with("$argon2d")
+        || hashed.starts_with("$argon2i")
     {
         HashType::Argon2
     } else {
@@ -44,10 +44,10 @@ pub fn validate(
 
     match hash_type {
         HashType::Bcrypt => {
-            let rehashed_password = encrypt(password);
-            Ok((bcrypt::verify(password, hash)?, Some(rehashed_password)))
+            let rehashed_password = hash(password);
+            Ok((bcrypt::verify(password, hashed)?, Some(rehashed_password)))
         }
-        HashType::Argon2 => Ok((argon2::verify_encoded(hash, password.as_bytes())?, None)),
+        HashType::Argon2 => Ok((argon2::verify_encoded(hashed, password.as_bytes())?, None)),
     }
 }
 

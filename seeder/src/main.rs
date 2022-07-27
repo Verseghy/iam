@@ -10,7 +10,7 @@ async fn create_user(db: &DbConn, name: &str, email: &str, password: &str) -> St
         id: Set(create_user_id()),
         name: Set(name.to_string()),
         email: Set(email.to_string()),
-        password: Set(password::encrypt(password).unwrap()),
+        password: Set(password::hash(password).unwrap()),
         ..Default::default()
     }
     .insert(db)

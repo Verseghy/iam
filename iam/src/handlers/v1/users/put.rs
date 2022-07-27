@@ -29,7 +29,7 @@ pub async fn add_user(
 ) -> Result<Json<AddUserResponse>, PutError> {
     let id = create_user_id();
 
-    let hash = password::encrypt(&req.password)?;
+    let hash = password::hash(&req.password)?;
 
     let user = users::ActiveModel {
         id: Set(id.clone()),

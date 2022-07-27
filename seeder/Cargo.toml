@@ -1,0 +1,11 @@
+[package]
+name = "seeder"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+dotenv = "0.15.0"
+entity = { path = "../entity" }
+sea-orm = { version = "0.9.1", default-features = false, features = ["runtime-actix-rustls", "sqlx-mysql"] }
+tokio = { version = "1.20.1", features = ["rt", "macros"] }

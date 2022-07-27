@@ -28,7 +28,7 @@ use tower_http::{
     ServiceBuilderExt,
 };
 
-pub async fn handle_error(err: BoxError) -> Response {
+async fn handle_error(err: BoxError) -> Response {
     if err.is::<Elapsed>() {
         (StatusCode::REQUEST_TIMEOUT, "Request took too long").into_response()
     } else {
@@ -37,7 +37,7 @@ pub async fn handle_error(err: BoxError) -> Response {
     }
 }
 
-pub async fn shutdown_signals() {
+async fn shutdown_signals() {
     #[cfg(unix)]
     {
         use tokio::signal::unix::{signal, SignalKind};

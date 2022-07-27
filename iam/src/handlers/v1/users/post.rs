@@ -1,9 +1,10 @@
-use crate::{password, shared::Shared, util::set_option};
+use crate::{shared::Shared, util::set_option};
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
     Extension, Json,
 };
+use common::password::{self, HashError};
 use entity::users;
 use sea_orm::{entity::EntityTrait, DbErr, Set};
 use serde::Deserialize;
@@ -44,7 +45,7 @@ pub enum PostError {
     #[error("database error")]
     DatabaseError(#[from] DbErr),
     #[error("unknown error")]
-    HashError(#[from] argon2::Error),
+    HashError(#[from] HashError),
 }
 
 impl IntoResponse for PostError {

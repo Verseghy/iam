@@ -1,4 +1,5 @@
-use crate::{database, token::Jwt};
+use crate::token::Jwt;
+use common::database;
 use lettre::{transport::smtp::authentication::Credentials, AsyncSmtpTransport, Tokio1Executor};
 use rand::{rngs::StdRng, SeedableRng};
 use redis::aio::ConnectionManager;

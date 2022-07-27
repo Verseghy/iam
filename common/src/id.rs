@@ -5,7 +5,7 @@ use uuid::{
 
 static CONTEXT: Context = Context::new(123);
 
-pub fn create_id() -> String {
+fn create_id() -> String {
     let date = chrono::Utc::now();
     let timestamp = Timestamp::from_unix(
         &CONTEXT,
@@ -30,4 +30,19 @@ pub fn create_id() -> String {
         .as_hyphenated()
         .encode_lower(&mut Uuid::encode_buffer())
         .to_owned()
+}
+
+#[inline]
+pub fn create_action_id() -> String {
+    format!("ActionID-{}", create_id())
+}
+
+#[inline]
+pub fn create_group_id() -> String {
+    format!("GroupID-{}", create_id())
+}
+
+#[inline]
+pub fn create_user_id() -> String {
+    format!("UserID-{}", create_id())
 }

@@ -4,7 +4,7 @@ use axum::{
     response::{IntoResponse, Response},
     Extension, Json,
 };
-use common::create_id;
+use common::create_action_id;
 use entity::actions;
 use sea_orm::{entity::EntityTrait, DbErr, Set};
 use serde::{Deserialize, Serialize};
@@ -25,7 +25,7 @@ pub async fn add_action(
     Extension(shared): Extension<Shared>,
     Json(req): Json<AddActionRequest>,
 ) -> Result<Json<AddActionResponse>, PutError> {
-    let id = format!("ActionID-{}", create_id());
+    let id = create_action_id();
 
     let action = actions::ActiveModel {
         id: Set(id.clone()),

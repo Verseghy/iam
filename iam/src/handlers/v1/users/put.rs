@@ -4,7 +4,7 @@ use axum::{
     response::{IntoResponse, Response},
     Extension, Json,
 };
-use common::create_id;
+use common::create_user_id;
 use common::password::{self, HashError};
 use entity::users;
 use sea_orm::{entity::EntityTrait, DbErr, Set};
@@ -27,7 +27,7 @@ pub async fn add_user(
     Extension(shared): Extension<Shared>,
     Json(req): Json<AddUserRequest>,
 ) -> Result<Json<AddUserResponse>, PutError> {
-    let id = format!("UserID-{}", create_id());
+    let id = create_user_id();
 
     let hash = password::encrypt(&req.password)?;
 

@@ -1,4 +1,4 @@
-use common::{create_id, database, password};
+use common::{create_group_id, create_user_id, database, password};
 use entity::{
     actions, groups, pivot_actions_groups, pivot_actions_users, pivot_users_groups, users,
 };
@@ -7,7 +7,7 @@ use sea_orm::{ActiveModelTrait, ActiveValue::*, DbConn};
 async fn create_user(db: &DbConn, name: &str, email: &str, password: &str) -> String {
     println!("create user: {}", name);
     users::ActiveModel {
-        id: Set(format!("UserID-{}", create_id())),
+        id: Set(create_user_id()),
         name: Set(name.to_string()),
         email: Set(email.to_string()),
         password: Set(password::encrypt(password).unwrap()),
@@ -32,7 +32,7 @@ async fn get_action(db: &DbConn, name: &str) -> String {
 async fn create_group(db: &DbConn, name: &str) -> String {
     println!("create group: {}", name);
     groups::ActiveModel {
-        id: Set(format!("GroupID-{}", create_id())),
+        id: Set(create_group_id()),
         name: Set(name.to_string()),
         ..Default::default()
     }

@@ -1,2 +1,3 @@
 [workspace]
 members = ["iam", "entity", "migration", "common", "seeder"]
+default-members = ["iam"]

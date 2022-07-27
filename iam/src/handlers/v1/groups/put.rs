@@ -4,7 +4,7 @@ use axum::{
     response::{IntoResponse, Response},
     Extension, Json,
 };
-use common::create_id;
+use common::create_group_id;
 use entity::groups;
 use sea_orm::{entity::EntityTrait, DbErr, Set};
 use serde::{Deserialize, Serialize};
@@ -24,7 +24,7 @@ pub async fn add_group(
     Extension(shared): Extension<Shared>,
     Json(req): Json<AddGroupRequest>,
 ) -> Result<Json<AddGroupResponse>, PutError> {
-    let id = format!("GroupID-{}", create_id());
+    let id = create_group_id();
 
     let group = groups::ActiveModel {
         name: Set(req.name),

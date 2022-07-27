@@ -24,7 +24,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --locked
+          args: --locked --workspace
 
   fmt:
     name: Format
@@ -42,7 +42,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
-          args: -- --check
+          args: --all -- --check
 
   clippy:
     name: Clippy
@@ -63,27 +63,12 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --locked -- -D warnings
+          args: --workspace --locked -- -D warnings
 
   test:
     name: Test
     runs-on: ubuntu-latest
     container: rust:latest
-
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_DATABASE: iam
-          MYSQL_ROOT_PASSWORD: secret
-          TZ: Europe/Budapest
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
 
     steps:
       - uses: actions/checkout@v2
@@ -100,9 +85,4 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: -- --test-threads 1
-        env:
-          DB_USERNAME: root
-          DB_PASSWORD: secret
-          DB_HOST: mysql:3306
-          DB_DATABASE: iam
+          args: --workspace

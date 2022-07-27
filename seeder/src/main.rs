@@ -1,5 +1,4 @@
-use common::create_id;
-use common::{database, password};
+use common::{create_id, database, password};
 use entity::{
     actions, groups, pivot_actions_groups, pivot_actions_users, pivot_users_groups, users,
 };

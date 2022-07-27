@@ -1,2 +1,2 @@
 [workspace]
-members = ["iam", "entity", "migration", "common"]
+members = ["iam", "entity", "migration", "common", "seeder"]

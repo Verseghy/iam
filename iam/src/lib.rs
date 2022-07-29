@@ -3,7 +3,7 @@ mod auth;
 mod handlers;
 mod shared;
 mod token;
-mod util;
+mod utils;
 mod validate;
 
 #[cfg(test)]

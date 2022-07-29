@@ -1,4 +1,4 @@
-use crate::{shared::Shared, util::set_option};
+use crate::{shared::Shared, utils::set_option};
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},

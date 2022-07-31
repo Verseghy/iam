@@ -2,13 +2,8 @@ use chrono::NaiveDateTime;
 use entity::groups::{Column, Entity};
 use sea_orm_migration::prelude::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20220416_053618_create_groups"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {

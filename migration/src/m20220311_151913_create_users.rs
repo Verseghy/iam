@@ -2,13 +2,8 @@ use chrono::NaiveDateTime;
 use entity::users::{Column, Entity};
 use sea_orm_migration::prelude::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20220311_151913_create_users"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {

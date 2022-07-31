@@ -1,13 +1,8 @@
 use entity::pivot_actions_users::{Column, Entity};
 use sea_orm_migration::prelude::*;
 
+#[derive(DeriveMigrationName)]
 pub struct Migration;
-
-impl MigrationName for Migration {
-    fn name(&self) -> &str {
-        "m20220416_054659_create_pivot_actions_users"
-    }
-}
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {

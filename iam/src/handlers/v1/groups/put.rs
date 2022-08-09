@@ -1,12 +1,8 @@
-use crate::shared::Shared;
-use axum::{
-    http::StatusCode,
-    response::{IntoResponse, Response},
-    Extension, Json,
-};
+use crate::{json::Json, shared::Shared, utils::Error};
+use axum::Extension;
 use common::create_group_id;
 use entity::groups;
-use sea_orm::{entity::EntityTrait, DbErr, Set};
+use sea_orm::{entity::EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
@@ -23,7 +19,7 @@ pub struct AddGroupResponse {
 pub async fn add_group(
     Extension(shared): Extension<Shared>,
     Json(req): Json<AddGroupRequest>,
-) -> Result<Json<AddGroupResponse>, PutError> {
+) -> Result<Json<AddGroupResponse>, Error> {
     let id = create_group_id();
 
     let group = groups::ActiveModel {
@@ -34,19 +30,4 @@ pub async fn add_group(
     groups::Entity::insert(group).exec(&shared.db).await?;
 
     Ok(Json(AddGroupResponse { id }))
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum PutError {
-    #[error("database error")]
-    DatabaseError(#[from] DbErr),
-}
-
-impl IntoResponse for PutError {
-    fn into_response(self) -> Response {
-        let status_code = match self {
-            Self::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        };
-        (status_code, self.to_string()).into_response()
-    }
 }

@@ -1,11 +1,7 @@
-use crate::shared::Shared;
-use axum::{
-    http::StatusCode,
-    response::{IntoResponse, Response},
-    Extension, Json,
-};
+use crate::{json::Json, shared::Shared, utils::Error};
+use axum::Extension;
 use entity::users;
-use sea_orm::{entity::EntityTrait, DbErr, FromQueryResult, QuerySelect};
+use sea_orm::{entity::EntityTrait, FromQueryResult, QuerySelect};
 use serde::Serialize;
 
 #[derive(Serialize, Debug, FromQueryResult)]
@@ -15,9 +11,7 @@ pub struct User {
     email: String,
 }
 
-pub async fn list_users(
-    Extension(shared): Extension<Shared>,
-) -> Result<Json<Vec<User>>, GetsError> {
+pub async fn list_users(Extension(shared): Extension<Shared>) -> Result<Json<Vec<User>>, Error> {
     let res = users::Entity::find()
         .select_only()
         .column(users::Column::Id)
@@ -28,19 +22,4 @@ pub async fn list_users(
         .await?;
 
     Ok(Json(res))
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum GetsError {
-    #[error("database error")]
-    DatabaseError(#[from] DbErr),
-}
-
-impl IntoResponse for GetsError {
-    fn into_response(self) -> Response {
-        let status_code = match self {
-            Self::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        };
-        (status_code, self.to_string()).into_response()
-    }
 }

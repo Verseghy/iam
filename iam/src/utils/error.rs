@@ -13,6 +13,7 @@ pub enum Error {
     NotFound(Option<String>),
     BadRequest(Option<String>),
     Unauthorized(Option<String>),
+    Forbidden(Option<String>),
 }
 
 impl Error {
@@ -32,6 +33,10 @@ impl Error {
 
     pub fn unauthorized<S: AsRef<str>>(msg: S) -> Self {
         Error::Unauthorized(Some(msg.as_ref().to_string()))
+    }
+
+    pub fn forbidden<S: AsRef<str>>(msg: S) -> Self {
+        Error::Forbidden(Some(msg.as_ref().to_string()))
     }
 }
 
@@ -59,6 +64,7 @@ impl IntoResponse for Error {
             Self::NotFound(msg) => response_with_msg(StatusCode::NOT_FOUND, msg),
             Self::BadRequest(msg) => response_with_msg(StatusCode::BAD_REQUEST, msg),
             Self::Unauthorized(msg) => response_with_msg(StatusCode::UNAUTHORIZED, msg),
+            Self::Forbidden(msg) => response_with_msg(StatusCode::FORBIDDEN, msg),
         }
     }
 }

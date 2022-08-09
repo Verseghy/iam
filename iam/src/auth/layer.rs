@@ -1,29 +1,9 @@
 use super::permission::{self, CheckError};
-use crate::{shared::Shared, token::Claims};
-use axum::{body::BoxBody, http::StatusCode, response::IntoResponse};
-use hyper::{Request, Response};
+use crate::{shared::Shared, token::Claims, utils::Error};
+use hyper::Request;
 use std::sync::Arc;
 
-#[derive(Debug, thiserror::Error)]
-pub enum ValidationError {
-    #[error("get claims error")]
-    GetClaimsError,
-    #[error("check error: {0}")]
-    CheckError(#[from] permission::CheckError),
-}
-
-impl IntoResponse for ValidationError {
-    fn into_response(self) -> Response<BoxBody> {
-        let status_code = match self {
-            Self::GetClaimsError => StatusCode::UNAUTHORIZED,
-            Self::CheckError(CheckError::DatabaseError(_)) => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::CheckError(CheckError::NoPermission(_)) => StatusCode::FORBIDDEN,
-        };
-        (status_code, self.to_string()).into_response()
-    }
-}
-
-pub async fn validate<B>(request: &Request<B>, actions: &[&str]) -> Result<(), ValidationError>
+pub async fn validate<B>(request: &Request<B>, actions: &[&str]) -> Result<(), Error>
 where
     B: Send + Sync + 'static,
 {
@@ -32,9 +12,14 @@ where
     let claims = request
         .extensions()
         .get::<Arc<Claims>>()
-        .ok_or(ValidationError::GetClaimsError)?;
+        .ok_or_else(|| Error::unauthorized("missing or invalid authorization header"))?;
 
-    permission::check(claims.subject.as_str(), actions, &shared.db).await?;
+    permission::check(claims.subject.as_str(), actions, &shared.db)
+        .await
+        .map_err(|err| match err {
+            CheckError::DatabaseError(err) => Error::internal(err),
+            CheckError::NoPermission(perm) => Error::unauthorized(format!("no permission: {perm}")),
+        })?;
 
     Ok(())
 }

@@ -1,7 +1,7 @@
+use crate::json::Json;
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
-    Json,
 };
 use lettre::transport::smtp::Error as SmtpError;
 use redis::RedisError;

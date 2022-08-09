@@ -1,12 +1,8 @@
-use crate::shared::Shared;
-use axum::{
-    http::StatusCode,
-    response::{IntoResponse, Response},
-    Extension, Json,
-};
+use crate::{json::Json, shared::Shared, utils::Error};
+use axum::Extension;
 use common::create_action_id;
 use entity::actions;
-use sea_orm::{entity::EntityTrait, DbErr, Set};
+use sea_orm::{entity::EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 
@@ -24,7 +20,7 @@ pub struct AddActionResponse {
 pub async fn add_action(
     Extension(shared): Extension<Shared>,
     Json(req): Json<AddActionRequest>,
-) -> Result<Json<AddActionResponse>, PutError> {
+) -> Result<Json<AddActionResponse>, Error> {
     let id = create_action_id();
 
     let action = actions::ActiveModel {
@@ -37,19 +33,4 @@ pub async fn add_action(
     actions::Entity::insert(action).exec(&shared.db).await?;
 
     Ok(Json(AddActionResponse { id }))
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum PutError {
-    #[error("database error")]
-    DatabaseError(#[from] DbErr),
-}
-
-impl IntoResponse for PutError {
-    fn into_response(self) -> Response {
-        let status_code = match self {
-            Self::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        };
-        (status_code, self.to_string()).into_response()
-    }
 }

@@ -1,11 +1,7 @@
-use crate::shared::Shared;
-use axum::{
-    http::StatusCode,
-    response::{IntoResponse, Response},
-    Extension, Json,
-};
+use crate::{json::Json, shared::Shared, utils::Error};
+use axum::Extension;
 use entity::actions;
-use sea_orm::{entity::EntityTrait, DbErr};
+use sea_orm::entity::EntityTrait;
 use serde::Serialize;
 
 #[derive(Serialize, Debug)]
@@ -22,7 +18,7 @@ struct Action {
 
 pub async fn list_actions(
     Extension(shared): Extension<Shared>,
-) -> Result<Json<GetsResponse>, GetsError> {
+) -> Result<Json<GetsResponse>, Error> {
     let res = actions::Entity::find().all(&shared.db).await?;
 
     Ok(Json(GetsResponse {
@@ -35,19 +31,4 @@ pub async fn list_actions(
             })
             .collect(),
     }))
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum GetsError {
-    #[error("database error")]
-    DatabaseError(#[from] DbErr),
-}
-
-impl IntoResponse for GetsError {
-    fn into_response(self) -> Response {
-        let status_code = match self {
-            Self::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        };
-        (status_code, self.to_string()).into_response()
-    }
 }

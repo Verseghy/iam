@@ -1,10 +1,10 @@
 mod audit;
 mod auth;
 mod handlers;
+mod json;
 mod shared;
 mod token;
 mod utils;
-mod validate;
 
 #[cfg(test)]
 pub(crate) mod mock;

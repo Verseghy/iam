@@ -18,7 +18,7 @@ where
         .await
         .map_err(|err| match err {
             CheckError::DatabaseError(err) => Error::internal(err),
-            CheckError::NoPermission(perm) => Error::unauthorized(format!("no permission: {perm}")),
+            CheckError::NoPermission(perm) => Error::forbidden(format!("no permission: {perm}")),
         })?;
 
     Ok(())

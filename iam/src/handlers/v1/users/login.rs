@@ -1,7 +1,7 @@
 use crate::{
     json::{Json, ValidatedJson},
-    shared::Shared,
-    token,
+    shared::SharedTrait,
+    token::{self, JwtTrait},
     utils::Error,
 };
 use axum::Extension;
@@ -29,15 +29,15 @@ pub struct LoginResponse {
     token: String,
 }
 
-pub async fn login(
-    Extension(shared): Extension<Shared>,
+pub async fn login<S: SharedTrait>(
+    Extension(shared): Extension<S>,
     ValidatedJson(mut req): ValidatedJson<LoginRequest>,
 ) -> Result<Json<LoginResponse>, Error> {
     req.email = req.email.to_lowercase();
 
     let res = users::Entity::find()
         .filter(users::Column::Email.eq(req.email.clone()))
-        .one(&shared.db)
+        .one(shared.db())
         .await?
         .ok_or_else(|| Error::not_found("no user with this email"))?;
 
@@ -48,7 +48,7 @@ pub async fn login(
         let mut action: users::ActiveModel = res.clone().into();
         action.password = ActiveValue::Set(hash);
 
-        action.update(&shared.db).await?;
+        action.update(shared.db()).await?;
     }
 
     if !valid {
@@ -60,7 +60,7 @@ pub async fn login(
         ..Default::default()
     };
 
-    let token = shared.jwt.encode(&claims).map_err(Error::internal)?;
+    let token = shared.jwt().encode(&claims).map_err(Error::internal)?;
 
     crate::audit!(action = "login", user = res.id.to_string(),);
 

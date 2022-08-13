@@ -1,4 +1,4 @@
-use crate::{json::Json, shared::Shared, utils::Error};
+use crate::{json::Json, shared::SharedTrait, utils::Error};
 use axum::Extension;
 use common::{create_user_id, password};
 use entity::users;
@@ -18,8 +18,8 @@ pub struct AddUserResponse {
     id: String,
 }
 
-pub async fn add_user(
-    Extension(shared): Extension<Shared>,
+pub async fn add_user<S: SharedTrait>(
+    Extension(shared): Extension<S>,
     Json(req): Json<AddUserRequest>,
 ) -> Result<Json<AddUserResponse>, Error> {
     let id = create_user_id();
@@ -34,7 +34,7 @@ pub async fn add_user(
         ..Default::default()
     };
 
-    users::Entity::insert(user).exec(&shared.db).await?;
+    users::Entity::insert(user).exec(shared.db()).await?;
 
     Ok(Json(AddUserResponse { id }))
 }

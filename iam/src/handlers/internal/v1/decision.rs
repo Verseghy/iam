@@ -1,12 +1,11 @@
 use crate::{
     auth::{self, CheckError},
     json::Json,
-    shared::Shared,
+    shared::SharedTrait,
     token::Claims,
     utils::Error,
 };
 use axum::{
-    debug_handler,
     http::StatusCode,
     response::{IntoResponse, Response},
     Extension,
@@ -29,15 +28,14 @@ pub struct DecisionResponse {
     failed: String,
 }
 
-#[debug_handler]
-pub async fn decision(
-    Extension(shared): Extension<Shared>,
+pub async fn decision<S: SharedTrait>(
+    Extension(shared): Extension<S>,
     Extension(claims): Extension<Arc<Claims>>,
     Json(req): Json<DecisionRequest>,
 ) -> Result<Response, Error> {
     let actions: Vec<&str> = req.action_list.iter().map(|x| x.name.as_str()).collect();
 
-    match auth::check(&claims.subject, &actions, &shared.db).await {
+    match auth::check(&claims.subject, &actions, shared.db()).await {
         Err(CheckError::NoPermission(failed)) => {
             Ok(Json(DecisionResponse { failed }).into_response())
         }

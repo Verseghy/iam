@@ -1,4 +1,4 @@
-use crate::{json::ValidatedJson, shared::Shared, utils::Error};
+use crate::{json::ValidatedJson, shared::SharedTrait, utils::Error};
 use axum::{http::StatusCode, Extension};
 use lettre::{
     message::{Mailbox, Message},
@@ -15,13 +15,13 @@ pub struct InviteRequest {
     email: String,
 }
 
-pub async fn invite(
-    Extension(shared): Extension<Shared>,
+pub async fn invite<S: SharedTrait>(
+    Extension(shared): Extension<S>,
     ValidatedJson(req): ValidatedJson<InviteRequest>,
 ) -> Result<StatusCode, Error> {
     let key = format!("/invites/{}", &req.email);
 
-    let mut redis = shared.redis.clone();
+    let mut redis = shared.redis().clone();
 
     // If already invited fail
     if redis.exists(&key).await? {
@@ -29,7 +29,7 @@ pub async fn invite(
     }
 
     let token: String = shared
-        .rng
+        .rng()
         .clone()
         .sample_iter(&Alphanumeric)
         .take(32)
@@ -50,7 +50,7 @@ pub async fn invite(
         .body(format!("token: {token}"))
         .unwrap();
 
-    shared.smtp.send(email).await?;
+    shared.smtp().send(email).await?;
 
     Ok(StatusCode::OK)
 }

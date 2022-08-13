@@ -1,4 +1,4 @@
-use crate::{json::Json, shared::Shared, utils::Error};
+use crate::{json::Json, shared::SharedTrait, utils::Error};
 use axum::Extension;
 use entity::users;
 use sea_orm::{entity::EntityTrait, FromQueryResult, QuerySelect};
@@ -11,14 +11,16 @@ pub struct User {
     email: String,
 }
 
-pub async fn list_users(Extension(shared): Extension<Shared>) -> Result<Json<Vec<User>>, Error> {
+pub async fn list_users<S: SharedTrait>(
+    Extension(shared): Extension<S>,
+) -> Result<Json<Vec<User>>, Error> {
     let res = users::Entity::find()
         .select_only()
         .column(users::Column::Id)
         .column(users::Column::Name)
         .column(users::Column::Email)
         .into_model::<User>()
-        .all(&shared.db)
+        .all(shared.db())
         .await?;
 
     Ok(Json(res))

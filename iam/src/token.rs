@@ -66,12 +66,19 @@ impl Jwt {
             .expect("JWT_RSA_PUBLIC invalid"),
         }
     }
+}
 
-    pub fn get_claims(&self, token: &str) -> Result<Claims, JWTError> {
+pub trait JwtTrait {
+    fn get_claims(&self, token: &str) -> Result<Claims, JWTError>;
+    fn encode(&self, claims: &Claims) -> Result<String, JWTError>;
+}
+
+impl JwtTrait for Jwt {
+    fn get_claims(&self, token: &str) -> Result<Claims, JWTError> {
         Ok(jsonwebtoken::decode(token, &self.decoding, &*VALIDATION)?.claims)
     }
 
-    pub fn encode(&self, claims: &Claims) -> Result<String, JWTError> {
+    fn encode(&self, claims: &Claims) -> Result<String, JWTError> {
         jsonwebtoken::encode(&Header::new(Algorithm::RS256), &claims, &self.encoding)
     }
 }

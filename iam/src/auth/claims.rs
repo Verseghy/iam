@@ -1,4 +1,4 @@
-use crate::shared::Shared;
+use crate::{shared::SharedTrait, token::JwtTrait};
 use axum::{
     extract::{RequestParts, TypedHeader},
     headers::authorization::{Authorization, Bearer},
@@ -8,7 +8,10 @@ use axum::{
 };
 use std::sync::Arc;
 
-pub async fn get_claims<B>(request: Request<B>, next: Next<B>) -> Result<Response, StatusCode>
+pub async fn get_claims<S: SharedTrait, B>(
+    request: Request<B>,
+    next: Next<B>,
+) -> Result<Response, StatusCode>
 where
     B: Send,
 {
@@ -16,13 +19,10 @@ where
     let token = request_parts
         .extract::<TypedHeader<Authorization<Bearer>>>()
         .await;
-    let shared = request_parts
-        .extensions()
-        .get::<Shared>()
-        .expect("No Shared");
+    let shared = request_parts.extensions().get::<S>().expect("No Shared");
 
     if let Ok(token) = token {
-        if let Ok(claims) = shared.jwt.get_claims(token.token()) {
+        if let Ok(claims) = shared.jwt().get_claims(token.token()) {
             request_parts.extensions_mut().insert(Arc::new(claims));
         }
     }

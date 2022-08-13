@@ -1,4 +1,4 @@
-use crate::{json::Json, shared::Shared, utils::Error};
+use crate::{json::Json, shared::SharedTrait, utils::Error};
 use axum::Extension;
 use common::create_action_id;
 use entity::actions;
@@ -17,8 +17,8 @@ pub struct AddActionResponse {
     id: String,
 }
 
-pub async fn add_action(
-    Extension(shared): Extension<Shared>,
+pub async fn add_action<S: SharedTrait>(
+    Extension(shared): Extension<S>,
     Json(req): Json<AddActionRequest>,
 ) -> Result<Json<AddActionResponse>, Error> {
     let id = create_action_id();
@@ -30,7 +30,7 @@ pub async fn add_action(
         ..Default::default()
     };
 
-    actions::Entity::insert(action).exec(&shared.db).await?;
+    actions::Entity::insert(action).exec(shared.db()).await?;
 
     Ok(Json(AddActionResponse { id }))
 }

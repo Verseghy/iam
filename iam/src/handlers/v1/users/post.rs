@@ -1,6 +1,6 @@
 use crate::{
     json::Json,
-    shared::Shared,
+    shared::SharedTrait,
     utils::{set_option, Error},
 };
 use axum::{http::StatusCode, Extension};
@@ -18,8 +18,8 @@ pub struct UpdateUserRequest {
     password: Option<String>,
 }
 
-pub async fn update_user(
-    Extension(shared): Extension<Shared>,
+pub async fn update_user<S: SharedTrait>(
+    Extension(shared): Extension<S>,
     Json(req): Json<UpdateUserRequest>,
 ) -> Result<StatusCode, Error> {
     let hash = match req.password {
@@ -35,7 +35,7 @@ pub async fn update_user(
         ..Default::default()
     };
 
-    users::Entity::insert(user).exec(&shared.db).await?;
+    users::Entity::insert(user).exec(shared.db()).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }

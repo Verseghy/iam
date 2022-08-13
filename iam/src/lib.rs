@@ -10,12 +10,14 @@ mod utils;
 pub(crate) mod mock;
 
 use axum::{
+    body::Body,
     error_handling::HandleErrorLayer,
     http::{header::AUTHORIZATION, StatusCode},
     middleware,
     response::{IntoResponse, Response},
     BoxError, Router, Server,
 };
+use shared::SharedTrait;
 use std::{
     error::Error,
     iter::once,
@@ -55,10 +57,11 @@ async fn shutdown_signals() {
     }
 }
 
-pub async fn run() -> Result<(), Box<dyn Error>> {
-    let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 3001));
-    let shared = shared::create_shared().await;
+fn router<S: SharedTrait>() -> Router {
+    Router::new().nest("/", handlers::routes::<S>())
+}
 
+fn app<S: SharedTrait>(shared: S) -> Router {
     let cors_layer = CorsLayer::new()
         .allow_origin(Any)
         .allow_methods(Any)
@@ -73,17 +76,22 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
         .decompression()
         .layer(cors_layer)
         .add_extension(shared)
-        .layer(middleware::from_fn(auth::get_claims))
+        .layer(middleware::from_fn(auth::get_claims::<S, Body>))
         .into_inner();
 
-    let router = Router::new()
-        .nest("/", handlers::routes())
-        .layer(middlewares);
+    router::<S>().layer(middlewares)
+}
+
+pub async fn run() -> Result<(), Box<dyn Error>> {
+    let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 3001));
+    let shared = shared::create_shared().await;
+
+    let app = app(shared);
 
     tracing::info!("Listening on port {}", addr.port());
 
     Ok(Server::bind(&addr)
-        .serve(router.into_make_service())
+        .serve(app.into_make_service())
         .with_graceful_shutdown(shutdown_signals())
         .await?)
 }

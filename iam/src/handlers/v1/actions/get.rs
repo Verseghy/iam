@@ -1,4 +1,8 @@
-use crate::{json::Json, shared::Shared, utils::Error};
+use crate::{
+    json::Json,
+    shared::SharedTrait,
+    utils::Error,
+};
 use axum::{extract::Path, Extension};
 use entity::actions;
 use sea_orm::entity::EntityTrait;
@@ -10,12 +14,13 @@ pub struct GetResponse {
     name: String,
     secure: bool,
 }
-pub async fn get_action(
-    Extension(shared): Extension<Shared>,
+
+pub async fn get_action<S: SharedTrait>(
+    Extension(shared): Extension<S>,
     Path(id): Path<String>,
 ) -> Result<Json<GetResponse>, Error> {
     let res = actions::Entity::find_by_id(id)
-        .one(&shared.db)
+        .one(shared.db())
         .await?
         .ok_or_else(|| Error::not_found("action not found"))?;
 

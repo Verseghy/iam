@@ -1,6 +1,6 @@
 use crate::{
     json::Json,
-    shared::Shared,
+    shared::SharedTrait,
     utils::{set_option, Error},
 };
 use axum::{http::StatusCode, Extension};
@@ -16,8 +16,8 @@ pub struct UpdateActionRequest {
     secure: Option<bool>,
 }
 
-pub async fn update_action(
-    Extension(shared): Extension<Shared>,
+pub async fn update_action<S: SharedTrait>(
+    Extension(shared): Extension<S>,
     Json(req): Json<UpdateActionRequest>,
 ) -> Result<StatusCode, Error> {
     let action = actions::ActiveModel {
@@ -27,7 +27,7 @@ pub async fn update_action(
         ..Default::default()
     };
 
-    actions::Entity::update(action).exec(&shared.db).await?;
+    actions::Entity::update(action).exec(shared.db()).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }

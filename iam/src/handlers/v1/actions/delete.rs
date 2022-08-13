@@ -1,4 +1,4 @@
-use crate::{json::Json, shared::Shared, utils::Error};
+use crate::{json::Json, shared::SharedTrait, utils::Error};
 use axum::{http::StatusCode, Extension};
 use entity::actions;
 use sea_orm::entity::EntityTrait;
@@ -9,12 +9,12 @@ pub struct DeleteActionRequest {
     id: String,
 }
 
-pub async fn delete_action(
-    Extension(shared): Extension<Shared>,
+pub async fn delete_action<S: SharedTrait>(
+    Extension(shared): Extension<S>,
     Json(req): Json<DeleteActionRequest>,
 ) -> Result<StatusCode, Error> {
     actions::Entity::delete_by_id(req.id)
-        .exec(&shared.db)
+        .exec(shared.db())
         .await?;
 
     Ok(StatusCode::OK)

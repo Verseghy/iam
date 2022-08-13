@@ -1,6 +1,6 @@
 use crate::{
     json::Json,
-    shared::Shared,
+    shared::SharedTrait,
     utils::{set_option, Error},
 };
 use axum::{http::StatusCode, Extension};
@@ -15,8 +15,8 @@ pub struct UpdateGroupRequest {
     name: Option<String>,
 }
 
-pub async fn update_group(
-    Extension(shared): Extension<Shared>,
+pub async fn update_group<S: SharedTrait>(
+    Extension(shared): Extension<S>,
     Json(req): Json<UpdateGroupRequest>,
 ) -> Result<StatusCode, Error> {
     let group = groups::ActiveModel {
@@ -25,7 +25,7 @@ pub async fn update_group(
         ..Default::default()
     };
 
-    groups::Entity::update(group).exec(&shared.db).await?;
+    groups::Entity::update(group).exec(shared.db()).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }

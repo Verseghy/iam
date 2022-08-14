@@ -1,8 +1,4 @@
-use crate::{
-    json::Json,
-    shared::SharedTrait,
-    utils::Error,
-};
+use crate::{json::Json, shared::SharedTrait, utils::Error};
 use axum::{extract::Path, Extension};
 use entity::actions;
 use sea_orm::entity::EntityTrait;
@@ -29,4 +25,81 @@ pub async fn get_action<S: SharedTrait>(
         name: res.name,
         secure: res.secure,
     }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::{shared::mock::MockShared, utils::testing::body_to_json};
+    use axum::{
+        body::Body,
+        http::{Request, StatusCode},
+        routing::{get, Router},
+    };
+    use chrono::Utc;
+    use sea_orm::{DatabaseBackend, MockDatabase};
+    use serde_json::json;
+    use tower::ServiceExt;
+
+    #[tokio::test]
+    async fn has_in_db() {
+        let app = Router::new().route("/:id", get(get_action::<MockShared>));
+        let shared = MockShared::builder()
+            .db(
+                MockDatabase::new(DatabaseBackend::MySql).append_query_results(vec![vec![
+                    actions::Model {
+                        id: "TestID-0".to_owned(),
+                        name: "TestAction".to_owned(),
+                        secure: false,
+                        created_at: Utc::now().naive_utc(),
+                        updated_at: Utc::now().naive_utc(),
+                        deleted_at: None,
+                    },
+                ]]),
+            )
+            .build();
+
+        let res = app
+            .oneshot(
+                Request::get("/TestID-0")
+                    .extension(shared)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(res.status(), StatusCode::OK);
+
+        let body = body_to_json(res.into_body()).await;
+        assert_eq!(
+            body,
+            json!({"id": "TestID-0", "name": "TestAction", "secure": false})
+        );
+    }
+
+    #[tokio::test]
+    async fn not_found() {
+        let app = Router::new().route("/:id", get(get_action::<MockShared>));
+        let shared = MockShared::builder()
+            .db(MockDatabase::new(DatabaseBackend::MySql)
+                .append_query_results::<actions::Model>(vec![vec![]]))
+            .build();
+
+        let res = app
+            .oneshot(
+                Request::get("/TestID-0")
+                    .extension(shared)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(res.status(), StatusCode::NOT_FOUND);
+
+        let body = body_to_json(res.into_body()).await;
+        assert_eq!(body, json!({"error": "action not found"}));
+    }
 }

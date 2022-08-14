@@ -89,3 +89,97 @@ fn create_smtp_transport() -> SmtpTransport {
     ))
     .build()
 }
+
+#[cfg(test)]
+pub mod mock {
+    use super::*;
+    use crate::mock::{MockRedis, MockSmtpTransport};
+    use rand::rngs::mock::StepRng;
+    use sea_orm::MockDatabase;
+
+    pub struct MockSharedInner {
+        db: Option<DbConn>,
+        redis: Option<MockRedis>,
+        smtp: Option<MockSmtpTransport>,
+        jwt: Option<Jwt>,
+        rng: Option<StepRng>,
+    }
+
+    #[derive(Clone)]
+    pub struct MockShared {
+        inner: Arc<MockSharedInner>,
+    }
+
+    impl MockShared {
+        pub fn builder() -> MockSharedInner {
+            MockSharedInner {
+                db: None,
+                redis: None,
+                smtp: None,
+                jwt: None,
+                rng: None,
+            }
+        }
+    }
+
+    impl MockSharedInner {
+        pub fn db(mut self, db: MockDatabase) -> Self {
+            self.db = Some(db.into_connection());
+            self
+        }
+
+        pub fn redis(mut self, redis: MockRedis) -> Self {
+            self.redis = Some(redis);
+            self
+        }
+
+        pub fn smtp(mut self, smtp: MockSmtpTransport) -> Self {
+            self.smtp = Some(smtp);
+            self
+        }
+
+        pub fn jwt(mut self, jwt: Jwt) -> Self {
+            self.jwt = Some(jwt);
+            self
+        }
+
+        pub fn rng(mut self, rng: StepRng) -> Self {
+            self.rng = Some(rng);
+            self
+        }
+
+        pub fn build(mut self) -> MockShared {
+            MockShared {
+                inner: Arc::new(self),
+            }
+        }
+    }
+
+    impl SharedTrait for MockShared {
+        type Db = DbConn;
+        type Redis = MockRedis;
+        type Smtp = MockSmtpTransport;
+        type Jwt = Jwt;
+        type Rng = StepRng;
+
+        fn db(&self) -> &DbConn {
+            self.inner.db.as_ref().expect("database not set")
+        }
+
+        fn redis(&self) -> &MockRedis {
+            self.inner.redis.as_ref().expect("redis not set")
+        }
+
+        fn smtp(&self) -> &MockSmtpTransport {
+            self.inner.smtp.as_ref().expect("smtp not set")
+        }
+
+        fn jwt(&self) -> &Jwt {
+            self.inner.jwt.as_ref().expect("jwt not set")
+        }
+
+        fn rng(&self) -> &StepRng {
+            self.inner.rng.as_ref().expect("rng not set")
+        }
+    }
+}

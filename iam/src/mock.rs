@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use lettre::{address::Envelope, transport::smtp::Error as SmtpError, AsyncTransport, Message};
 use redis::{aio::ConnectionLike, Cmd, Pipeline, RedisFuture, Value};
 use std::collections::VecDeque;

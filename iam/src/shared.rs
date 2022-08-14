@@ -92,6 +92,8 @@ fn create_smtp_transport() -> SmtpTransport {
 
 #[cfg(test)]
 pub mod mock {
+    #![allow(unused)]
+
     use super::*;
     use crate::mock::{MockRedis, MockSmtpTransport};
     use rand::rngs::mock::StepRng;

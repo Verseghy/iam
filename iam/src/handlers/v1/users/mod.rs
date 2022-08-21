@@ -5,6 +5,7 @@ mod invite;
 mod login;
 mod post;
 mod put;
+mod register;
 
 use crate::{auth::permissions, shared::SharedTrait};
 use axum::{
@@ -32,4 +33,5 @@ pub fn routes<S: SharedTrait>() -> Router {
                 .post(post::update_user::<S>.layer(permissions![S, "iam.user.update"]))
                 .delete(delete::delete_user::<S>.layer(permissions![S, "iam.user.delete"])),
         )
+        .route("/register", post(register::register::<S>))
 }

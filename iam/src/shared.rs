@@ -122,6 +122,10 @@ pub mod mock {
                 rng: None,
             }
         }
+
+        pub fn empty() -> Self {
+            Self::builder().build()
+        }
     }
 
     impl MockSharedInner {

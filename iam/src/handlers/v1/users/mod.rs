@@ -1,7 +1,6 @@
 mod delete;
 mod get;
 mod gets;
-mod invite;
 mod login;
 mod post;
 mod put;
@@ -16,10 +15,6 @@ use axum::{
 
 pub fn routes<S: SharedTrait>() -> Router {
     Router::new()
-        .route(
-            "/invite",
-            post(invite::invite::<S>).route_layer(permissions![S, "iam.user.invite"]),
-        )
         .route("/login", post(login::login::<S>))
         .route(
             "/:user_id",

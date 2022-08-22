@@ -17,8 +17,6 @@ rand = { version = "0.8.5", default-features = false, features = ["std", "std_rn
 thiserror = "1.0.31"
 chrono = "0.4.19"
 validator = { version = "0.15.0", features = ["derive"] }
-lettre = { version = "0.10.0-rc.7", default-features = false, features = ["smtp-transport", "tokio1-rustls-tls", "builder"] }
-redis = { version = "0.21.5", features = ["aio", "tokio-comp", "connection-manager"] }
 async-trait = "0.1.56"
 jsonwebtoken = "8.1.0"
 futures-util = "0.3.21"

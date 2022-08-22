@@ -1,4 +1,9 @@
-use crate::{json::Json, json::ValidatedJson, shared::SharedTrait, utils::Error};
+use crate::{
+    json::Json,
+    json::ValidatedJson,
+    shared::SharedTrait,
+    utils::{DatabaseErrorType, Error},
+};
 use axum::{http::StatusCode, Extension};
 use entity::users;
 use sea_orm::{EntityTrait, Set};
@@ -34,9 +39,15 @@ pub async fn register<S: SharedTrait>(
         ..Default::default()
     };
 
-    let result = users::Entity::insert(model).exec(shared.db()).await?;
+    let result = users::Entity::insert(model).exec(shared.db()).await;
 
-    tracing::info!("register result: {:?}", result);
+    if let Err(err) = result {
+        if err.is_duplicate_entry() {
+            Err(Error::bad_request("this email is already registered"))?
+        } else {
+            Err(Error::internal(err))?
+        }
+    }
 
     Ok((StatusCode::CREATED, Json(Response { id })))
 }

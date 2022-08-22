@@ -11,11 +11,3 @@ services:
       - "TZ=Europe/Budapest"
     ports:
         - "33061:3306"
-  redis:
-    image: redis:6.2-alpine
-    environment:
-      - "MASTER=true"
-    ports:
-      - "6379:6379"
-    command:
-      - "redis-server"

@@ -6,9 +6,6 @@ mod shared;
 mod token;
 mod utils;
 
-#[cfg(test)]
-pub(crate) mod mock;
-
 use axum::{
     body::Body,
     error_handling::HandleErrorLayer,

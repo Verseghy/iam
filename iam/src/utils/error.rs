@@ -3,8 +3,6 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use lettre::transport::smtp::Error as SmtpError;
-use redis::RedisError;
 use sea_orm::DbErr;
 use serde_json::json;
 
@@ -71,18 +69,6 @@ impl IntoResponse for Error {
 
 impl From<DbErr> for Error {
     fn from(error: DbErr) -> Self {
-        Error::internal(error)
-    }
-}
-
-impl From<RedisError> for Error {
-    fn from(error: RedisError) -> Self {
-        Error::internal(error)
-    }
-}
-
-impl From<SmtpError> for Error {
-    fn from(error: SmtpError) -> Self {
         Error::internal(error)
     }
 }

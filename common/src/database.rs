@@ -1,4 +1,3 @@
-use redis::aio::ConnectionManager;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use tracing::log::LevelFilter;
 
@@ -14,16 +13,4 @@ pub async fn connect() -> DatabaseConnection {
     tracing::info!("Connected to database");
 
     db
-}
-
-pub async fn connect_redis() -> ConnectionManager {
-    let url = std::env::var("REDIS_URL").expect("REDIS_URL not set");
-    let client = redis::Client::open(url)
-        .map_err(|err| format!("failed to connect to redis: {:?}", err))
-        .unwrap();
-
-    ConnectionManager::new(client)
-        .await
-        .map_err(|err| format!("failed to connect to redis: {:?}", err))
-        .unwrap()
 }

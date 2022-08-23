@@ -34,7 +34,7 @@ jobs:
           tags: verseghy/iam-migration:latest
 
       - name: Kubernetes deploy
-        uses: actions-hub/kubectl@v1
+        uses: actions-hub/kubectl@v1.24.4
         env:
           KUBE_HOST: ${{ secrets.K8S_HOST }}
           KUBE_USERNAME: ${{ secrets.K8S_USERNAME }}

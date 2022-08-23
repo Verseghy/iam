@@ -37,8 +37,7 @@ jobs:
         uses: actions-hub/kubectl@v1.24.4
         env:
           KUBE_HOST: ${{ secrets.K8S_HOST }}
-          KUBE_USERNAME: ${{ secrets.K8S_USERNAME }}
-          KUBE_PASSWORD: ${{ secrets.K8S_SECRET }}
+          KUBE_TOKEN: ${{ secrets.K8S_SECRET }}
           KUBE_CERTIFICATE: ${{ secrets.K8S_CERTIFICATE }}
         with:
           args: rollout restart deployment iam -n iam

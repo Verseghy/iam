@@ -30,8 +30,7 @@ RUN rm target/release/deps/migration* \
        target/release/deps/libentity* \
        target/release/deps/common* \
        target/release/deps/libcommon* && \
-    cargo build -p migration --release && \
-    strip -s target/release/migration
+    cargo build -p migration --release
 
 FROM alpine
 WORKDIR /app

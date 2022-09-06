@@ -30,8 +30,7 @@ RUN rm target/release/deps/iam* \
        target/release/deps/libentity* \
        target/release/deps/common* \
        target/release/deps/libcommon* && \
-    cargo build --release && \
-    strip -s target/release/iam
+    cargo build --release
 
 FROM alpine
 WORKDIR /app

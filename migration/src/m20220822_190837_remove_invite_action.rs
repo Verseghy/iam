@@ -1,5 +1,5 @@
-use entity::{actions, pivot_actions_users, pivot_actions_groups};
-use sea_orm::{TransactionTrait, ConnectionTrait, entity::prelude::*};
+use entity::{actions, pivot_actions_groups, pivot_actions_users};
+use sea_orm::{entity::prelude::*, ConnectionTrait, TransactionTrait};
 use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]

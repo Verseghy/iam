@@ -3,7 +3,6 @@ mod get;
 mod gets;
 mod login;
 mod post;
-mod put;
 mod register;
 
 use crate::{auth::permissions, shared::SharedTrait};
@@ -24,7 +23,6 @@ pub fn routes<S: SharedTrait>() -> Router {
             "/",
             MethodRouter::new()
                 .get(gets::list_users::<S>.layer(permissions![S, "iam.user.list"]))
-                .put(put::add_user::<S>.layer(permissions![S, "iam.user.add"]))
                 .post(post::update_user::<S>.layer(permissions![S, "iam.user.update"]))
                 .delete(delete::delete_user::<S>.layer(permissions![S, "iam.user.delete"])),
         )

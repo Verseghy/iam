@@ -35,7 +35,7 @@ pub async fn register<S: SharedTrait>(
         id: Set(id.clone()),
         password: Set(common::password::hash(&req.password).map_err(Error::internal)?),
         name: Set(req.name),
-        email: Set(req.password),
+        email: Set(req.email),
         ..Default::default()
     };
 

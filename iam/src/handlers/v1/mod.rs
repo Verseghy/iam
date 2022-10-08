@@ -1,4 +1,5 @@
 mod actions;
+mod apps;
 mod groups;
 mod users;
 
@@ -10,4 +11,5 @@ pub fn routes<S: SharedTrait>() -> Router {
         .nest("/actions", actions::routes::<S>())
         .nest("/users", users::routes::<S>())
         .nest("/groups", groups::routes::<S>())
+        .nest("/apps", apps::routes::<S>())
 }

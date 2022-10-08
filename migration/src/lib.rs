@@ -1,3 +1,5 @@
+mod utils;
+
 pub use sea_orm_migration::MigratorTrait;
 use sea_orm_migration::{async_trait::async_trait, MigrationTrait};
 
@@ -10,6 +12,7 @@ mod m20220416_054675935_create_pivot_users_groups;
 mod m20220416_060135_add_iam_actions;
 mod m20220822_190837_remove_invite_action;
 mod m20221007_103449_create_app;
+mod m20221007_211858_apps_permissions;
 
 pub struct Migrator;
 
@@ -25,6 +28,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20220416_060135_add_iam_actions::Migration),
             Box::new(m20220822_190837_remove_invite_action::Migration),
             Box::new(m20221007_103449_create_app::Migration),
+            Box::new(m20221007_211858_apps_permissions::Migration),
         ]
     }
 }

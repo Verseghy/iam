@@ -27,6 +27,7 @@ tower-http = { version = "0.3.4", features = ["auth", "compression-full", "decom
 hyper = "0.14.20"
 http-body = "0.4.5"
 common = { path = "../common" }
+base64 = "0.13.0"
 
 [dev-dependencies]
 mime = "0.3.16"

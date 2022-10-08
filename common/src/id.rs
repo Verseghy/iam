@@ -46,3 +46,8 @@ pub fn create_group_id() -> String {
 pub fn create_user_id() -> String {
     format!("UserID-{}", create_id())
 }
+
+#[inline]
+pub fn create_app_id() -> String {
+    format!("AppID-{}", create_id())
+}

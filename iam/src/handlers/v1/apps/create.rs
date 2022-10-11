@@ -30,11 +30,13 @@ pub async fn create_app<S: SharedTrait>(
     let id = create_app_id();
     let password = Alphanumeric.sample_string(&mut shared.rng().clone(), 32);
 
+    let hashed_password = common::password::hash(&password).map_err(Error::internal)?;
+
     let app = apps::ActiveModel {
         id: Set(id.clone()),
         name: Set(req.name),
         // TODO: hash or encrypt
-        password: Set(password.clone()),
+        password: Set(hashed_password),
         ..Default::default()
     };
 

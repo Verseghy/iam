@@ -1,6 +1,6 @@
-use sea_orm_migration::prelude::*;
 use crate::utils::{add_action, delete_action};
 use sea_orm::TransactionTrait;
+use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

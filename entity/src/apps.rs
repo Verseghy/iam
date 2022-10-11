@@ -1,4 +1,4 @@
-use sea_orm::entity::prelude::*;
+use sea_orm::{entity::prelude::*, JoinType, QueryFilter, QuerySelect};
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
 #[sea_orm(table_name = "apps")]
@@ -34,5 +34,28 @@ impl Related<super::groups::Entity> for Entity {
 
     fn via() -> Option<RelationDef> {
         Some(super::pivot_apps_groups::Relation::App.def())
+    }
+}
+
+impl Entity {
+    pub fn get_actions_through_groups(id: &str) -> Select<super::actions::Entity> {
+        super::actions::Entity::find()
+            .filter(Column::Id.eq(id))
+            .join_rev(
+                JoinType::InnerJoin,
+                super::pivot_actions_groups::Relation::Action.def(),
+            )
+            .join(
+                JoinType::InnerJoin,
+                super::pivot_actions_groups::Relation::Group.def(),
+            )
+            .join_rev(
+                JoinType::InnerJoin,
+                super::pivot_apps_groups::Relation::Group.def(),
+            )
+            .join(
+                JoinType::InnerJoin,
+                super::pivot_apps_groups::Relation::App.def(),
+            )
     }
 }

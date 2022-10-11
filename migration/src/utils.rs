@@ -1,9 +1,13 @@
-use entity::{actions, pivot_actions_users, pivot_actions_groups, pivot_apps_actions};
 use common::create_action_id;
-use sea_orm_migration::prelude::*;
+use entity::{actions, pivot_actions_groups, pivot_actions_users, pivot_apps_actions};
 use sea_orm::{prelude::*, ConnectionTrait, Set};
+use sea_orm_migration::prelude::*;
 
-pub async fn add_action(txn: &impl ConnectionTrait, action: &str, secure: bool) -> Result<(), DbErr> {
+pub async fn add_action(
+    txn: &impl ConnectionTrait,
+    action: &str,
+    secure: bool,
+) -> Result<(), DbErr> {
     let model = actions::ActiveModel {
         id: Set(create_action_id()),
         name: Set(action.to_owned()),

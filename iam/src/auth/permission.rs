@@ -1,5 +1,6 @@
 use entity::{
     actions::{self, Entity as Actions},
+    apps::{self, Entity as Apps},
     users::{self, Entity as Users},
 };
 use sea_orm::{
@@ -18,20 +19,34 @@ pub async fn check<DB>(user_id: &str, permissions: &[&str], database: &DB) -> Re
 where
     DB: ConnectionTrait,
 {
-    let mut user_permissions = <Users as Related<Actions>>::find_related()
-        .filter(users::Column::Id.eq(user_id))
-        .select_only()
-        .column(actions::Column::Name);
-
     let actions: Vec<String> = ActionResult::find_by_statement(StatementBuilder::build(
-        QueryTrait::query(&mut user_permissions).union(
-            UnionType::Distinct,
-            QueryTrait::into_query(
+        <Users as Related<Actions>>::find_related()
+            .filter(users::Column::Id.eq(user_id))
+            .select_only()
+            .column(actions::Column::Name)
+            .into_query()
+            .union(
+                UnionType::Distinct,
                 Actions::get_actions_for_user_id(user_id)
                     .select_only()
-                    .column(actions::Column::Name),
+                    .column(actions::Column::Name)
+                    .into_query(),
+            )
+            .union(
+                UnionType::Distinct,
+                <Apps as Related<Actions>>::find_related()
+                    .filter(apps::Column::Id.eq(user_id))
+                    .select_only()
+                    .column(actions::Column::Name)
+                    .into_query(),
+            )
+            .union(
+                UnionType::Distinct,
+                Apps::get_actions_through_groups(user_id)
+                    .select_only()
+                    .column(actions::Column::Name)
+                    .into_query(),
             ),
-        ),
         &database.get_database_backend(),
     ))
     .all(database)

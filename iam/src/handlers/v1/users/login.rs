@@ -39,7 +39,7 @@ pub async fn login<S: SharedTrait>(
         .filter(users::Column::Email.eq(req.email.clone()))
         .one(shared.db())
         .await?
-        .ok_or_else(|| Error::not_found("invalid email or password"))?;
+        .ok_or_else(|| Error::bad_request("invalid email or password"))?;
 
     let (valid, rehash) =
         password::validate(&res.password, &req.password).map_err(Error::internal)?;

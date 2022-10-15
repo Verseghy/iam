@@ -1,4 +1,8 @@
-use crate::{json::Json, shared::SharedTrait, utils::Error};
+use crate::{
+    json::Json,
+    shared::SharedTrait,
+    utils::{Error, Result},
+};
 use axum::{http::StatusCode, Extension};
 use entity::groups;
 use sea_orm::entity::EntityTrait;
@@ -12,7 +16,7 @@ pub struct DeleteGroupRequest {
 pub async fn delete_group<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Json(req): Json<DeleteGroupRequest>,
-) -> Result<StatusCode, Error> {
+) -> Result<StatusCode> {
     let res = groups::Entity::delete_by_id(req.id)
         .exec(shared.db())
         .await?;

@@ -14,6 +14,8 @@ pub enum Error {
     Forbidden(Option<String>),
 }
 
+pub type Result<T> = std::result::Result<T, Error>;
+
 impl Error {
     pub fn internal<E: Into<Box<dyn std::error::Error>>>(error: E) -> Self {
         let error = error.into();

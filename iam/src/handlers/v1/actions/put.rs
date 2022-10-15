@@ -1,4 +1,4 @@
-use crate::{json::Json, shared::SharedTrait, utils::Error};
+use crate::{json::Json, shared::SharedTrait, utils::Result};
 use axum::Extension;
 use common::create_action_id;
 use entity::actions;
@@ -20,7 +20,7 @@ pub struct AddActionResponse {
 pub async fn add_action<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Json(req): Json<AddActionRequest>,
-) -> Result<Json<AddActionResponse>, Error> {
+) -> Result<Json<AddActionResponse>> {
     let id = create_action_id();
 
     let action = actions::ActiveModel {

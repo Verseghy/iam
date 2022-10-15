@@ -1,7 +1,7 @@
 use crate::{
     json::Json,
     shared::SharedTrait,
-    utils::{set_option, Error},
+    utils::{set_option, Result},
 };
 use axum::{http::StatusCode, Extension};
 use entity::actions;
@@ -19,7 +19,7 @@ pub struct UpdateActionRequest {
 pub async fn update_action<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Json(req): Json<UpdateActionRequest>,
-) -> Result<StatusCode, Error> {
+) -> Result<StatusCode> {
     let action = actions::ActiveModel {
         id: Set(req.id),
         name: set_option(req.name),

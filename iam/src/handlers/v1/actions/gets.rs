@@ -1,4 +1,4 @@
-use crate::{json::Json, shared::SharedTrait, utils::Error};
+use crate::{json::Json, shared::SharedTrait, utils::Result};
 use axum::Extension;
 use entity::actions;
 use sea_orm::entity::EntityTrait;
@@ -18,7 +18,7 @@ struct Action {
 
 pub async fn list_actions<S: SharedTrait>(
     Extension(shared): Extension<S>,
-) -> Result<Json<GetsResponse>, Error> {
+) -> Result<Json<GetsResponse>> {
     let res = actions::Entity::find().all(shared.db()).await?;
 
     Ok(Json(GetsResponse {

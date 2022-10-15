@@ -3,7 +3,7 @@ use crate::{
     json::Json,
     shared::SharedTrait,
     token::Claims,
-    utils::Error,
+    utils::{Error, Result},
 };
 use axum::{
     http::StatusCode,
@@ -32,7 +32,7 @@ pub async fn decision<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Extension(claims): Extension<Arc<Claims>>,
     Json(req): Json<DecisionRequest>,
-) -> Result<Response, Error> {
+) -> Result<Response> {
     let actions: Vec<&str> = req.action_list.iter().map(|x| x.name.as_str()).collect();
 
     match auth::check(&claims.subject, &actions, shared.db()).await {

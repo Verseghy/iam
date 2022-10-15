@@ -2,7 +2,7 @@ use crate::{
     json::{Json, ValidatedJson},
     shared::SharedTrait,
     token::{self, JwtTrait},
-    utils::Error,
+    utils::{Error, Result},
 };
 use axum::Extension;
 use common::password;
@@ -32,7 +32,7 @@ pub struct LoginResponse {
 pub async fn login<S: SharedTrait>(
     Extension(shared): Extension<S>,
     ValidatedJson(mut req): ValidatedJson<LoginRequest>,
-) -> Result<Json<LoginResponse>, Error> {
+) -> Result<Json<LoginResponse>> {
     req.email = req.email.to_lowercase();
 
     let res = users::Entity::find()

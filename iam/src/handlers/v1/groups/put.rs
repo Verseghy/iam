@@ -1,4 +1,4 @@
-use crate::{json::Json, shared::SharedTrait, utils::Error};
+use crate::{json::Json, shared::SharedTrait, utils::Result};
 use axum::Extension;
 use common::create_group_id;
 use entity::groups;
@@ -19,7 +19,7 @@ pub struct AddGroupResponse {
 pub async fn add_group<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Json(req): Json<AddGroupRequest>,
-) -> Result<Json<AddGroupResponse>, Error> {
+) -> Result<Json<AddGroupResponse>> {
     let id = create_group_id();
 
     let group = groups::ActiveModel {

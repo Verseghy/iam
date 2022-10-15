@@ -1,12 +1,13 @@
 use super::permission::{self, CheckError};
-use crate::{shared::SharedTrait, token::Claims, utils::Error};
+use crate::{
+    shared::SharedTrait,
+    token::Claims,
+    utils::{Error, Result},
+};
 use hyper::Request;
 use std::sync::Arc;
 
-pub async fn validate<S: SharedTrait, B>(
-    request: &Request<B>,
-    actions: &[&str],
-) -> Result<(), Error>
+pub async fn validate<S: SharedTrait, B>(request: &Request<B>, actions: &[&str]) -> Result<()>
 where
     B: Send + Sync + 'static,
 {

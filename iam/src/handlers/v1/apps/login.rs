@@ -28,7 +28,7 @@ pub async fn login_app<S: SharedTrait>(
     let res = apps::Entity::find_by_id(id.clone())
         .one(shared.db())
         .await?
-        .ok_or_else(|| Error::not_found("invalid token"))?;
+        .ok_or_else(|| Error::bad_request("invalid token"))?;
 
     let (valid, _) =
         common::password::validate(&res.password, &password).map_err(Error::internal)?;

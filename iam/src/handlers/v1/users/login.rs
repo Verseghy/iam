@@ -2,7 +2,7 @@ use crate::{
     json::{Json, ValidatedJson},
     shared::SharedTrait,
     token::{self, JwtTrait},
-    utils::Error,
+    utils::{Error, Result},
 };
 use axum::Extension;
 use common::password;
@@ -32,14 +32,14 @@ pub struct LoginResponse {
 pub async fn login<S: SharedTrait>(
     Extension(shared): Extension<S>,
     ValidatedJson(mut req): ValidatedJson<LoginRequest>,
-) -> Result<Json<LoginResponse>, Error> {
+) -> Result<Json<LoginResponse>> {
     req.email = req.email.to_lowercase();
 
     let res = users::Entity::find()
         .filter(users::Column::Email.eq(req.email.clone()))
         .one(shared.db())
         .await?
-        .ok_or_else(|| Error::not_found("no user with this email"))?;
+        .ok_or_else(|| Error::bad_request("invalid email or password"))?;
 
     let (valid, rehash) =
         password::validate(&res.password, &req.password).map_err(Error::internal)?;
@@ -52,7 +52,7 @@ pub async fn login<S: SharedTrait>(
     }
 
     if !valid {
-        return Err(Error::bad_request("wrong password"));
+        return Err(Error::bad_request("invalid email or password"));
     }
 
     let claims = token::Claims {

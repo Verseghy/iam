@@ -2,7 +2,7 @@ use crate::{
     json::Json,
     json::ValidatedJson,
     shared::SharedTrait,
-    utils::{DatabaseErrorType, Error},
+    utils::{DatabaseErrorType, Error, Result},
 };
 use axum::{http::StatusCode, Extension};
 use entity::users;
@@ -28,7 +28,7 @@ pub struct Response {
 pub async fn register<S: SharedTrait>(
     Extension(shared): Extension<S>,
     ValidatedJson(req): ValidatedJson<Request>,
-) -> Result<(StatusCode, Json<Response>), Error> {
+) -> Result<(StatusCode, Json<Response>)> {
     let id = common::create_user_id();
 
     let model = users::ActiveModel {

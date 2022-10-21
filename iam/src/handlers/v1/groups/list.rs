@@ -1,4 +1,4 @@
-use crate::{json::Json, shared::SharedTrait, utils::Error};
+use crate::{json::Json, shared::SharedTrait, utils::Result};
 use axum::Extension;
 use entity::groups;
 use sea_orm::{entity::EntityTrait, FromQueryResult, QuerySelect};
@@ -12,7 +12,7 @@ pub struct Group {
 
 pub async fn list_groups<S: SharedTrait>(
     Extension(shared): Extension<S>,
-) -> Result<Json<Vec<Group>>, Error> {
+) -> Result<Json<Vec<Group>>> {
     let res = groups::Entity::find()
         .select_only()
         .column(groups::Column::Id)

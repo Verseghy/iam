@@ -1,7 +1,7 @@
 use crate::{
     json::Json,
     shared::SharedTrait,
-    utils::{set_option, Error},
+    utils::{set_option, Error, Result},
 };
 use axum::{http::StatusCode, Extension};
 use common::password;
@@ -21,7 +21,7 @@ pub struct UpdateUserRequest {
 pub async fn update_user<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Json(req): Json<UpdateUserRequest>,
-) -> Result<StatusCode, Error> {
+) -> Result<StatusCode> {
     let hash = match req.password {
         Some(pwd) => Some(password::hash(&pwd).map_err(Error::internal)?),
         None => None,

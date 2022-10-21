@@ -1,4 +1,4 @@
-use crate::{json::Json, shared::SharedTrait, utils::Error};
+use crate::{json::Json, shared::SharedTrait, utils::Result};
 use axum::Extension;
 use entity::users;
 use sea_orm::{entity::EntityTrait, FromQueryResult, QuerySelect};
@@ -13,7 +13,7 @@ pub struct User {
 
 pub async fn list_users<S: SharedTrait>(
     Extension(shared): Extension<S>,
-) -> Result<Json<Vec<User>>, Error> {
+) -> Result<Json<Vec<User>>> {
     let res = users::Entity::find()
         .select_only()
         .column(users::Column::Id)

@@ -1,4 +1,8 @@
-use crate::{json::Json, shared::SharedTrait, utils::Error};
+use crate::{
+    json::Json,
+    shared::SharedTrait,
+    utils::{Error, Result},
+};
 use axum::{extract::Path, Extension};
 use entity::users;
 use sea_orm::entity::EntityTrait;
@@ -14,7 +18,7 @@ pub struct GetUserResponse {
 pub async fn get_user<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Path(id): Path<String>,
-) -> Result<Json<GetUserResponse>, Error> {
+) -> Result<Json<GetUserResponse>> {
     let res = users::Entity::find_by_id(id)
         .one(shared.db())
         .await?

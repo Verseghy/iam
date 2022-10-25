@@ -27,7 +27,7 @@ where
             .into_query()
             .union(
                 UnionType::Distinct,
-                Actions::get_actions_for_user_id(user_id)
+                Actions::get_actions_for_user_id_through_groups(user_id)
                     .select_only()
                     .column(actions::Column::Name)
                     .into_query(),
@@ -42,7 +42,7 @@ where
             )
             .union(
                 UnionType::Distinct,
-                Apps::get_actions_through_groups(user_id)
+                Actions::get_actions_for_app_id_through_groups(user_id)
                     .select_only()
                     .column(actions::Column::Name)
                     .into_query(),

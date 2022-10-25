@@ -60,7 +60,7 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(pivot_apps_actions::Entity)
+                    .table(pivot_apps_groups::Entity)
                     .if_not_exists()
                     .col(ColumnDef::new(pivot_apps_groups::Column::AppId).string())
                     .col(ColumnDef::new(pivot_apps_groups::Column::GroupId).string())

@@ -46,7 +46,7 @@ impl Related<super::groups::Entity> for Entity {
 impl ActiveModelBehavior for ActiveModel {}
 
 impl Entity {
-    pub fn get_actions_for_user_id(id: &str) -> Select<super::actions::Entity> {
+    pub fn get_actions_for_user_id_through_groups(id: &str) -> Select<super::actions::Entity> {
         Self::find()
             .filter(super::users::Column::Id.eq(id))
             .join_rev(
@@ -64,6 +64,27 @@ impl Entity {
             .join(
                 JoinType::InnerJoin,
                 super::pivot_users_groups::Relation::User.def(),
+            )
+    }
+
+    pub fn get_actions_for_app_id_through_groups(id: &str) -> Select<super::actions::Entity> {
+        super::actions::Entity::find()
+            .filter(Column::Id.eq(id))
+            .join_rev(
+                JoinType::InnerJoin,
+                super::pivot_actions_groups::Relation::Action.def(),
+            )
+            .join(
+                JoinType::InnerJoin,
+                super::pivot_actions_groups::Relation::Group.def(),
+            )
+            .join_rev(
+                JoinType::InnerJoin,
+                super::pivot_apps_groups::Relation::Group.def(),
+            )
+            .join(
+                JoinType::InnerJoin,
+                super::pivot_apps_groups::Relation::App.def(),
             )
     }
 

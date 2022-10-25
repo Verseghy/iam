@@ -1,7 +1,7 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
-#[sea_orm(table_name = "pivot_app_groups")]
+#[sea_orm(table_name = "pivot_apps_groups")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub app_id: String,

@@ -1,10 +1,11 @@
 mod actions;
 mod apps;
+mod assign;
 mod groups;
 mod users;
 
-use crate::shared::SharedTrait;
-use axum::Router;
+use crate::{auth::permissions, shared::SharedTrait};
+use axum::{handler::Handler, routing::post, Router};
 
 pub fn routes<S: SharedTrait>() -> Router {
     Router::new()
@@ -12,4 +13,8 @@ pub fn routes<S: SharedTrait>() -> Router {
         .nest("/users", users::routes::<S>())
         .nest("/groups", groups::routes::<S>())
         .nest("/apps", apps::routes::<S>())
+        .route(
+            "/assign",
+            post(assign::assign::<S>.layer(permissions![S, "iam.policy.assign"])),
+        )
 }

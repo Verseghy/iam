@@ -1,7 +1,7 @@
 use crate::{json::Json, utils::Error, SharedTrait};
 use axum::{http::StatusCode, Extension};
 use entity::{pivot_actions_users, pivot_users_groups};
-use sea_orm::{EntityTrait, Set, TransactionTrait};
+use sea_orm::{EntityTrait, Set};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -15,8 +15,6 @@ pub async fn assign<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Json(request): Json<Request>,
 ) -> Result<StatusCode, Error> {
-    let txn = shared.db().begin().await?;
-
     if request.action.is_none() && request.group.is_none() {
         return Err(Error::bad_request("no action or group"));
     }
@@ -32,10 +30,9 @@ pub async fn assign<S: SharedTrait>(
         };
 
         pivot_actions_users::Entity::insert(model)
-            .exec(&txn)
+            .exec(shared.db())
             .await?;
 
-        txn.commit().await?;
         return Ok(StatusCode::NO_CONTENT);
     } else if let Some(group_id) = request.group {
         let model = pivot_users_groups::ActiveModel {
@@ -43,9 +40,10 @@ pub async fn assign<S: SharedTrait>(
             group_id: Set(group_id),
         };
 
-        pivot_users_groups::Entity::insert(model).exec(&txn).await?;
+        pivot_users_groups::Entity::insert(model)
+            .exec(shared.db())
+            .await?;
 
-        txn.commit().await?;
         return Ok(StatusCode::NO_CONTENT);
     }
 

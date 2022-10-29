@@ -19,7 +19,7 @@ pub async fn assign<S: SharedTrait>(
         return Err(Error::bad_request("no action or group"));
     }
 
-    if request.action.is_some() && request.action.is_some() {
+    if request.action.is_some() && request.group.is_some() {
         return Err(Error::bad_request("action and group at the same time"));
     }
 

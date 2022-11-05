@@ -36,5 +36,11 @@ FROM alpine
 WORKDIR /app
 COPY --from=builder /builder/app/target/release/iam ./
 EXPOSE 3001
+
+RUN addgroup -S iam && \
+    adduser -S -D -H -s /bin/false -G iam iam && \
+    chown -R iam:iam /app
+USER iam
+
 CMD ["./iam"]
 

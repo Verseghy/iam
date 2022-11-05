@@ -75,7 +75,7 @@ pub trait JwtTrait {
 
 impl JwtTrait for Jwt {
     fn get_claims(&self, token: &str) -> Result<Claims, JWTError> {
-        Ok(jsonwebtoken::decode(token, &self.decoding, &*VALIDATION)?.claims)
+        Ok(jsonwebtoken::decode(token, &self.decoding, &VALIDATION)?.claims)
     }
 
     fn encode(&self, claims: &Claims) -> Result<String, JWTError> {

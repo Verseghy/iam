@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 chrono = { version = "0.4.22", features = ["clock"], default-features = false }
-uuid = { version = "1.2.1", features = ["v1"] }
+uuid = { version = "1.2.1", features = ["v1", "rng"] }
 sea-orm = { version = "0.9.3", default-features = false, features = ["runtime-actix-rustls", "sqlx-mysql"] }
 tracing = { version = "0.1.37", default-features = false }
 redis = { version = "0.21.6", features = ["aio", "tokio-comp", "connection-manager"] }
@@ -13,3 +13,5 @@ rand = { version = "0.8.5", default-features = false, features = ["std", "std_rn
 rust-argon2 = { version = "1.0.0", default-features = false }
 bcrypt = "0.13.0"
 thiserror = "1.0.37"
+serde = "1.0.148"
+once_cell = "1.16.0"

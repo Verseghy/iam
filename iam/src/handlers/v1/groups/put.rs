@@ -1,6 +1,6 @@
 use crate::{json::Json, shared::SharedTrait, utils::Result};
 use axum::Extension;
-use common::create_group_id;
+use common::Id;
 use entity::groups;
 use sea_orm::{entity::EntityTrait, Set};
 use serde::{Deserialize, Serialize};
@@ -13,14 +13,14 @@ pub struct AddGroupRequest {
 
 #[derive(Serialize, Debug)]
 pub struct AddGroupResponse {
-    id: String,
+    id: Id,
 }
 
 pub async fn add_group<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Json(req): Json<AddGroupRequest>,
 ) -> Result<Json<AddGroupResponse>> {
-    let id = create_group_id();
+    let id = Id::new_group();
 
     let group = groups::ActiveModel {
         name: Set(req.name),

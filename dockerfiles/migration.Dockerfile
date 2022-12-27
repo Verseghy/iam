@@ -7,7 +7,7 @@ RUN cargo new --bin app && \
     cargo new --lib app/entity && \
     cargo new --lib app/migration && \
     cargo new --lib app/common && \
-    cargo new --bin app/seeder
+    cargo new --bin app/cmds
 
 WORKDIR /builder/app
 

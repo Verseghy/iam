@@ -4,4 +4,4 @@ lto = true
 
 [workspace]
 members = ["iam", "entity", "migration", "common", "cmds"]
-# default-members = ["iam"]
+default-members = ["iam", "cmds"]

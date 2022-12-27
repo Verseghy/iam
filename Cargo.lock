@@ -576,6 +576,10 @@ name = "cmds"
 version = "0.1.0"
 dependencies = [
  "common",
+ "dotenv",
+ "entity",
+ "sea-orm",
+ "tokio",
 ]
 
 [[package]]
@@ -2093,17 +2097,6 @@ dependencies = [
  "quote",
  "rustversion",
  "syn",
-]
-
-[[package]]
-name = "seeder"
-version = "0.1.0"
-dependencies = [
- "common",
- "dotenv",
- "entity",
- "sea-orm",
- "tokio",
 ]
 
 [[package]]

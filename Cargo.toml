@@ -3,5 +3,5 @@ strip = true
 lto = true
 
 [workspace]
-members = ["iam", "entity", "migration", "common", "seeder", "cmds"]
+members = ["iam", "entity", "migration", "common", "cmds"]
 # default-members = ["iam"]

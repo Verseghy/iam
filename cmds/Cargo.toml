@@ -5,6 +5,14 @@ edition = "2021"
 
 [dependencies]
 common = { path = "../common/" }
+dotenv = "0.15.0"
+entity = { path = "../entity" }
+sea-orm = { version = "0.9.3", default-features = false, features = ["runtime-actix-rustls", "sqlx-mysql"] }
+tokio = { version = "1.21.2", features = ["rt", "macros"] }
+
+[[bin]]
+name = "seeder"
+path = "src/seeder.rs"
 
 [[bin]]
 name = "password_hash"

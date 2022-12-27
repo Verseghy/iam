@@ -1,4 +1,4 @@
-use common::create_action_id;
+use common::Id;
 use entity::{actions, pivot_actions_groups, pivot_actions_users, pivot_apps_actions};
 use sea_orm::{prelude::*, ConnectionTrait, Set};
 use sea_orm_migration::prelude::*;
@@ -9,7 +9,7 @@ pub async fn add_action(
     secure: bool,
 ) -> Result<(), DbErr> {
     let model = actions::ActiveModel {
-        id: Set(create_action_id()),
+        id: Set(Id::new_action().to_string()),
         name: Set(action.to_owned()),
         secure: Set(secure),
         ..Default::default()

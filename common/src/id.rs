@@ -146,23 +146,3 @@ impl<'de> Deserialize<'de> for Id {
         deserializer.deserialize_str(Visitor)
     }
 }
-
-#[inline]
-pub fn create_action_id() -> String {
-    Id::new_action().to_string()
-}
-
-#[inline]
-pub fn create_group_id() -> String {
-    Id::new_group().to_string()
-}
-
-#[inline]
-pub fn create_user_id() -> String {
-    Id::new_user().to_string()
-}
-
-#[inline]
-pub fn create_app_id() -> String {
-    Id::new_app().to_string()
-}

@@ -1,4 +1,4 @@
-use common::create_action_id;
+use common::Id;
 use entity::actions::{Column, Entity};
 use sea_orm_migration::prelude::*;
 
@@ -14,87 +14,87 @@ impl MigrationTrait for Migration {
                     .into_table(Entity)
                     .columns(vec![Column::Id, Column::Name, Column::Secure])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.action.add".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.action.get".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.action.update".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.action.list".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.action.delete".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.group.add".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.group.get".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.group.list".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.group.delete".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.group.edit".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.user.add".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.user.get".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.user.list".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.user.update".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.user.invite".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.user.delete".into(),
                         true.into(),
                     ])
                     .values_panic(vec![
-                        create_action_id().into(),
+                        Id::new_action().to_string().into(),
                         "iam.policy.assign".into(),
                         true.into(),
                     ])

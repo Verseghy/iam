@@ -1,6 +1,6 @@
 use crate::{json::Json, shared::SharedTrait, utils::Result};
 use axum::Extension;
-use common::create_action_id;
+use common::Id;
 use entity::actions;
 use sea_orm::{entity::EntityTrait, Set};
 use serde::{Deserialize, Serialize};
@@ -14,17 +14,17 @@ pub struct AddActionRequest {
 
 #[derive(Serialize, Debug)]
 pub struct AddActionResponse {
-    id: String,
+    id: Id,
 }
 
 pub async fn add_action<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Json(req): Json<AddActionRequest>,
 ) -> Result<Json<AddActionResponse>> {
-    let id = create_action_id();
+    let id = Id::new_action();
 
     let action = actions::ActiveModel {
-        id: Set(id.clone()),
+        id: Set(id.to_string()),
         name: Set(req.action),
         secure: Set(req.secure),
         ..Default::default()

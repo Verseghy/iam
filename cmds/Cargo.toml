@@ -1,0 +1,11 @@
+[package]
+name = "cmds"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common/" }
+
+[[bin]]
+name = "password_hash"
+path = "src/password_hash.rs"

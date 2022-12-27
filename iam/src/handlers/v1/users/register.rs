@@ -5,6 +5,7 @@ use crate::{
     utils::{DatabaseErrorType, Error, Result},
 };
 use axum::{http::StatusCode, Extension};
+use common::Id;
 use entity::users;
 use sea_orm::{EntityTrait, Set};
 use serde::{Deserialize, Serialize};
@@ -22,17 +23,17 @@ pub struct Request {
 
 #[derive(Serialize, Debug)]
 pub struct Response {
-    id: String,
+    id: Id,
 }
 
 pub async fn register<S: SharedTrait>(
     Extension(shared): Extension<S>,
     ValidatedJson(req): ValidatedJson<Request>,
 ) -> Result<(StatusCode, Json<Response>)> {
-    let id = common::create_user_id();
+    let id = Id::new_user();
 
     let model = users::ActiveModel {
-        id: Set(id.clone()),
+        id: Set(id.to_string()),
         password: Set(common::password::hash(&req.password).map_err(Error::internal)?),
         name: Set(req.name),
         email: Set(req.email),

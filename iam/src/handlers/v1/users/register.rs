@@ -62,7 +62,7 @@ mod tests {
         utils::testing::{body_to_json, json_body},
     };
     use axum::{
-        handler::Handler,
+        handler::HandlerWithoutStateExt,
         http::{self, Request, StatusCode},
     };
     use sea_orm::{DatabaseBackend, MockDatabase, MockExecResult};

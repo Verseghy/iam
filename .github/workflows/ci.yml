@@ -90,7 +90,6 @@ jobs:
   cargo-deny:
     name: cargo-deny check
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.checks == 'advisories' }}
     strategy:
       matrix:
         checks:

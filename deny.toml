@@ -19,6 +19,7 @@ allow = [
 ]
 exceptions = [
     { allow = ["OpenSSL"], name = "ring" },
+    { allow = ["Unicode-DFS-2016"], name = "unicode-ident" },
     { allow = ["CC0-1.0"], name = "constant_time_eq" },
 ]
 private.ignore = false

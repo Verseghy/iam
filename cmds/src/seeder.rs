@@ -81,7 +81,7 @@ async fn add_user_to_group(db: &DbConn, user: &String, group: &String) {
 
 #[tokio::main]
 async fn main() {
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
     let db = database::connect().await;
 
     let user1 = create_user(&db, "TestUser1", "test@test.test", "test").await;

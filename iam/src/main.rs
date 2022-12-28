@@ -1,4 +1,4 @@
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use std::{error::Error, fs::File};
 use tracing_subscriber::{filter, layer::SubscriberExt, prelude::*, util::SubscriberInitExt};
 

@@ -10,8 +10,8 @@ name = "migration"
 path = "src/lib.rs"
 
 [dependencies]
-sea-orm-migration = { version = "0.9.3" }
-tokio = { version = "1.21.2", features = ["rt", "macros"] }
+sea-orm-migration = { version = "0.10.6" }
+tokio = { version = "1.23.0", features = ["rt", "macros"] }
 entity = { path = "../entity" }
 common = { path = "../common" }
-chrono = "0.4.22"
+chrono = "0.4.23"

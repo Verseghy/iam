@@ -23,7 +23,7 @@ impl Related<super::actions::Entity> for Entity {
     }
 
     fn via() -> Option<RelationDef> {
-        Some(super::pivot_apps_actions::Relation::App.def())
+        Some(super::pivot_apps_actions::Relation::App.def().rev())
     }
 }
 

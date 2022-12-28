@@ -2,6 +2,7 @@
 name = "entity"
 version = "0.1.0"
 edition = "2021"
+license-file.workspace = true
 
 [dependencies]
 sea-orm = { version = "0.9.3", default-features = false, features = ["runtime-actix-rustls", "sqlx-mysql", "macros", "with-chrono"] }

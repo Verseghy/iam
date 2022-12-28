@@ -1,8 +1,8 @@
-use sea_orm::DbErr;
+use sea_orm::{DbErr, RuntimeErr};
 
-fn get_error_msg(err: &DbErr) -> &str {
+fn get_error_msg(err: &DbErr) -> String {
     match err {
-        DbErr::Exec(msg) => msg,
+        DbErr::Exec(RuntimeErr::SqlxError(error)) => error.to_string(),
         _ => unimplemented!(),
     }
 }

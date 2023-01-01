@@ -3,7 +3,6 @@ mod auth;
 mod handlers;
 mod json;
 mod shared;
-mod token;
 mod utils;
 
 use axum::{

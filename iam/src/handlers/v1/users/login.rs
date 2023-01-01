@@ -1,11 +1,13 @@
 use crate::{
     json::{Json, ValidatedJson},
     shared::SharedTrait,
-    token::{self, JwtTrait},
     utils::{Error, Result},
 };
 use axum::Extension;
-use common::password;
+use common::{
+    password,
+    token::{self, JwtTrait},
+};
 use entity::users;
 use sea_orm::{
     entity::{ActiveModelTrait, ColumnTrait, EntityTrait},

@@ -18,3 +18,7 @@ path = "src/seeder.rs"
 [[bin]]
 name = "password_hash"
 path = "src/password_hash.rs"
+
+[[bin]]
+name = "generate_token"
+path = "src/generate_token.rs"

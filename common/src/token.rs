@@ -68,6 +68,12 @@ impl Jwt {
     }
 }
 
+impl Default for Jwt {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub trait JwtTrait {
     fn get_claims(&self, token: &str) -> Result<Claims, JWTError>;
     fn encode(&self, claims: &Claims) -> Result<String, JWTError>;

@@ -4,7 +4,7 @@ lto = true
 
 [workspace]
 members = ["iam", "entity", "migration", "common", "cmds"]
-default-members = ["iam", "cmds"]
+default-members = ["iam", "cmds", "migration"]
 
 [workspace.package]
 license-file = "./LICENSE"

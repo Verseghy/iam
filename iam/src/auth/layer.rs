@@ -1,9 +1,9 @@
 use super::permission::{self, CheckError};
 use crate::{
     shared::SharedTrait,
-    token::Claims,
     utils::{Error, Result},
 };
+use common::token::Claims;
 use hyper::Request;
 use std::sync::Arc;
 

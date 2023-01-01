@@ -1,10 +1,6 @@
-use crate::{
-    json::Json,
-    token::{self, JwtTrait},
-    utils::Error,
-    SharedTrait,
-};
+use crate::{json::Json, utils::Error, SharedTrait};
 use axum::Extension;
+use common::token::{self, JwtTrait};
 use entity::apps;
 use sea_orm::EntityTrait;
 use serde::{Deserialize, Serialize};

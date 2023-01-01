@@ -2,7 +2,6 @@ use crate::{
     auth::{self, CheckError},
     json::Json,
     shared::SharedTrait,
-    token::Claims,
     utils::{Error, Result},
 };
 use axum::{
@@ -10,6 +9,7 @@ use axum::{
     response::{IntoResponse, Response},
     Extension,
 };
+use common::token::Claims;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 

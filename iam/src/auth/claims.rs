@@ -1,4 +1,4 @@
-use crate::{shared::SharedTrait, token::JwtTrait};
+use crate::shared::SharedTrait;
 use axum::{
     extract::{FromRequestParts, TypedHeader},
     headers::authorization::{Authorization, Bearer},
@@ -7,6 +7,7 @@ use axum::{
     response::Response,
     Extension,
 };
+use common::token::JwtTrait;
 use std::sync::Arc;
 
 pub async fn get_claims<S: SharedTrait, B>(

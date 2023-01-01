@@ -5,8 +5,8 @@ use entity::{
 use sea_orm::{ActiveModelTrait, ActiveValue::*, DbConn};
 
 async fn create_user(db: &DbConn, name: &str, email: &str, password: &str) -> String {
-    println!("create user: {}", name);
-    users::ActiveModel {
+    print!("create user: {}", name);
+    let user = users::ActiveModel {
         id: Set(Id::new_user().to_string()),
         name: Set(name.to_string()),
         email: Set(email.to_string()),
@@ -16,7 +16,11 @@ async fn create_user(db: &DbConn, name: &str, email: &str, password: &str) -> St
     .insert(db)
     .await
     .unwrap()
-    .id
+    .id;
+
+    println!(" ({})", user);
+
+    user
 }
 
 async fn get_action(db: &DbConn, name: &str) -> String {

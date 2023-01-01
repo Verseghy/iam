@@ -1,6 +1,6 @@
 mod delete;
-mod get;
 mod gets;
+mod id;
 mod login;
 mod post;
 mod register;
@@ -8,17 +8,13 @@ mod register;
 use crate::{auth::permissions, shared::SharedTrait};
 use axum::{
     handler::Handler,
-    routing::{get, post, MethodRouter},
+    routing::{post, MethodRouter},
     Router,
 };
 
 pub fn routes<S: SharedTrait>() -> Router {
     Router::new()
         .route("/login", post(login::login::<S>))
-        .route(
-            "/:user_id",
-            get(get::get_user::<S>).layer(permissions![S, "iam.user.get"]),
-        )
         .route(
             "/",
             MethodRouter::new()
@@ -27,4 +23,5 @@ pub fn routes<S: SharedTrait>() -> Router {
                 .delete(delete::delete_user::<S>.layer(permissions![S, "iam.user.delete"])),
         )
         .route("/register", post(register::register::<S>))
+        .nest("/:user_id", id::routes::<S>())
 }

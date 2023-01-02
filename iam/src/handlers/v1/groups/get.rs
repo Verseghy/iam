@@ -1,9 +1,6 @@
-use crate::{
-    json::Json,
-    shared::SharedTrait,
-    utils::{Error, Result},
-};
+use crate::{json::Json, shared::SharedTrait};
 use axum::{extract::Path, Extension};
+use common::error::{self, Result};
 use entity::groups;
 use sea_orm::{entity::EntityTrait, FromQueryResult};
 use serde::Serialize;
@@ -21,7 +18,7 @@ pub async fn get_group<S: SharedTrait>(
         .into_model::<GetResponse>()
         .one(shared.db())
         .await?
-        .ok_or_else(|| Error::not_found("group not found"))?;
+        .ok_or(error::GROUP_NOT_FOUND)?;
 
     Ok(Json(res))
 }

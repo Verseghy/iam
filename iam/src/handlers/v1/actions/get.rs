@@ -1,9 +1,6 @@
-use crate::{
-    json::Json,
-    shared::SharedTrait,
-    utils::{Error, Result},
-};
+use crate::{json::Json, shared::SharedTrait};
 use axum::{extract::Path, Extension};
+use common::error::{self, Result};
 use entity::actions;
 use sea_orm::entity::EntityTrait;
 use serde::Serialize;
@@ -22,7 +19,7 @@ pub async fn get_action<S: SharedTrait>(
     let res = actions::Entity::find_by_id(id)
         .one(shared.db())
         .await?
-        .ok_or_else(|| Error::not_found("action not found"))?;
+        .ok_or(error::ACTION_NOT_FOUND)?;
 
     Ok(Json(GetResponse {
         id: res.id,

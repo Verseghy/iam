@@ -1,4 +1,3 @@
-use crate::utils::Error;
 use axum::{
     async_trait,
     body::HttpBody,
@@ -7,6 +6,7 @@ use axum::{
     response::{IntoResponse, Response},
     BoxError,
 };
+use common::error::{self, Error};
 use serde::{de::DeserializeOwned, Serialize};
 use validator::Validate;
 
@@ -27,12 +27,11 @@ where
         match axum::Json::<T>::from_request(req, state).await {
             Ok(value) => Ok(Self(value.0)),
             Err(rejection) => match rejection {
-                JsonRejection::JsonDataError(_) => Err(Error::bad_request("missing fields")),
-                JsonRejection::JsonSyntaxError(_) => Err(Error::bad_request("syntax error")),
-                JsonRejection::MissingJsonContentType(_) => {
-                    Err(Error::bad_request("missing or wrong Content-Type"))
-                }
-                err => Err(Error::internal(err)),
+                JsonRejection::JsonDataError(_) => Err(error::JSON_MISSING_FIELDS),
+                JsonRejection::JsonSyntaxError(_) => Err(error::JSON_SYNTAX_ERROR),
+                JsonRejection::MissingJsonContentType(_) => Err(error::JSON_CONTENT_TYPE),
+                // out of memory
+                _ => Err(error::INTERNAL),
             },
         }
     }
@@ -63,8 +62,7 @@ where
     async fn from_request(req: Request<B>, state: &S) -> Result<Self, Self::Rejection> {
         let Json(json) = Json::<T>::from_request(req, state).await?;
 
-        json.validate()
-            .map_err(|_| Error::bad_request("invalid data"))?;
+        json.validate().map_err(|_| error::JSON_VALIDATE_INVALID)?;
 
         Ok(ValidatedJson(json))
     }

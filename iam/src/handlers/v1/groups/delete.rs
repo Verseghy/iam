@@ -1,9 +1,6 @@
-use crate::{
-    json::Json,
-    shared::SharedTrait,
-    utils::{Error, Result},
-};
+use crate::{json::Json, shared::SharedTrait};
 use axum::{http::StatusCode, Extension};
+use common::error::{self, Result};
 use entity::groups;
 use sea_orm::entity::EntityTrait;
 use serde::Deserialize;
@@ -22,8 +19,8 @@ pub async fn delete_group<S: SharedTrait>(
         .await?;
 
     if res.rows_affected == 0 {
-        Err(Error::not_found("group not found"))
-    } else {
-        Ok(StatusCode::NO_CONTENT)
+        return Err(error::GROUP_NOT_FOUND);
     }
+
+    Ok(StatusCode::NO_CONTENT)
 }

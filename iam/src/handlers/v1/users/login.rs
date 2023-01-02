@@ -1,10 +1,10 @@
 use crate::{
     json::{Json, ValidatedJson},
     shared::SharedTrait,
-    utils::{Error, Result},
 };
 use axum::Extension;
 use common::{
+    error::{self, Result},
     password,
     token::{self, JwtTrait},
 };
@@ -41,10 +41,9 @@ pub async fn login<S: SharedTrait>(
         .filter(users::Column::Email.eq(req.email.clone()))
         .one(shared.db())
         .await?
-        .ok_or_else(|| Error::bad_request("invalid email or password"))?;
+        .ok_or(error::INVALID_EMAIL_OR_PASSWORD)?;
 
-    let (valid, rehash) =
-        password::validate(&res.password, &req.password).map_err(Error::internal)?;
+    let (valid, rehash) = password::validate(&res.password, &req.password)?;
 
     if let Some(Ok(hash)) = rehash {
         let mut action: users::ActiveModel = res.clone().into();
@@ -54,7 +53,7 @@ pub async fn login<S: SharedTrait>(
     }
 
     if !valid {
-        return Err(Error::bad_request("invalid email or password"));
+        return Err(error::INVALID_EMAIL_OR_PASSWORD);
     }
 
     let claims = token::Claims {
@@ -62,7 +61,7 @@ pub async fn login<S: SharedTrait>(
         ..Default::default()
     };
 
-    let token = shared.jwt().encode(&claims).map_err(Error::internal)?;
+    let token = shared.jwt().encode(&claims)?;
 
     crate::audit!(action = "login", user = res.id.to_string(),);
 

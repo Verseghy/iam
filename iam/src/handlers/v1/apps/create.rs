@@ -1,10 +1,9 @@
 use crate::{
     json::{Json, ValidatedJson},
-    utils::Error,
     SharedTrait,
 };
 use axum::{http::StatusCode, Extension};
-use common::Id;
+use common::{error::Result, Id};
 use entity::apps;
 use rand::distributions::{Alphanumeric, DistString};
 use sea_orm::{EntityTrait, Set};
@@ -26,11 +25,11 @@ pub struct Response {
 pub async fn create_app<S: SharedTrait>(
     Extension(shared): Extension<S>,
     ValidatedJson(req): ValidatedJson<Request>,
-) -> Result<(StatusCode, Json<Response>), Error> {
+) -> Result<(StatusCode, Json<Response>)> {
     let id = Id::new_app();
     let password = Alphanumeric.sample_string(&mut shared.rng().clone(), 32);
 
-    let hashed_password = common::password::hash(&password).map_err(Error::internal)?;
+    let hashed_password = common::password::hash(&password)?;
 
     let app = apps::ActiveModel {
         id: Set(id.to_string()),

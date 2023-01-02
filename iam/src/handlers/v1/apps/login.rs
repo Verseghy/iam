@@ -1,6 +1,9 @@
-use crate::{json::Json, utils::Error, SharedTrait};
+use crate::{json::Json, SharedTrait};
 use axum::Extension;
-use common::token::{self, JwtTrait};
+use common::{
+    error::{self, Result},
+    token::{self, JwtTrait},
+};
 use entity::apps;
 use sea_orm::EntityTrait;
 use serde::{Deserialize, Serialize};
@@ -18,19 +21,18 @@ pub struct Response {
 pub async fn login_app<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Json(request): Json<Request>,
-) -> Result<Json<Response>, Error> {
+) -> Result<Json<Response>> {
     let (id, password) = parse_token(&request.token)?;
 
     let res = apps::Entity::find_by_id(id.clone())
         .one(shared.db())
         .await?
-        .ok_or_else(|| Error::bad_request("invalid token"))?;
+        .ok_or(error::APP_INVALID_TOKEN)?;
 
-    let (valid, _) =
-        common::password::validate(&res.password, &password).map_err(Error::internal)?;
+    let (valid, _) = common::password::validate(&res.password, &password)?;
 
     if !valid {
-        return Err(Error::bad_request("invalid token"));
+        return Err(error::APP_INVALID_TOKEN);
     }
 
     let claims = token::Claims {
@@ -38,19 +40,18 @@ pub async fn login_app<S: SharedTrait>(
         ..Default::default()
     };
 
-    let token = shared.jwt().encode(&claims).map_err(Error::internal)?;
+    let token = shared.jwt().encode(&claims)?;
 
     Ok(Json(Response { token }))
 }
 
-fn parse_token(token: &str) -> Result<(String, String), Error> {
-    let decoded = base64::decode(token).map_err(|_| Error::bad_request("invalid token"))?;
-    let decoded_string =
-        String::from_utf8(decoded).map_err(|_| Error::bad_request("invalid token"))?;
+fn parse_token(token: &str) -> Result<(String, String)> {
+    let decoded = base64::decode(token).map_err(|_| error::APP_INVALID_TOKEN)?;
+    let decoded_string = String::from_utf8(decoded).map_err(|_| error::APP_INVALID_TOKEN)?;
 
     let (id, password) = decoded_string
         .split_once(':')
-        .ok_or_else(|| Error::bad_request("invalid token"))?;
+        .ok_or(error::APP_INVALID_TOKEN)?;
 
     Ok((id.into(), password.into()))
 }

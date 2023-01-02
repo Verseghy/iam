@@ -1,5 +1,6 @@
-use crate::{json::Json, utils::Error, SharedTrait};
+use crate::{json::Json, SharedTrait};
 use axum::{http::StatusCode, Extension};
+use common::error::{self, Result};
 use entity::{pivot_actions_users, pivot_users_groups};
 use sea_orm::{EntityTrait, Set};
 use serde::Deserialize;
@@ -14,13 +15,13 @@ pub struct Request {
 pub async fn assign<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Json(request): Json<Request>,
-) -> Result<StatusCode, Error> {
+) -> Result<StatusCode> {
     if request.action.is_none() && request.group.is_none() {
-        return Err(Error::bad_request("no action or group"));
+        return Err(error::ASSIGN_NO_ACTION_OR_GROUP);
     }
 
     if request.action.is_some() && request.group.is_some() {
-        return Err(Error::bad_request("action and group at the same time"));
+        return Err(error::ASSIGN_ACTION_AND_GROUP_SAME_TIME);
     }
 
     if let Some(action_id) = request.action {

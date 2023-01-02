@@ -1,8 +1,11 @@
 use std::sync::Arc;
 
-use crate::{json::Json, utils::Error, SharedTrait};
+use crate::{json::Json, SharedTrait};
 use axum::{extract::Path, Extension};
-use common::token::Claims;
+use common::{
+    error::{self, Result},
+    token::Claims,
+};
 use entity::{actions, users};
 use sea_orm::{query::QueryFilter, ColumnTrait, FromQueryResult, Related};
 use serde::Serialize;
@@ -18,9 +21,9 @@ pub async fn get_actions<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Path(id): Path<String>,
     Extension(claims): Extension<Arc<Claims>>,
-) -> Result<Json<Vec<Action>>, Error> {
+) -> Result<Json<Vec<Action>>> {
     if id != claims.subject {
-        return Err(Error::forbidden("no permission"));
+        return Err(error::NO_PERMISSION);
     }
 
     Ok(Json(

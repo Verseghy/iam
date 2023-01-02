@@ -1,10 +1,10 @@
+use common::error::{self, Result};
 use entity::{
     actions::{self, Entity as Actions},
     apps::{self, Entity as Apps},
     users::{self, Entity as Users},
 };
 use sea_orm::{
-    error::DbErr,
     query::{QueryFilter, QuerySelect},
     sea_query::UnionType,
     ColumnTrait, ConnectionTrait, FromQueryResult, QueryTrait, Related, StatementBuilder,
@@ -15,7 +15,7 @@ struct ActionResult {
     name: String,
 }
 
-pub async fn check<DB>(user_id: &str, permissions: &[&str], database: &DB) -> Result<(), CheckError>
+pub async fn check<DB>(user_id: &str, permissions: &[&str], database: &DB) -> Result<()>
 where
     DB: ConnectionTrait,
 {
@@ -65,17 +65,9 @@ where
         }
 
         if !has {
-            Err(CheckError::NoPermission(permission.to_string()))?;
+            return Err(error::NO_PERMISSION);
         }
     }
 
     Ok(())
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum CheckError {
-    #[error("database error: {0}")]
-    DatabaseError(#[from] DbErr),
-    #[error("no permission: {0}")]
-    NoPermission(String),
 }

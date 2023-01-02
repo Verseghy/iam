@@ -1,10 +1,6 @@
-use crate::{
-    json::Json,
-    shared::SharedTrait,
-    utils::{set_option, Error, Result},
-};
+use crate::{json::Json, shared::SharedTrait, utils::set_option};
 use axum::{http::StatusCode, Extension};
-use common::password;
+use common::{error::Result, password};
 use entity::users;
 use sea_orm::{entity::EntityTrait, Set};
 use serde::Deserialize;
@@ -23,7 +19,7 @@ pub async fn update_user<S: SharedTrait>(
     Json(req): Json<UpdateUserRequest>,
 ) -> Result<StatusCode> {
     let hash = match req.password {
-        Some(pwd) => Some(password::hash(&pwd).map_err(Error::internal)?),
+        Some(pwd) => Some(password::hash(&pwd)?),
         None => None,
     };
 

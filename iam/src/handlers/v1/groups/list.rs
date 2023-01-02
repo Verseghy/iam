@@ -1,5 +1,6 @@
-use crate::{json::Json, shared::SharedTrait, utils::Result};
+use crate::{json::Json, shared::SharedTrait};
 use axum::Extension;
+use common::error::Result;
 use entity::groups;
 use sea_orm::{entity::EntityTrait, FromQueryResult, QuerySelect};
 use serde::Serialize;

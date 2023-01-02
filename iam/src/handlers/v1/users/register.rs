@@ -1,11 +1,9 @@
-use crate::{
-    json::Json,
-    json::ValidatedJson,
-    shared::SharedTrait,
-    utils::{DatabaseErrorType, Error, Result},
-};
+use crate::{json::Json, json::ValidatedJson, shared::SharedTrait, utils::DatabaseErrorType};
 use axum::{http::StatusCode, Extension};
-use common::Id;
+use common::{
+    error::{self, Result},
+    Id,
+};
 use entity::users;
 use sea_orm::{EntityTrait, Set};
 use serde::{Deserialize, Serialize};
@@ -34,7 +32,7 @@ pub async fn register<S: SharedTrait>(
 
     let model = users::ActiveModel {
         id: Set(id.to_string()),
-        password: Set(common::password::hash(&req.password).map_err(Error::internal)?),
+        password: Set(common::password::hash(&req.password)?),
         name: Set(req.name),
         email: Set(req.email),
         ..Default::default()
@@ -44,10 +42,10 @@ pub async fn register<S: SharedTrait>(
 
     if let Err(err) = result {
         if err.is_duplicate_entry() {
-            Err(Error::bad_request("this email is already registered"))?
-        } else {
-            Err(Error::internal(err))?
+            return Err(error::EMAIL_ALREADY_REGISTERED);
         }
+
+        Err(err)?;
     }
 
     Ok((StatusCode::CREATED, Json(Response { id })))

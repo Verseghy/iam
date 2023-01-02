@@ -1,9 +1,9 @@
-use super::permission::{self, CheckError};
-use crate::{
-    shared::SharedTrait,
-    utils::{Error, Result},
+use super::permission;
+use crate::shared::SharedTrait;
+use common::{
+    error::{self, Result},
+    token::Claims,
 };
-use common::token::Claims;
 use hyper::Request;
 use std::sync::Arc;
 
@@ -16,14 +16,9 @@ where
     let claims = request
         .extensions()
         .get::<Arc<Claims>>()
-        .ok_or_else(|| Error::unauthorized("missing or invalid authorization header"))?;
+        .ok_or(error::INVALID_AUTH_HEADER)?;
 
-    permission::check(claims.subject.as_str(), actions, shared.db())
-        .await
-        .map_err(|err| match err {
-            CheckError::DatabaseError(err) => Error::internal(err),
-            CheckError::NoPermission(perm) => Error::forbidden(format!("no permission: {perm}")),
-        })?;
+    permission::check(claims.subject.as_str(), actions, shared.db()).await?;
 
     Ok(())
 }

@@ -1,9 +1,6 @@
-use crate::{
-    json::Json,
-    shared::SharedTrait,
-    utils::{Error, Result},
-};
+use crate::{json::Json, shared::SharedTrait};
 use axum::{extract::Path, Extension};
+use common::error::{self, Result};
 use entity::users;
 use sea_orm::entity::EntityTrait;
 use serde::Serialize;
@@ -22,7 +19,7 @@ pub async fn get_user<S: SharedTrait>(
     let res = users::Entity::find_by_id(id)
         .one(shared.db())
         .await?
-        .ok_or_else(|| Error::not_found("user not found"))?;
+        .ok_or(error::USER_NOT_FOUND)?;
 
     Ok(Json(GetUserResponse {
         id: res.id,

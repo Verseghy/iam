@@ -1,11 +1,9 @@
+use crate::error::{self, Result};
 use chrono::{Duration, Utc};
-use jsonwebtoken::{
-    errors::Error as JWTError, Algorithm, DecodingKey, EncodingKey, Header, Validation,
-};
+use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
-use std::default::Default;
-use std::ops::Add;
+use std::{default::Default, ops::Add};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -75,16 +73,19 @@ impl Default for Jwt {
 }
 
 pub trait JwtTrait {
-    fn get_claims(&self, token: &str) -> Result<Claims, JWTError>;
-    fn encode(&self, claims: &Claims) -> Result<String, JWTError>;
+    fn get_claims(&self, token: &str) -> Result<Claims>;
+    fn encode(&self, claims: &Claims) -> Result<String>;
 }
 
 impl JwtTrait for Jwt {
-    fn get_claims(&self, token: &str) -> Result<Claims, JWTError> {
-        Ok(jsonwebtoken::decode(token, &self.decoding, &VALIDATION)?.claims)
+    fn get_claims(&self, token: &str) -> Result<Claims> {
+        Ok(jsonwebtoken::decode(token, &self.decoding, &VALIDATION)
+            .map_err(|_| error::JWT_INVALID_TOKEN)?
+            .claims)
     }
 
-    fn encode(&self, claims: &Claims) -> Result<String, JWTError> {
+    fn encode(&self, claims: &Claims) -> Result<String> {
         jsonwebtoken::encode(&Header::new(Algorithm::RS256), &claims, &self.encoding)
+            .map_err(|_| error::JWT_INVALID_TOKEN)
     }
 }

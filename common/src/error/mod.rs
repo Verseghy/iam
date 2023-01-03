@@ -113,6 +113,6 @@ mod tests {
         let content_type = response.headers().get(header::CONTENT_TYPE);
 
         assert!(content_type.is_some(), "response");
-        assert_ne!(content_type.unwrap(), "application/json");
+        assert_eq!(content_type.unwrap(), "application/json");
     }
 }

@@ -53,7 +53,6 @@ impl Error {
 }
 
 impl IntoResponse for Error {
-    #[inline]
     fn into_response(self) -> Response {
         let mut buf = BytesMut::with_capacity(128).writer();
 

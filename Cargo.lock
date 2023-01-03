@@ -471,7 +471,6 @@ dependencies = [
  "sea-orm",
  "serde",
  "serde_json",
- "thiserror",
  "tracing",
  "uuid",
 ]
@@ -990,7 +989,6 @@ dependencies = [
  "sea-orm",
  "serde",
  "serde_json",
- "thiserror",
  "tokio",
  "tower",
  "tower-http",

@@ -57,14 +57,13 @@ mod tests {
 
     use crate::{
         shared::mock::MockShared,
-        utils::testing::{body_to_json, json_body},
+        utils::testing::{assert_error, body_to_json, json_body},
     };
     use axum::{
         handler::HandlerWithoutStateExt,
         http::{self, Request, StatusCode},
     };
     use sea_orm::{DatabaseBackend, MockDatabase, MockExecResult};
-    use serde_json::json;
     use tower::ServiceExt;
 
     #[tokio::test]
@@ -123,10 +122,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(res.status(), StatusCode::BAD_REQUEST);
-
-        let body = body_to_json(res.into_body()).await;
-        assert_eq!(body, json!({"error": "invalid data"}));
+        assert_error!(res, error::JSON_VALIDATE_INVALID);
     }
 
     #[tokio::test]
@@ -148,10 +144,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(res.status(), StatusCode::BAD_REQUEST);
-
-        let body = body_to_json(res.into_body()).await;
-        assert_eq!(body, json!({"error": "invalid data"}));
+        assert_error!(res, error::JSON_VALIDATE_INVALID);
     }
 
     #[tokio::test]
@@ -173,10 +166,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(res.status(), StatusCode::BAD_REQUEST);
-
-        let body = body_to_json(res.into_body()).await;
-        assert_eq!(body, json!({"error": "invalid data"}));
+        assert_error!(res, error::JSON_VALIDATE_INVALID);
     }
 
     #[tokio::test]
@@ -198,9 +188,6 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(res.status(), StatusCode::BAD_REQUEST);
-
-        let body = body_to_json(res.into_body()).await;
-        assert_eq!(body, json!({"error": "invalid data"}));
+        assert_error!(res, error::JSON_VALIDATE_INVALID);
     }
 }

@@ -21,3 +21,14 @@ macro_rules! json_body {
 }
 
 pub(crate) use json_body;
+
+macro_rules! assert_error {
+    ($res:expr, $error:expr) => {
+        assert_eq!(($res).status(), ($error).status());
+
+        let res_json = $crate::utils::testing::body_to_json(($res).into_body()).await;
+        assert_eq!(res_json["code"], ($error).code());
+    };
+}
+
+pub(crate) use assert_error;

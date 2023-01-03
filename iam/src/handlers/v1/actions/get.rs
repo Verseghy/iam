@@ -32,7 +32,10 @@ pub async fn get_action<S: SharedTrait>(
 mod tests {
     use super::*;
 
-    use crate::{shared::mock::MockShared, utils::testing::body_to_json};
+    use crate::{
+        shared::mock::MockShared,
+        utils::testing::{assert_error, body_to_json},
+    };
     use axum::{
         body::Body,
         http::{Request, StatusCode},
@@ -98,9 +101,6 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(res.status(), StatusCode::NOT_FOUND);
-
-        let body = body_to_json(res.into_body()).await;
-        assert_eq!(body, json!({"error": "action not found"}));
+        assert_error!(res, error::ACTION_NOT_FOUND);
     }
 }

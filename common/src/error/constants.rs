@@ -7,7 +7,7 @@ const_error! {
 }
 const_error! {
     #[error("I001", INTERNAL_SERVER_ERROR)]
-    #[message("failed to hash the password")]
+    #[message("internal server error")]
     const FAILED_PASSWORD_HASH;
 }
 const_error! {
@@ -27,7 +27,7 @@ const_error! {
 }
 const_error! {
     #[error("I005", INTERNAL_SERVER_ERROR)]
-    #[message("database error")]
+    #[message("internal server error")]
     const DATABASE_ERROR;
 }
 const_error! {

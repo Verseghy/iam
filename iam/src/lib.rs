@@ -2,6 +2,7 @@ mod audit;
 mod auth;
 mod handlers;
 mod json;
+mod middlewares;
 mod shared;
 mod utils;
 
@@ -13,6 +14,7 @@ use axum::{
     response::{IntoResponse, Response},
     BoxError, Router, Server,
 };
+use middlewares::TraceRequestIdLayer;
 use shared::SharedTrait;
 use std::{
     error::Error,
@@ -25,6 +27,7 @@ use tower_http::{
     cors::{Any, CorsLayer},
     ServiceBuilderExt,
 };
+use utils::MakeUuidRequestId;
 
 async fn handle_error(err: BoxError) -> Response {
     if err.is::<Elapsed>() {
@@ -67,12 +70,15 @@ fn app<S: SharedTrait>(shared: S) -> Router {
         .layer(HandleErrorLayer::new(handle_error))
         .timeout(Duration::from_secs(10))
         .sensitive_headers(once(AUTHORIZATION))
+        .set_x_request_id(MakeUuidRequestId)
         .trace_for_http()
+        .layer(TraceRequestIdLayer)
         .compression()
         .decompression()
         .layer(cors_layer)
         .add_extension(shared)
         .layer(middleware::from_fn(auth::get_claims::<S, Body>))
+        .propagate_x_request_id()
         .into_inner();
 
     router::<S>().layer(middlewares)

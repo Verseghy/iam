@@ -28,6 +28,7 @@ http-body = "0.4.5"
 common = { path = "../common" }
 base64 = "0.20.0"
 dotenvy = "0.15.6"
+uuid = { version = "1.2.2", features = ["v4"] }
 
 [dev-dependencies]
 mime = "0.3.16"

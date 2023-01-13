@@ -93,3 +93,48 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
         .with_graceful_shutdown(shutdown_signals())
         .await?)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::shared::mock::MockShared;
+    use axum::routing::get;
+    use hyper::{Body, Request};
+    use tower::ServiceExt;
+
+    #[tokio::test]
+    async fn has_x_request_id() {
+        let svc = middlewares(
+            MockShared::empty(),
+            Router::new().route("/", get(|| async {})),
+        );
+
+        let res = svc.oneshot(Request::new(Body::empty())).await.unwrap();
+
+        let mut values = res.headers().get_all("x-request-id").iter();
+        assert!(values.next().is_some());
+        assert_eq!(values.next(), None);
+    }
+
+    #[tokio::test]
+    async fn custom_x_request_id() {
+        let svc = middlewares(
+            MockShared::empty(),
+            Router::new().route("/", get(|| async {})),
+        );
+
+        let res = svc
+            .oneshot(
+                Request::builder()
+                    .header("x-request-id", "test-id")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        let mut values = res.headers().get_all("x-request-id").iter();
+        assert_eq!(values.next().unwrap(), "test-id");
+        assert_eq!(values.next(), None);
+    }
+}

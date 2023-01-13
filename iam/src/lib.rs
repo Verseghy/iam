@@ -15,7 +15,7 @@ use axum::{
     BoxError, Router, Server,
 };
 use middlewares::TraceRequestIdLayer;
-use shared::SharedTrait;
+use shared::{Shared, SharedTrait};
 use std::{
     error::Error,
     iter::once,
@@ -56,11 +56,7 @@ async fn shutdown_signals() {
     }
 }
 
-fn router<S: SharedTrait>() -> Router {
-    Router::new().nest("/", handlers::routes::<S>())
-}
-
-fn app<S: SharedTrait>(shared: S) -> Router {
+fn middlewares<S: SharedTrait>(shared: S, router: Router) -> Router {
     let cors_layer = CorsLayer::new()
         .allow_origin(Any)
         .allow_methods(Any)
@@ -81,14 +77,14 @@ fn app<S: SharedTrait>(shared: S) -> Router {
         .propagate_x_request_id()
         .into_inner();
 
-    router::<S>().layer(middlewares)
+    router.layer(middlewares)
 }
 
 pub async fn run() -> Result<(), Box<dyn Error>> {
     let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 3001));
     let shared = shared::create_shared().await;
 
-    let app = app(shared);
+    let app = middlewares(shared, handlers::routes::<Shared>());
 
     tracing::info!("Listening on port {}", addr.port());
 

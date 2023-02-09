@@ -6,12 +6,7 @@ use sea_orm::entity::EntityTrait;
 use serde::Serialize;
 
 #[derive(Serialize, Debug)]
-pub struct GetsResponse {
-    actions: Vec<Action>,
-}
-
-#[derive(Serialize, Debug)]
-struct Action {
+pub struct Action {
     id: String,
     name: String,
     secure: bool,
@@ -19,17 +14,16 @@ struct Action {
 
 pub async fn list_actions<S: SharedTrait>(
     Extension(shared): Extension<S>,
-) -> Result<Json<GetsResponse>> {
+) -> Result<Json<Vec<Action>>> {
     let res = actions::Entity::find().all(shared.db()).await?;
 
-    Ok(Json(GetsResponse {
-        actions: res
-            .into_iter()
+    Ok(Json(
+        res.into_iter()
             .map(|x| Action {
                 id: x.id,
                 name: x.name,
                 secure: x.secure,
             })
             .collect(),
-    }))
+    ))
 }

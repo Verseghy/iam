@@ -5,7 +5,7 @@ use entity::{
 use sea_orm::{ActiveModelTrait, ActiveValue::*, DbConn};
 
 async fn create_user(db: &DbConn, name: &str, email: &str, password: &str) -> String {
-    print!("create user: {}", name);
+    print!("create user: {name}");
     let user = users::ActiveModel {
         id: Set(Id::new_user().to_string()),
         name: Set(name.to_string()),
@@ -18,13 +18,13 @@ async fn create_user(db: &DbConn, name: &str, email: &str, password: &str) -> St
     .unwrap()
     .id;
 
-    println!(" ({})", user);
+    println!(" ({user})");
 
     user
 }
 
 async fn get_action(db: &DbConn, name: &str) -> String {
-    println!("get action: {}", name);
+    println!("get action: {name}");
     actions::Entity::find_by_name(name)
         .one(db)
         .await
@@ -34,7 +34,7 @@ async fn get_action(db: &DbConn, name: &str) -> String {
 }
 
 async fn create_group(db: &DbConn, name: &str) -> String {
-    println!("create group: {}", name);
+    println!("create group: {name}");
     groups::ActiveModel {
         id: Set(Id::new_group().to_string()),
         name: Set(name.to_string()),
@@ -47,7 +47,7 @@ async fn create_group(db: &DbConn, name: &str) -> String {
 }
 
 async fn add_action_to_user(db: &DbConn, action: &str, user: &String) {
-    println!("add action `{}` to user: {}", action, user);
+    println!("add action `{action}` to user: {user}");
     let action = get_action(db, action).await;
 
     pivot_actions_users::ActiveModel {
@@ -60,7 +60,7 @@ async fn add_action_to_user(db: &DbConn, action: &str, user: &String) {
 }
 
 async fn add_action_to_group(db: &DbConn, action: &str, group: &String) {
-    println!("add action `{}` to group: {}", action, group);
+    println!("add action `{action}` to group: {group}");
     let action = get_action(db, action).await;
 
     pivot_actions_groups::ActiveModel {
@@ -73,7 +73,7 @@ async fn add_action_to_group(db: &DbConn, action: &str, group: &String) {
 }
 
 async fn add_user_to_group(db: &DbConn, user: &String, group: &String) {
-    println!("add user `{}` to group: {}", user, group);
+    println!("add user `{user}` to group: {group}");
     pivot_users_groups::ActiveModel {
         user_id: Set(user.clone()),
         group_id: Set(group.clone()),

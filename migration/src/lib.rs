@@ -13,6 +13,7 @@ mod m20220416_060135_add_iam_actions;
 mod m20220822_190837_remove_invite_action;
 mod m20221007_103449_create_app;
 mod m20221007_211858_apps_permissions;
+mod m20230226_221912_apps_permission2;
 
 pub struct Migrator;
 
@@ -30,6 +31,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20220822_190837_remove_invite_action::Migration),
             Box::new(m20221007_103449_create_app::Migration),
             Box::new(m20221007_211858_apps_permissions::Migration),
+            Box::new(m20230226_221912_apps_permission2::Migration),
         ]
     }
 }

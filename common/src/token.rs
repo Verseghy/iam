@@ -79,9 +79,13 @@ pub trait JwtTrait {
 
 impl JwtTrait for Jwt {
     fn get_claims(&self, token: &str) -> Result<Claims> {
-        Ok(jsonwebtoken::decode(token, &self.decoding, &VALIDATION)
-            .map_err(|_| error::JWT_INVALID_TOKEN)?
-            .claims)
+        match jsonwebtoken::decode(token, &self.decoding, &VALIDATION) {
+            Ok(decode) => Ok(decode.claims),
+            Err(error) => {
+                tracing::warn!(token, error = error.to_string(), "invalid token");
+                Err(error::JWT_INVALID_TOKEN)
+            }
+        }
     }
 
     fn encode(&self, claims: &Claims) -> Result<String> {

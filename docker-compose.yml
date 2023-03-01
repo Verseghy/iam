@@ -4,10 +4,9 @@ services:
   database:
     image: mysql:8.0
     environment:
-      - "MYSQL_DATABASE=iam"
-      - "MYSQL_USER=backend"
-      - "MYSQL_PASSWORD=password"
-      - "MYSQL_ROOT_PASSWORD=secret"
-      - "TZ=Europe/Budapest"
+      MYSQL_DATABASE: iam
+      MYSQL_USER: iam
+      MYSQL_PASSWORD: secret
+      TZ: Europe/Budapest
     ports:
-        - "33061:3306"
+        - "3306:3306"

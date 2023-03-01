@@ -1,5 +1,6 @@
 mod app;
 mod error;
+pub mod testing;
 mod user;
 mod utils;
 

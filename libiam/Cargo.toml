@@ -10,3 +10,5 @@ serde = { version = "1.0.152", features = ["derive"] }
 serde_json = "1.0.93"
 thiserror = "1.0.38"
 iam-common = { path = "../iam-common" }
+iam-entity = { path = "../iam-entity" }
+sea-orm = { version = "0.10.6", default-features = false, features = ["runtime-tokio-rustls", "sqlx-mysql", "macros"] }

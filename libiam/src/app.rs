@@ -12,6 +12,7 @@ use crate::{
 
 #[derive(Debug)]
 pub struct AppInner {
+    secret: String,
     token: String,
     _iam: Iam,
 }
@@ -42,6 +43,7 @@ impl App {
 
         Ok(Self {
             inner: Arc::new(AppInner {
+                secret: secret.to_owned(),
                 token: res.token,
                 _iam: iam.clone(),
             }),
@@ -53,7 +55,7 @@ impl App {
     }
 
     pub fn id(&self) -> String {
-        let (id, _) = iam_common::app::parse_token(&self.inner.token).unwrap();
+        let (id, _) = iam_common::app::parse_token(&self.inner.secret).unwrap();
         id
     }
 }

@@ -13,6 +13,7 @@ use crate::{
 #[derive(Debug)]
 pub struct AppInner {
     token: String,
+    _iam: Iam,
 }
 
 #[derive(Debug, Clone)]
@@ -40,7 +41,10 @@ impl App {
         let res = unwrap_res(res)?;
 
         Ok(Self {
-            inner: Arc::new(AppInner { token: res.token }),
+            inner: Arc::new(AppInner {
+                token: res.token,
+                _iam: iam.clone(),
+            }),
         })
     }
 

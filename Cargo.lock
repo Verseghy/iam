@@ -1256,7 +1256,9 @@ name = "libiam"
 version = "0.1.0"
 dependencies = [
  "iam-common",
+ "iam-entity",
  "reqwest",
+ "sea-orm",
  "serde",
  "serde_json",
  "thiserror",

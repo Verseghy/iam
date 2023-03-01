@@ -7,6 +7,7 @@ mod utils;
 use std::sync::Arc;
 
 pub use app::App;
+pub use iam_common::token::Jwt;
 pub use user::User;
 
 #[derive(Debug)]

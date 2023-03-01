@@ -9,6 +9,7 @@ members = [
     "iam-entity",
     "iam-migration",
     "iam-macros",
+    "libiam",
     "cmds",
 ]
 default-members = [

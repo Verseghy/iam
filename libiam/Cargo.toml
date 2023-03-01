@@ -5,3 +5,8 @@ edition = "2021"
 license-file.workspace = true
 
 [dependencies]
+reqwest = { version = "0.11.14", features = ["json"] }
+serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0.93"
+thiserror = "1.0.38"
+iam-common = { path = "../iam-common" }

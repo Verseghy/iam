@@ -13,7 +13,7 @@ async fn main() {
     let db = database::connect().await;
     let input = env::args().nth(1).expect("no input user");
 
-    let jwt = Jwt::new();
+    let jwt = Jwt::from_env();
 
     let user = users::Entity::find_by_id(input)
         .one(&db)

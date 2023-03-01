@@ -43,32 +43,29 @@ static VALIDATION: Lazy<Validation> = Lazy::new(|| {
 });
 
 pub struct Jwt {
-    encoding: EncodingKey,
+    encoding: Option<EncodingKey>,
     decoding: DecodingKey,
 }
 
 impl Jwt {
-    pub fn new() -> Self {
-        Self {
-            encoding: EncodingKey::from_rsa_pem(
-                std::env::var("JWT_RSA_PRIVATE")
-                    .expect("JWT_RSA_PRIVATE not set")
-                    .as_ref(),
-            )
-            .expect("JWT_RSA_PRIVATE invalid"),
-            decoding: DecodingKey::from_rsa_pem(
-                std::env::var("JWT_RSA_PUBLIC")
-                    .expect("JWT_RSA_PUBLIC not set")
-                    .as_ref(),
-            )
-            .expect("JWT_RSA_PUBLIC invalid"),
-        }
+    pub fn new(encoding: Option<&[u8]>, decoding: &[u8]) -> Self {
+        let encoding = encoding.map(|k| EncodingKey::from_rsa_pem(k).expect("invalid public key"));
+        let decoding = DecodingKey::from_rsa_pem(decoding).expect("invalid private key");
+
+        Self { encoding, decoding }
+    }
+
+    pub fn from_env() -> Self {
+        let encoding = std::env::var("JWT_RSA_PRIVATE").expect("JWT_RSA_PRIVATE not set");
+        let decoding = std::env::var("JWT_RSA_PUBLIC").expect("JWT_RSA_PUBLIC not set");
+
+        Self::new(Some(encoding.as_ref()), decoding.as_ref())
     }
 }
 
 impl Default for Jwt {
     fn default() -> Self {
-        Self::new()
+        Self::from_env()
     }
 }
 
@@ -89,7 +86,11 @@ impl JwtTrait for Jwt {
     }
 
     fn encode(&self, claims: &Claims) -> Result<String> {
-        jsonwebtoken::encode(&Header::new(Algorithm::RS256), &claims, &self.encoding)
+        let Some(encoding) = &self.encoding else {
+            return Err(error::INTERNAL);
+        };
+
+        jsonwebtoken::encode(&Header::new(Algorithm::RS256), &claims, &encoding)
             .map_err(|_| error::JWT_INVALID_TOKEN)
     }
 }

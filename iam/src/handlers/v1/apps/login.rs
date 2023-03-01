@@ -22,7 +22,7 @@ pub async fn login_app<S: SharedTrait>(
     Extension(shared): Extension<S>,
     Json(request): Json<Request>,
 ) -> Result<Json<Response>> {
-    let (id, password) = parse_token(&request.token)?;
+    let (id, password) = iam_common::app::parse_token(&request.token)?;
 
     let res = apps::Entity::find_by_id(id.clone())
         .one(shared.db())
@@ -43,15 +43,4 @@ pub async fn login_app<S: SharedTrait>(
     let token = shared.jwt().encode(&claims)?;
 
     Ok(Json(Response { token }))
-}
-
-fn parse_token(token: &str) -> Result<(String, String)> {
-    let decoded = base64::decode(token).map_err(|_| error::APP_INVALID_TOKEN)?;
-    let decoded_string = String::from_utf8(decoded).map_err(|_| error::APP_INVALID_TOKEN)?;
-
-    let (id, password) = decoded_string
-        .split_once(':')
-        .ok_or(error::APP_INVALID_TOKEN)?;
-
-    Ok((id.into(), password.into()))
 }

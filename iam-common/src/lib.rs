@@ -1,3 +1,4 @@
+pub mod app;
 pub mod database;
 pub mod error;
 mod id;

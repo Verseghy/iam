@@ -24,6 +24,8 @@ pub async fn login_app<S: SharedTrait>(
 ) -> Result<Json<Response>> {
     let (id, password) = iam_common::app::parse_token(&request.token)?;
 
+    tracing::debug!(id, "app login");
+
     let res = apps::Entity::find_by_id(id.clone())
         .one(shared.db())
         .await?

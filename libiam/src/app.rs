@@ -29,6 +29,8 @@ impl App {
             token: String,
         }
 
+        tracing::debug!(secret, "app logging into iam");
+
         let res = Client::new()
             .post(iam.get_url("/v1/apps/login"))
             .json(&json!({

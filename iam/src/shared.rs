@@ -46,7 +46,7 @@ pub async fn create_shared() -> Shared {
     Shared {
         inner: Arc::new(SharedInner {
             db: database::connect().await,
-            jwt: Jwt::new(),
+            jwt: Jwt::from_env(),
             rng: StdRng::from_entropy(),
         }),
     }

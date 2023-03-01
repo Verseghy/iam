@@ -13,7 +13,7 @@ use std::borrow::Cow;
 #[doc(hidden)]
 pub mod __macro_support {
     pub use axum::http::StatusCode;
-    pub use macros;
+    pub use iam_macros;
     pub use std::borrow::Cow;
 }
 
@@ -91,7 +91,7 @@ macro_rules! const_error {
         #[message($msg:literal)]
         const $name:ident;
     ) => {
-        $crate::error::__macro_support::macros::error_code_to_ident!($code);
+        $crate::error::__macro_support::iam_macros::error_code_to_ident!($code);
         pub const $name: $crate::error::Error = $crate::error::Error::new(
             $crate::error::__macro_support::StatusCode::$status,
             $code,

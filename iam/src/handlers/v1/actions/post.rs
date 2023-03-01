@@ -1,7 +1,7 @@
 use crate::{json::Json, shared::SharedTrait, utils::set_option};
 use axum::{http::StatusCode, Extension};
-use common::error::Result;
-use entity::actions;
+use iam_common::error::Result;
+use iam_entity::actions;
 use sea_orm::{entity::EntityTrait, Set};
 use serde::Deserialize;
 use std::default::Default;

@@ -1,6 +1,6 @@
 use crate::{auth, json::Json, shared::SharedTrait};
 use axum::{http::StatusCode, Extension};
-use common::{error::Result, token::Claims};
+use iam_common::{error::Result, token::Claims};
 use serde::Deserialize;
 use std::sync::Arc;
 

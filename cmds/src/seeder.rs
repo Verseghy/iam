@@ -1,5 +1,5 @@
-use common::{database, password, Id};
-use entity::{
+use iam_common::{database, password, Id};
+use iam_entity::{
     actions, groups, pivot_actions_groups, pivot_actions_users, pivot_users_groups, users,
 };
 use sea_orm::{ActiveModelTrait, ActiveValue::*, DbConn};

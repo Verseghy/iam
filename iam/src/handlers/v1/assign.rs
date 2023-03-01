@@ -1,7 +1,7 @@
 use crate::{json::Json, SharedTrait};
 use axum::{http::StatusCode, Extension};
-use common::error::{self, Result};
-use entity::{pivot_actions_users, pivot_users_groups};
+use iam_common::error::{self, Result};
+use iam_entity::{pivot_actions_users, pivot_users_groups};
 use sea_orm::{EntityTrait, Set};
 use serde::Deserialize;
 

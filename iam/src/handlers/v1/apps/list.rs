@@ -1,7 +1,7 @@
 use crate::{json::Json, shared::SharedTrait};
 use axum::Extension;
-use common::{error::Result, Id};
-use entity::apps;
+use iam_common::{error::Result, Id};
+use iam_entity::apps;
 use sea_orm::EntityTrait;
 use serde::Serialize;
 use serde_json::json;

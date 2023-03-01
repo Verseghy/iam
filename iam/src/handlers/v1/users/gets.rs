@@ -1,7 +1,7 @@
 use crate::{json::Json, shared::SharedTrait};
 use axum::Extension;
-use common::error::Result;
-use entity::users;
+use iam_common::error::Result;
+use iam_entity::users;
 use sea_orm::{entity::EntityTrait, FromQueryResult, QuerySelect};
 use serde::Serialize;
 

@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use entity::groups::{Column, Entity};
+use iam_entity::users::{Column, Entity};
 use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
@@ -14,12 +14,14 @@ impl MigrationTrait for Migration {
                     .table(Entity)
                     .if_not_exists()
                     .col(ColumnDef::new(Column::Id).string().primary_key())
+                    .col(ColumnDef::new(Column::Name).string_len(256).not_null())
                     .col(
-                        ColumnDef::new(Column::Name)
-                            .string_len(64)
-                            .unique_key()
-                            .not_null(),
+                        ColumnDef::new(Column::Email)
+                            .string_len(256)
+                            .not_null()
+                            .unique_key(),
                     )
+                    .col(ColumnDef::new(Column::Password).string_len(256).not_null())
                     .col(
                         ColumnDef::new(Column::CreatedAt)
                             .date_time()

@@ -5,9 +5,9 @@ edition = "2021"
 license-file.workspace = true
 
 [dependencies]
-common = { path = "../common/" }
+iam-common = { path = "../iam-common/" }
 dotenvy = "0.15.6"
-entity = { path = "../entity" }
+iam-entity = { path = "../iam-entity" }
 sea-orm = { version = "0.10.6", default-features = false, features = ["runtime-actix-rustls", "sqlx-mysql"] }
 tokio = { version = "1.24.2", features = ["rt", "macros"] }
 

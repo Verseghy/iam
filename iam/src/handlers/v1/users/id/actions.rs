@@ -2,11 +2,11 @@ use std::sync::Arc;
 
 use crate::{json::Json, SharedTrait};
 use axum::{extract::Path, Extension};
-use common::{
+use iam_common::{
     error::{self, Result},
     token::Claims,
 };
-use entity::{actions, users};
+use iam_entity::{actions, users};
 use sea_orm::{query::QueryFilter, ColumnTrait, FromQueryResult, Related};
 use serde::Serialize;
 

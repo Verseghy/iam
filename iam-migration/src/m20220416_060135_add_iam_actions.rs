@@ -1,5 +1,5 @@
-use common::Id;
-use entity::actions::{Column, Entity};
+use iam_common::Id;
+use iam_entity::actions::{Column, Entity};
 use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]

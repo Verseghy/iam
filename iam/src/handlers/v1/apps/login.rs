@@ -1,10 +1,10 @@
 use crate::{json::Json, SharedTrait};
 use axum::Extension;
-use common::{
+use iam_common::{
     error::{self, Result},
     token::{self, JwtTrait},
 };
-use entity::apps;
+use iam_entity::apps;
 use sea_orm::EntityTrait;
 use serde::{Deserialize, Serialize};
 
@@ -29,7 +29,7 @@ pub async fn login_app<S: SharedTrait>(
         .await?
         .ok_or(error::APP_INVALID_TOKEN)?;
 
-    let (valid, _) = common::password::validate(&res.password, &password)?;
+    let (valid, _) = iam_common::password::validate(&res.password, &password)?;
 
     if !valid {
         return Err(error::APP_INVALID_TOKEN);

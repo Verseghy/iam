@@ -3,12 +3,12 @@ use crate::{
     shared::SharedTrait,
 };
 use axum::Extension;
-use common::{
+use iam_common::{
     error::{self, Result},
     password,
     token::{self, JwtTrait},
 };
-use entity::users;
+use iam_entity::users;
 use sea_orm::{
     entity::{ActiveModelTrait, ColumnTrait, EntityTrait},
     query::QueryFilter,

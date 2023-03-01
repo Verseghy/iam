@@ -1,11 +1,11 @@
-use common::{database, token::Jwt};
+use iam_common::{database, token::Jwt};
 use rand::{rngs::StdRng, SeedableRng};
 use sea_orm::DbConn;
 use std::sync::Arc;
 
 pub trait SharedTrait: Clone + Send + Sync + 'static {
     type Db: sea_orm::ConnectionTrait + sea_orm::TransactionTrait;
-    type Jwt: common::token::JwtTrait;
+    type Jwt: iam_common::token::JwtTrait;
     type Rng: rand::Rng + Clone;
 
     fn db(&self) -> &Self::Db;

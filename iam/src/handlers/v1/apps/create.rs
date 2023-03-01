@@ -3,8 +3,8 @@ use crate::{
     SharedTrait,
 };
 use axum::{http::StatusCode, Extension};
-use common::{error::Result, Id};
-use entity::apps;
+use iam_common::{error::Result, Id};
+use iam_entity::apps;
 use rand::distributions::{Alphanumeric, DistString};
 use sea_orm::{EntityTrait, Set};
 use serde::{Deserialize, Serialize};
@@ -29,7 +29,7 @@ pub async fn create_app<S: SharedTrait>(
     let id = Id::new_app();
     let password = Alphanumeric.sample_string(&mut shared.rng().clone(), 32);
 
-    let hashed_password = common::password::hash(&password)?;
+    let hashed_password = iam_common::password::hash(&password)?;
 
     let app = apps::ActiveModel {
         id: Set(id.to_string()),

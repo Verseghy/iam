@@ -1,10 +1,12 @@
 mod app;
 mod error;
+mod user;
 mod utils;
 
 use std::sync::Arc;
 
 pub use app::App;
+pub use user::User;
 
 #[derive(Debug)]
 pub struct IamInner {

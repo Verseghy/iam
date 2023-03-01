@@ -1062,6 +1062,7 @@ dependencies = [
  "bcrypt",
  "bytes",
  "chrono",
+ "iam-entity",
  "iam-macros",
  "jsonwebtoken",
  "mime",

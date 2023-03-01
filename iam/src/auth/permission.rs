@@ -1,5 +1,5 @@
-use common::error::{self, Result};
-use entity::{
+use iam_common::error::{self, Result};
+use iam_entity::{
     actions::{self, Entity as Actions},
     apps::{self, Entity as Apps},
     users::{self, Entity as Users},

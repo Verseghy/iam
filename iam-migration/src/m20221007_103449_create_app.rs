@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use entity::{
+use iam_entity::{
     apps::{Column, Entity},
     pivot_apps_actions, pivot_apps_groups,
 };

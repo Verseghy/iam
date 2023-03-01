@@ -3,8 +3,19 @@ strip = true
 lto = true
 
 [workspace]
-members = ["iam", "entity", "migration", "common", "macros", "cmds"]
-default-members = ["iam", "cmds", "migration"]
+members = [
+    "iam",
+    "iam-common",
+    "iam-entity",
+    "iam-migration",
+    "iam-macros",
+    "cmds",
+]
+default-members = [
+    "iam",
+    "iam-migration",
+    "cmds",
+]
 
 [workspace.package]
 license-file = "./LICENSE"

@@ -1,10 +1,10 @@
 use crate::{json::Json, json::ValidatedJson, shared::SharedTrait, utils::DatabaseErrorType};
 use axum::{http::StatusCode, Extension};
-use common::{
+use iam_common::{
     error::{self, Result},
     Id,
 };
-use entity::users;
+use iam_entity::users;
 use sea_orm::{EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -32,7 +32,7 @@ pub async fn register<S: SharedTrait>(
 
     let model = users::ActiveModel {
         id: Set(id.to_string()),
-        password: Set(common::password::hash(&req.password)?),
+        password: Set(iam_common::password::hash(&req.password)?),
         name: Set(req.name),
         email: Set(req.email),
         ..Default::default()

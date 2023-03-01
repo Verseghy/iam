@@ -1,4 +1,4 @@
-use entity::pivot_actions_groups::{Column, Entity};
+use iam_entity::pivot_users_groups::{Column, Entity};
 use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
@@ -12,9 +12,9 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Entity)
                     .if_not_exists()
-                    .col(ColumnDef::new(Column::ActionId).string())
+                    .col(ColumnDef::new(Column::UserId).string())
                     .col(ColumnDef::new(Column::GroupId).string())
-                    .primary_key(Index::create().col(Column::ActionId).col(Column::GroupId))
+                    .primary_key(Index::create().col(Column::UserId).col(Column::GroupId))
                     .to_owned(),
             )
             .await

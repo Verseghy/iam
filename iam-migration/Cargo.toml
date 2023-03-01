@@ -1,5 +1,5 @@
 [package]
-name = "migration"
+name = "iam-migration"
 version = "0.1.0"
 edition = "2021"
 publish = false
@@ -12,6 +12,6 @@ path = "src/lib.rs"
 [dependencies]
 sea-orm-migration = { version = "0.10.6" }
 tokio = { version = "1.24.2", features = ["rt", "macros"] }
-entity = { path = "../entity" }
-common = { path = "../common" }
+iam-entity = { path = "../iam-entity" }
+iam-common = { path = "../iam-common" }
 chrono = { version = "0.4.23", default-features = false }

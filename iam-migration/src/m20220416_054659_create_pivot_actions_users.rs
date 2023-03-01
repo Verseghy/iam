@@ -1,4 +1,4 @@
-use entity::pivot_actions_users::{Column, Entity};
+use iam_entity::pivot_actions_users::{Column, Entity};
 use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]

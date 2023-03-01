@@ -6,7 +6,7 @@ use axum::{
     response::{IntoResponse, Response},
     BoxError,
 };
-use common::error::{self, Error};
+use iam_common::error::{self, Error};
 use serde::{de::DeserializeOwned, Serialize};
 use validator::Validate;
 

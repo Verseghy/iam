@@ -1,8 +1,8 @@
-use common::{
+use iam_common::{
     database,
     token::{Claims, Jwt, JwtTrait},
 };
-use entity::users;
+use iam_entity::users;
 use sea_orm::EntityTrait;
 use std::env;
 

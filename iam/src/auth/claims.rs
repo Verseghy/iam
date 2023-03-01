@@ -7,7 +7,7 @@ use axum::{
     response::Response,
     Extension,
 };
-use common::token::JwtTrait;
+use iam_common::token::JwtTrait;
 use std::sync::Arc;
 
 pub async fn get_claims<S: SharedTrait, B>(

@@ -10,6 +10,7 @@ dotenvy = "0.15.6"
 iam-entity = { path = "../iam-entity" }
 sea-orm = { version = "0.10.6", default-features = false, features = ["runtime-actix-rustls", "sqlx-mysql"] }
 tokio = { version = "1.24.2", features = ["rt", "macros"] }
+libiam = { path = "../libiam" }
 
 [[bin]]
 name = "seeder"
@@ -22,3 +23,7 @@ path = "src/password_hash.rs"
 [[bin]]
 name = "generate_token"
 path = "src/generate_token.rs"
+
+[[bin]]
+name = "create_iam_app"
+path = "src/create_iam_app.rs"

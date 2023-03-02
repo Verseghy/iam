@@ -431,6 +431,7 @@ dependencies = [
  "dotenvy",
  "iam-common",
  "iam-entity",
+ "libiam",
  "sea-orm",
  "tokio",
 ]

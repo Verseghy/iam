@@ -8,6 +8,7 @@ RUN cargo new --bin app && \
     cargo new --lib app/iam-migration && \
     cargo new --lib app/iam-common && \
     cargo new --lib app/iam-macros && \
+    cargo new --lib app/libiam && \
     cargo new --bin app/cmds
 
 WORKDIR /builder/app

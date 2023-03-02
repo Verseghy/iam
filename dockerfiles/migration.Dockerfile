@@ -21,7 +21,7 @@ COPY ./iam-macros/Cargo.toml ./iam-macros/Cargo.toml
 
 RUN rm ./iam-macros/src/lib.rs && \
     touch ./iam-macros/src/lib.rs && \
-    cargo build -p migration --release && \
+    cargo build -p iam-migration --release && \
     rm -rf ./iam-migration/src \
            ./iam-entity/src/ \
 	   ./iam-common/src/
@@ -31,18 +31,18 @@ COPY ./iam-entity/src/ ./iam-entity/src/
 COPY ./iam-common/src/ ./iam-common/src/
 COPY ./iam-macros/src/ ./iam-macros/src/
 
-RUN rm target/release/deps/iam_migration* \
-       target/release/deps/iam_entity* \
-       target/release/deps/libiam_entity* \
-       target/release/deps/iam_common* \
-       target/release/deps/libiam_common* \
-       target/release/deps/iam_macros* \
-       target/release/deps/libiam_macros* && \
-    cargo build -p migration --release
+RUN rm target/release/deps/iam* \
+       target/release/deps/libiam* && \
+    cargo build -p iam-migration --release
 
 FROM alpine
 WORKDIR /app
-COPY --from=builder /builder/app/target/release/migration ./
-EXPOSE 3001
-CMD ["./migration"]
+COPY --from=builder /builder/app/target/release/iam-migration ./
+
+RUN addgroup -S iam && \
+    adduser -S -D -H -s /bin/false -G iam iam && \
+    chown -R iam:iam /app
+USER iam
+
+CMD ["./iam-migration"]
 

@@ -33,12 +33,7 @@ COPY ./iam-common/src/ ./iam-common/src/
 COPY ./iam-macros/src/ ./iam-macros/src/
 
 RUN rm target/release/deps/iam* \
-       target/release/deps/iam_entity* \
-       target/release/deps/libiam_entity* \
-       target/release/deps/iam_common* \
-       target/release/deps/libiam_common* \
-       target/release/deps/iam_macros* \
-       target/release/deps/libiam_macros* && \
+       target/release/deps/libiam* && \
     cargo build --release
 
 FROM alpine

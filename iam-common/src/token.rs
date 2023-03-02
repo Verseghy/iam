@@ -90,7 +90,7 @@ impl JwtTrait for Jwt {
             return Err(error::INTERNAL);
         };
 
-        jsonwebtoken::encode(&Header::new(Algorithm::RS256), &claims, &encoding)
+        jsonwebtoken::encode(&Header::new(Algorithm::RS256), &claims, encoding)
             .map_err(|_| error::JWT_INVALID_TOKEN)
     }
 }

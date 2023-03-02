@@ -3,6 +3,7 @@ use crate::{
     utils::Either,
     Iam,
 };
+use iam_common::Id;
 use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
@@ -20,11 +21,11 @@ pub struct User {
 }
 
 impl User {
-    pub async fn register(iam: &Iam, name: &str, email: &str, password: &str) -> Result<Self> {
+    pub async fn register(iam: &Iam, name: &str, email: &str, password: &str) -> Result<Id> {
         #[derive(Debug, Deserialize)]
         #[allow(unused)]
         struct Response {
-            id: String,
+            id: Id,
         }
 
         let res = Client::new()
@@ -39,9 +40,9 @@ impl User {
             .json::<Either<Response, ErrorMessage>>()
             .await?;
 
-        let _ = unwrap_res(res)?;
+        let res = unwrap_res(res)?;
 
-        Self::login(iam, email, password).await
+        Ok(res.id)
     }
 
     pub async fn login(iam: &Iam, email: &str, password: &str) -> Result<Self> {

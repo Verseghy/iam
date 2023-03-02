@@ -1,6 +1,7 @@
 mod actions;
 mod apps;
 mod assign;
+mod decision;
 mod groups;
 mod users;
 
@@ -17,4 +18,5 @@ pub fn routes<S: SharedTrait>() -> Router {
             "/assign",
             post(assign::assign::<S>.layer(permissions![S, "iam.policy.assign"])),
         )
+        .route("/decision", post(decision::decision::<S>))
 }

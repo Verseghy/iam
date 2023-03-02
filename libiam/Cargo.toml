@@ -12,3 +12,7 @@ thiserror = "1.0.38"
 iam-common = { path = "../iam-common" }
 iam-entity = { path = "../iam-entity" }
 sea-orm = { version = "0.10.6", default-features = false, features = ["runtime-tokio-rustls", "sqlx-mysql", "macros"] }
+tracing = "0.1.37"
+tokio = { version = "1.25.0", features = ["rt"] }
+futures = "0.3.26"
+async-trait = "0.1.64"

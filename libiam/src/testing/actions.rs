@@ -62,6 +62,8 @@ where
     let action_id = get_action_by_name(db, action_name).await;
 
     if let Some(action_id) = action_id {
+        tracing::debug!("assigning action '{action_id}' to app '{app_id}'");
+
         let model = pivot_apps_actions::ActiveModel {
             app_id: Set(app_id.to_string()),
             action_id: Set(action_id),

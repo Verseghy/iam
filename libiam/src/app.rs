@@ -1,12 +1,13 @@
 use std::sync::Arc;
 
+use iam_common::user::UserInfo;
 use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
 
 use crate::{
     error::{unwrap_res, ErrorMessage, Result},
-    utils::Either,
+    utils::{create_client, Either},
     Iam,
 };
 
@@ -14,7 +15,8 @@ use crate::{
 pub struct AppInner {
     secret: String,
     token: String,
-    _iam: Iam,
+    iam: Iam,
+    client: Client,
 }
 
 #[derive(Debug, Clone)]
@@ -46,10 +48,16 @@ impl App {
         Ok(Self {
             inner: Arc::new(AppInner {
                 secret: secret.to_owned(),
+                client: create_client(&res.token),
                 token: res.token,
-                _iam: iam.clone(),
+                iam: iam.clone(),
             }),
         })
+    }
+
+    #[inline]
+    fn client(&self) -> &Client {
+        &self.inner.client
     }
 
     pub fn token(&self) -> &str {
@@ -59,5 +67,19 @@ impl App {
     pub fn id(&self) -> String {
         let (id, _) = iam_common::app::parse_token(&self.inner.secret).unwrap();
         id
+    }
+
+    pub async fn get_user_info(&self, id: &str) -> Result<UserInfo> {
+        let res = self
+            .client()
+            .get(self.inner.iam.get_url(&format!("/v1/users/{}/", id)))
+            .send()
+            .await?
+            .json::<Either<UserInfo, ErrorMessage>>()
+            .await?;
+
+        let res = unwrap_res(res)?;
+
+        Ok(res)
     }
 }

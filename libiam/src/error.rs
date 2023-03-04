@@ -5,7 +5,7 @@ use crate::utils::Either;
 #[derive(Debug, Deserialize)]
 pub struct ErrorMessage {
     pub code: String,
-    pub message: String,
+    pub error: String,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -22,6 +22,9 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub fn unwrap_res<T>(either: Either<T, ErrorMessage>) -> Result<T> {
     match either {
         Either::Left(t) => Ok(t),
-        Either::Right(err) => Err(Error::Iam(err)),
+        Either::Right(err) => {
+            tracing::error!("iam returned error: {err:?}");
+            Err(Error::Iam(err))
+        }
     }
 }

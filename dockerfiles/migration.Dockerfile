@@ -1,6 +1,5 @@
-FROM rust:alpine as builder
+FROM rust:slim-bookworm as builder
 
-RUN apk add musl-dev
 WORKDIR /builder
 RUN cargo new --bin app && \
     cargo new --bin app/iam && \
@@ -35,14 +34,14 @@ RUN rm target/release/deps/iam* \
        target/release/deps/libiam* && \
     cargo build -p iam-migration --release
 
-FROM alpine
+FROM debian:12-slim
 WORKDIR /app
 COPY --from=builder /builder/app/target/release/iam-migration ./
 
-RUN addgroup -S iam && \
-    adduser -S -D -H -s /bin/false -G iam iam && \
-    chown -R iam:iam /app
-USER iam
+RUN addgroup --system app && \
+    adduser --system --disabled-password --no-create-home --shell /bin/false --ingroup app app && \
+    chown -R app:app /app
+USER app
 
 CMD ["./iam-migration"]
 

@@ -9,11 +9,7 @@ use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
 use std::sync::Arc;
-
-#[derive(Debug, Deserialize)]
-struct Claims {
-    sub: String,
-}
+use iam_common::token::Claims;
 
 #[derive(Debug)]
 pub struct UserInner {
@@ -82,7 +78,7 @@ impl User {
                         )
                         .unwrap()
                         .claims
-                        .sub
+                        .subject
                         .as_str()
                     )
                     .as_str(),

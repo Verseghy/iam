@@ -3,13 +3,13 @@ use crate::{
     utils::Either,
     Iam,
 };
+use iam_common::token::Claims;
 use iam_common::Id;
 use jsonwebtoken::{Algorithm, DecodingKey, Validation};
 use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
 use std::sync::Arc;
-use iam_common::token::Claims;
 
 #[derive(Debug)]
 pub struct UserInner {

@@ -17,6 +17,7 @@ default-members = [
     "iam-migration",
     "cmds",
 ]
+resolver = "2"
 
 [workspace.package]
 license-file = "./LICENSE"

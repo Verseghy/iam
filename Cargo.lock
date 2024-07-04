@@ -65,12 +65,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "arc-swap"
-version = "1.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c5d78ce20460b82d3fa150275ed9d55e21064fc7951177baacf86a145c4a4b1f"
-
-[[package]]
 name = "arrayref"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -447,20 +441,6 @@ checksum = "3538270d33cc669650c4b093848450d380def10c331d38c768e34cac80576e6e"
 dependencies = [
  "termcolor",
  "unicode-width",
-]
-
-[[package]]
-name = "combine"
-version = "4.6.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "35ed6e9d84f0b51a7f52daf1c7d71dd136fd7a3f41a8462b8cdb8c78d920fad4"
-dependencies = [
- "bytes",
- "futures-core",
- "memchr",
- "pin-project-lite",
- "tokio",
- "tokio-util",
 ]
 
 [[package]]
@@ -1017,7 +997,6 @@ dependencies = [
  "mime",
  "once_cell",
  "rand",
- "redis",
  "rust-argon2",
  "sea-orm",
  "serde",
@@ -1663,28 +1642,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "redis"
-version = "0.22.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "513b3649f1a111c17954296e4a3b9eecb108b766c803e2b99f179ebe27005985"
-dependencies = [
- "arc-swap",
- "async-trait",
- "bytes",
- "combine",
- "futures",
- "futures-util",
- "itoa",
- "percent-encoding",
- "pin-project-lite",
- "ryu",
- "sha1_smol",
- "tokio",
- "tokio-util",
- "url",
-]
-
-[[package]]
 name = "redox_syscall"
 version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2083,12 +2040,6 @@ dependencies = [
  "cpufeatures",
  "digest",
 ]
-
-[[package]]
-name = "sha1_smol"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae1a47186c03a32177042e55dbc5fd5aee900b8e0069a8d70fba96a9375cd012"
 
 [[package]]
 name = "sha2"

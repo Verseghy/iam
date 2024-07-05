@@ -3,8 +3,7 @@ use crate::{
     utils::Either,
     Iam,
 };
-use iam_common::token::Claims;
-use iam_common::Id;
+use iam_common::{keys::jwt::Claims, Id};
 use jsonwebtoken::{Algorithm, DecodingKey, Validation};
 use reqwest::Client;
 use serde::Deserialize;
@@ -78,7 +77,7 @@ impl User {
                         )
                         .unwrap()
                         .claims
-                        .subject
+                        .sub
                         .as_str()
                     )
                     .as_str(),

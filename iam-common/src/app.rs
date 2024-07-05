@@ -48,6 +48,6 @@ where
 
     apps::Entity::insert(app).exec(db).await?;
 
-    let secret = BASE64_STANDARD_NO_PAD.encode(format!("{}:{}", id.to_string(), password));
+    let secret = BASE64_STANDARD_NO_PAD.encode(format!("{}:{}", id, password));
     Ok((id, secret))
 }

@@ -1,5 +1,6 @@
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
+use std::fmt::{self, Display};
 use uuid::{
     v1::{Context, Timestamp},
     Uuid,
@@ -81,10 +82,10 @@ impl Id {
     }
 }
 
-impl ToString for Id {
-    #[inline]
-    fn to_string(&self) -> String {
-        format!(
+impl Display for Id {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
             "{}-{}",
             self.get_prefix(),
             self.uuid

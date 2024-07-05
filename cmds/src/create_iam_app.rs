@@ -14,6 +14,6 @@ async fn main() {
 
     let (id, secret) = create_app(&database, &name).await;
 
-    println!("id: {}", id.to_string());
+    println!("id: {}", id);
     println!("secret: {}", secret);
 }

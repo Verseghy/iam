@@ -6,7 +6,7 @@ fn audit_filter(metadata: &tracing::Metadata<'_>) -> bool {
     if metadata.is_event() {
         return metadata.target().starts_with("audit");
     }
-    return metadata.name().starts_with("audit");
+    metadata.name().starts_with("audit")
 }
 
 #[tokio::main]

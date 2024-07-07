@@ -6,7 +6,10 @@ use kube::{
     api::{ObjectMeta, PostParams},
     Api, Client,
 };
-use libiam::{testing::{self, actions::assign_action_to_user}, Iam, User};
+use libiam::{
+    testing::{self, actions::assign_action_to_user},
+    Iam, User,
+};
 use rand::{
     distributions::{Alphanumeric, DistString},
     rngs::OsRng,

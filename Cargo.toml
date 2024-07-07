@@ -9,12 +9,14 @@ members = [
     "iam-entity",
     "iam-migration",
     "iam-macros",
+    "iam-setup",
     "libiam",
     "cmds",
 ]
 default-members = [
     "iam",
     "iam-migration",
+    "iam-setup",
     "cmds",
 ]
 resolver = "2"

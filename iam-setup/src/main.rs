@@ -76,18 +76,22 @@ async fn create_admin_user(client: Client) -> anyhow::Result<()> {
     let database_url = env::var("DATABASE_URL").context("DATABASE_URL is not set")?;
 
     let database_password = {
-        let secrets = secrets
+        let secret = secrets
             .get_opt(MYSQL_SECRET_NAME)
             .await
             .context("Failed to query secret")?
             .context("No mysql secret")?
-            .string_data
+            .data
             .unwrap();
 
-        secrets
-            .get(MYSQL_SECRET_KEY)
-            .context("No mysql password")?
-            .to_owned()
+        String::from_utf8(
+            secret
+                .get(MYSQL_SECRET_KEY)
+                .context("No mysql password")?
+                .0
+                .clone(),
+        )
+        .context("Not utf8 from kube rs")?
     };
 
     let database_url = {

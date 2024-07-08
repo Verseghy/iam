@@ -14,15 +14,16 @@ use rand::{
     distributions::{Alphanumeric, DistString},
     rngs::OsRng,
 };
+use url::Url;
+
+const MYSQL_SECRET_NAME: &str = "mysql";
+const MYSQL_SECRET_KEY: &str = "MYSQL_ROOT_PASSWORD";
 
 async fn generate_mysql_password(client: Client) -> anyhow::Result<()> {
-    const SECRET_NAME: &str = "mysql";
-    const SECRET_KEY: &str = "MYSQL_ROOT_PASSWORD";
-
     let secrets: Api<Secret> = Api::default_namespaced(client);
 
     if secrets
-        .get_opt(SECRET_NAME)
+        .get_opt(MYSQL_SECRET_NAME)
         .await
         .context("Failed to query secret")?
         .is_some()
@@ -38,12 +39,12 @@ async fn generate_mysql_password(client: Client) -> anyhow::Result<()> {
             &PostParams::default(),
             &Secret {
                 metadata: ObjectMeta {
-                    name: Some(SECRET_NAME.to_owned()),
+                    name: Some(MYSQL_SECRET_NAME.to_owned()),
                     ..Default::default()
                 },
                 string_data: Some({
                     let mut map = BTreeMap::new();
-                    map.insert(SECRET_KEY.to_owned(), mysql_password);
+                    map.insert(MYSQL_SECRET_KEY.to_owned(), mysql_password);
                     map
                 }),
                 ..Default::default()
@@ -74,8 +75,33 @@ async fn create_admin_user(client: Client) -> anyhow::Result<()> {
     let iam_url = env::var("IAM_URL").context("IAM_URL is not set")?;
     let database_url = env::var("DATABASE_URL").context("DATABASE_URL is not set")?;
 
+    let database_password = {
+        let secret = secrets
+            .get_opt(MYSQL_SECRET_NAME)
+            .await
+            .context("Failed to query secret")?
+            .context("No mysql secret")?
+            .data
+            .unwrap();
+
+        String::from_utf8(
+            secret
+                .get(MYSQL_SECRET_KEY)
+                .context("No mysql password")?
+                .0
+                .clone(),
+        )
+        .context("Not utf8 from kube rs")?
+    };
+
+    let database_url = {
+        let mut url = Url::parse(&database_url).context("invalid url")?;
+        url.set_password(Some(&database_password)).unwrap();
+        url
+    };
+
     let iam = Iam::new(&iam_url);
-    let db = testing::Database::connect(&database_url).await;
+    let db = testing::Database::connect(database_url.as_str()).await;
 
     let admin_password = Alphanumeric.sample_string(&mut OsRng, 64);
     let user = User::register(&iam, "admin", ADMIN_EMAIL, &admin_password).await?;

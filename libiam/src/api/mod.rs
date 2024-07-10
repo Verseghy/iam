@@ -1,5 +1,6 @@
 pub mod app;
 pub mod user;
+pub mod well_known;
 
 use reqwest::{header::AUTHORIZATION, Client, Method, Url};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};

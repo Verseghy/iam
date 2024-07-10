@@ -1,9 +1,9 @@
+pub mod api;
 mod app;
-mod error;
 pub mod testing;
 mod user;
-mod utils;
 
+use api::Api;
 use std::sync::Arc;
 
 pub use app::App;
@@ -11,7 +11,7 @@ pub use user::User;
 
 #[derive(Debug)]
 pub struct IamInner {
-    base_url: String,
+    api: Api,
 }
 
 #[derive(Debug, Clone)]
@@ -23,12 +23,12 @@ impl Iam {
     pub fn new(base_url: &str) -> Self {
         Self {
             inner: Arc::new(IamInner {
-                base_url: base_url.to_owned(),
+                api: Api::new(base_url, None).unwrap(),
             }),
         }
     }
 
-    pub(crate) fn get_url(&self, path: &str) -> String {
-        format!("{}{}", self.inner.base_url, path)
+    pub fn api(&self) -> &Api {
+        &self.inner.api
     }
 }

@@ -1,22 +1,15 @@
-use std::sync::Arc;
-
-use iam_common::user::UserInfo;
-use reqwest::Client;
-use serde::Deserialize;
-use serde_json::json;
-
 use crate::{
-    error::{unwrap_res, ErrorMessage, Result},
-    utils::{create_client, Either},
+    api::{self, Api},
     Iam,
 };
+use iam_common::user::UserInfo;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct AppInner {
     secret: String,
     token: String,
-    iam: Iam,
-    client: Client,
+    api: Api,
 }
 
 #[derive(Debug, Clone)]
@@ -25,39 +18,18 @@ pub struct App {
 }
 
 impl App {
-    pub async fn login(iam: &Iam, secret: &str) -> Result<Self> {
-        #[derive(Debug, Deserialize)]
-        struct Response {
-            token: String,
-        }
-
-        tracing::debug!(secret, "app logging into iam");
-
-        let res = Client::new()
-            .post(iam.get_url("/v1/apps/login"))
-            .json(&json!({
-                "token": secret,
-            }))
-            .send()
+    pub async fn login(iam: &Iam, secret: &str) -> anyhow::Result<Self> {
+        let token = api::app::login(&iam.inner.api, &api::app::login::Request { token: secret })
             .await?
-            .json::<Either<Response, ErrorMessage>>()
-            .await?;
-
-        let res = unwrap_res(res)?;
+            .token;
 
         Ok(Self {
             inner: Arc::new(AppInner {
                 secret: secret.to_owned(),
-                client: create_client(&res.token),
-                token: res.token,
-                iam: iam.clone(),
+                token: token.clone(),
+                api: iam.inner.api.with_token(token),
             }),
         })
-    }
-
-    #[inline]
-    fn client(&self) -> &Client {
-        &self.inner.client
     }
 
     pub fn token(&self) -> &str {
@@ -69,17 +41,8 @@ impl App {
         id
     }
 
-    pub async fn get_user_info(&self, id: &str) -> Result<UserInfo> {
-        let res = self
-            .client()
-            .get(self.inner.iam.get_url(&format!("/v1/users/{}/", id)))
-            .send()
-            .await?
-            .json::<Either<UserInfo, ErrorMessage>>()
-            .await?;
-
-        let res = unwrap_res(res)?;
-
+    pub async fn get_user_info(&self, id: &str) -> anyhow::Result<UserInfo> {
+        let res = api::user::get_user(&self.inner.api, id).await?;
         Ok(res)
     }
 }

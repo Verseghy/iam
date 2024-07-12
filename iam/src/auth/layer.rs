@@ -3,7 +3,7 @@ use crate::shared::SharedTrait;
 use hyper::Request;
 use iam_common::{
     error::{self, Result},
-    token::Claims,
+    keys::jwt::Claims,
 };
 use std::sync::Arc;
 
@@ -18,7 +18,7 @@ where
         .get::<Arc<Claims>>()
         .ok_or(error::INVALID_AUTH_HEADER)?;
 
-    permission::check(claims.subject.as_str(), actions, shared.db()).await?;
+    permission::check(claims.sub.as_str(), actions, shared.db()).await?;
 
     Ok(())
 }

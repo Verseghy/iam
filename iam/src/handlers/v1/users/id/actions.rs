@@ -1,14 +1,13 @@
-use std::sync::Arc;
-
 use crate::{json::Json, SharedTrait};
 use axum::{extract::Path, Extension};
 use iam_common::{
     error::{self, Result},
-    token::Claims,
+    keys::jwt::Claims,
 };
 use iam_entity::{actions, users};
 use sea_orm::{query::QueryFilter, ColumnTrait, FromQueryResult, Related};
 use serde::Serialize;
+use std::sync::Arc;
 
 #[derive(Debug, FromQueryResult, Serialize)]
 pub struct Action {
@@ -22,7 +21,7 @@ pub async fn get_actions<S: SharedTrait>(
     Path(id): Path<String>,
     Extension(claims): Extension<Arc<Claims>>,
 ) -> Result<Json<Vec<Action>>> {
-    if id != claims.subject {
+    if id != claims.sub {
         return Err(error::NO_PERMISSION);
     }
 

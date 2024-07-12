@@ -11,3 +11,4 @@ kube = "0.92.1"
 libiam = { version = "0.1.0", path = "../libiam" }
 rand = "0.8.5"
 tokio = { version = "1.38.0", features = ["rt", "macros"] }
+url = "2.5.2"

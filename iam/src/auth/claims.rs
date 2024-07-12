@@ -7,7 +7,6 @@ use axum::{
     response::Response,
     Extension,
 };
-use iam_common::token::JwtTrait;
 use std::sync::Arc;
 
 pub async fn get_claims<S: SharedTrait, B>(
@@ -23,7 +22,7 @@ where
     let mut request = Request::from_parts(parts, body);
 
     if let Ok(token) = token {
-        if let Ok(claims) = shared.jwt().get_claims(token.token()) {
+        if let Ok(claims) = shared.key_manager().jwt().get_claims(token.token()) {
             request.extensions_mut().insert(Arc::new(claims));
         }
     }

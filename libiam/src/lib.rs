@@ -1,5 +1,6 @@
 pub mod api;
 mod app;
+pub mod jwt;
 pub mod testing;
 mod user;
 

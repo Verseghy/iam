@@ -7,7 +7,7 @@ use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use thiserror::Error;
 use tokio::runtime::Handle;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Api {
     client: Client,
     base: Url,

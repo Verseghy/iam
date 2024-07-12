@@ -5,7 +5,7 @@ use jsonwebtoken::{Header, Validation};
 use serde::{Deserialize, Serialize};
 use std::env;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claims {
     pub iss: String,
     pub sub: String,

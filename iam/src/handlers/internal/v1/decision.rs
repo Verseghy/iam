@@ -1,6 +1,6 @@
 use crate::{auth, json::Json, shared::SharedTrait};
 use axum::{http::StatusCode, Extension};
-use iam_common::{error::Result, token::Claims};
+use iam_common::{error::Result, keys::jwt::Claims};
 use serde::Deserialize;
 use std::sync::Arc;
 
@@ -21,7 +21,7 @@ pub async fn decision<S: SharedTrait>(
 ) -> Result<StatusCode> {
     let actions: Vec<&str> = req.action_list.iter().map(|x| x.name.as_str()).collect();
 
-    auth::check(&claims.subject, &actions, shared.db()).await?;
+    auth::check(&claims.sub, &actions, shared.db()).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }

@@ -1,5 +1,6 @@
 pub mod api;
 mod app;
+pub mod jwt;
 pub mod testing;
 mod user;
 
@@ -7,7 +8,6 @@ use api::Api;
 use std::sync::Arc;
 
 pub use app::App;
-pub use iam_common::token::Jwt;
 pub use user::User;
 
 #[derive(Debug)]

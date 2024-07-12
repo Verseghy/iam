@@ -2,8 +2,7 @@ use crate::{
     api::{self, Api},
     Iam,
 };
-use iam_common::token::Claims;
-use iam_common::Id;
+use iam_common::{keys::jwt::Claims, Id};
 use jsonwebtoken::{Algorithm, DecodingKey, Validation};
 use std::sync::Arc;
 
@@ -68,7 +67,7 @@ impl User {
                         )
                         .unwrap()
                         .claims
-                        .subject
+                        .sub
                         .as_str()
                     )
                     .as_str(),

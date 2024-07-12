@@ -2,7 +2,7 @@ use crate::{json::Json, SharedTrait};
 use axum::Extension;
 use iam_common::{
     error::{self, Result},
-    token::{self, JwtTrait},
+    keys::jwt::Claims,
 };
 use iam_entity::apps;
 use sea_orm::EntityTrait;
@@ -37,12 +37,7 @@ pub async fn login_app<S: SharedTrait>(
         return Err(error::APP_INVALID_TOKEN);
     }
 
-    let claims = token::Claims {
-        subject: id,
-        ..Default::default()
-    };
-
-    let token = shared.jwt().encode(&claims)?;
+    let token = shared.key_manager().jwt().encode(&Claims::new(id));
 
     Ok(Json(Response { token }))
 }

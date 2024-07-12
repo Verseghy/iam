@@ -5,8 +5,8 @@ use crate::{
 use axum::Extension;
 use iam_common::{
     error::{self, Result},
+    keys::jwt::Claims,
     password,
-    token::{self, JwtTrait},
 };
 use iam_entity::users;
 use sea_orm::{
@@ -15,7 +15,6 @@ use sea_orm::{
     ActiveValue,
 };
 use serde::{Deserialize, Serialize};
-use std::default::Default;
 use validator::Validate;
 
 #[derive(Deserialize, Debug, Validate)]
@@ -56,14 +55,9 @@ pub async fn login<S: SharedTrait>(
         return Err(error::INVALID_EMAIL_OR_PASSWORD);
     }
 
-    let claims = token::Claims {
-        subject: res.id.to_string(),
-        ..Default::default()
-    };
+    crate::audit!(action = "login", user = res.id);
 
-    let token = shared.jwt().encode(&claims)?;
-
-    crate::audit!(action = "login", user = res.id.to_string(),);
+    let token = shared.key_manager().jwt().encode(&Claims::new(res.id));
 
     Ok(Json(LoginResponse { token }))
 }

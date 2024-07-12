@@ -21,9 +21,5 @@ name = "password_hash"
 path = "src/password_hash.rs"
 
 [[bin]]
-name = "generate_token"
-path = "src/generate_token.rs"
-
-[[bin]]
 name = "create_iam_app"
 path = "src/create_iam_app.rs"

@@ -24,7 +24,7 @@ where
         ..Default::default()
     };
 
-    actions::Entity::insert(model).exec(db).await.unwrap();
+    let _ = actions::Entity::insert(model).exec(db).await;
 }
 
 pub async fn ensure_action<D>(db: &D, action_name: &str, secure: bool)

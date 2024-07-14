@@ -3,6 +3,5 @@ mod layer;
 mod permission;
 
 pub use claims::*;
-pub(crate) use layer::permissions;
-pub use layer::validate;
+pub use layer::permissions;
 pub use permission::check;

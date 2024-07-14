@@ -1,39 +1,52 @@
 use super::permission;
 use crate::shared::SharedTrait;
-use hyper::Request;
-use iam_common::{
-    error::{self, Result},
-    keys::jwt::Claims,
+use axum::{
+    body::Body,
+    extract::Request,
+    response::{IntoResponse, Response},
 };
-use std::sync::Arc;
+use futures_util::future::BoxFuture;
+use iam_common::{error, keys::jwt::Claims};
+use std::{marker::PhantomData, sync::Arc};
+use tower_http::auth::{AsyncAuthorizeRequest, AsyncRequireAuthorizationLayer};
 
-pub async fn validate<S: SharedTrait, B>(request: &Request<B>, actions: &[&str]) -> Result<()>
-where
-    B: Send + Sync + 'static,
-{
-    let shared = request.extensions().get::<S>().expect("No Shared");
-
-    let claims = request
-        .extensions()
-        .get::<Arc<Claims>>()
-        .ok_or(error::INVALID_AUTH_HEADER)?;
-
-    permission::check(claims.sub.as_str(), actions, shared.db()).await?;
-
-    Ok(())
+#[derive(Debug, Clone)]
+pub struct Auth<S> {
+    actions: &'static [&'static str],
+    _marker: PhantomData<S>,
 }
 
-macro_rules! permissions {
-    ($shared:ty, $($actions:literal),+ $(,)?) => {
-        ::tower_http::auth::AsyncRequireAuthorizationLayer::new(move |request: ::hyper::Request<::hyper::Body>| async move {
-            use ::axum::response::IntoResponse;
+impl<S: SharedTrait> AsyncAuthorizeRequest<Body> for Auth<S> {
+    type RequestBody = Body;
+    type ResponseBody = Body;
+    type Future = BoxFuture<'static, Result<Request, Response>>;
 
-            match $crate::auth::validate::<$shared, ::hyper::Body>(&request, &[$($actions),+]).await {
-                Ok(_) => Ok(request),
-                Err(err) => Err(err.into_response()),
-            }
+    fn authorize(&mut self, request: Request) -> Self::Future {
+        let shared = request.extensions().get::<S>().expect("No Shared");
+
+        let Some(claims) = request.extensions().get::<Arc<Claims>>() else {
+            return Box::pin(async move { Err(error::INVALID_AUTH_HEADER.into_response()) });
+        };
+
+        let shared = shared.clone();
+        let claims = claims.clone();
+        let actions = self.actions;
+
+        Box::pin(async move {
+            if let Err(err) = permission::check(claims.sub.as_str(), actions, shared.db()).await {
+                return Err(err.into_response());
+            };
+
+            Ok(request)
         })
     }
 }
 
-pub(crate) use permissions;
+pub fn permissions<S: SharedTrait>(
+    actions: &'static [&'static str],
+) -> AsyncRequireAuthorizationLayer<Auth<S>> {
+    AsyncRequireAuthorizationLayer::new(Auth {
+        actions,
+        _marker: PhantomData,
+    })
+}

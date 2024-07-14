@@ -7,12 +7,11 @@ mod shared;
 mod utils;
 
 use axum::{
-    body::Body,
     error_handling::HandleErrorLayer,
     http::{header::AUTHORIZATION, StatusCode},
     middleware,
     response::{IntoResponse, Response},
-    BoxError, Router, Server,
+    BoxError, Router,
 };
 use middlewares::TraceRequestIdLayer;
 use shared::{Shared, SharedTrait};
@@ -22,6 +21,7 @@ use std::{
     net::{Ipv4Addr, SocketAddr},
     time::Duration,
 };
+use tokio::net::TcpListener;
 use tower::{timeout::error::Elapsed, ServiceBuilder};
 use tower_http::{
     cors::{Any, CorsLayer},
@@ -73,7 +73,7 @@ fn middlewares<S: SharedTrait>(shared: S, router: Router) -> Router {
         .decompression()
         .layer(cors_layer)
         .add_extension(shared)
-        .layer(middleware::from_fn(auth::get_claims::<S, Body>))
+        .layer(middleware::from_fn(auth::get_claims::<S>))
         .propagate_x_request_id()
         .into_inner();
 
@@ -88,8 +88,9 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
 
     tracing::info!("Listening on port {}", addr.port());
 
-    Ok(Server::bind(&addr)
-        .serve(app.into_make_service())
+    let listener = TcpListener::bind(&addr).await?;
+
+    Ok(axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signals())
         .await?)
 }
@@ -98,8 +99,8 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
 mod tests {
     use super::*;
     use crate::shared::mock::MockShared;
-    use axum::routing::get;
-    use hyper::{Body, Request};
+    use axum::{body::Body, routing::get};
+    use hyper::Request;
     use tower::ServiceExt;
 
     #[tokio::test]

@@ -8,28 +8,29 @@ license-file.workspace = true
 
 [dependencies]
 iam-entity = { path = "../iam-entity" }
-sea-orm = { version = "0.10.6", default-features = false, features = ["runtime-actix-rustls", "sqlx-mysql", "macros", "mock"] }
-axum = { version = "0.6.1", features = ["http2", "macros", "headers"] }
-serde = { version = "1.0.152", features = ["derive"] }
-serde_json = "1.0.91"
-tracing = "0.1.37"
-tracing-subscriber = { version = "0.3.16", features = ["json"] }
+sea-orm = { version = "0.12.15", default-features = false, features = ["runtime-actix-rustls", "sqlx-mysql", "macros", "mock"] }
+axum = { version = "0.7.5", features = ["http2", "macros"] }
+serde = { version = "1.0.204", features = ["derive"] }
+serde_json = "1.0.120"
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["json"] }
 rand = { version = "0.8.5", default-features = false, features = ["std", "std_rng"] }
-chrono = { version = "0.4.23", default-features = false }
-validator = { version = "0.16.0", features = ["derive"] }
-async-trait = "0.1.60"
-futures-util = "0.3.25"
-once_cell = "1.16.0"
-tokio = { version = "1.24.2", features = ["rt-multi-thread", "macros", "signal"] }
+chrono = { version = "0.4.38", default-features = false }
+validator = { version = "0.18.1", features = ["derive"] }
+async-trait = "0.1.81"
+futures-util = "0.3.30"
+once_cell = "1.19.0"
+tokio = { version = "1.38.0", features = ["rt-multi-thread", "macros", "signal"] }
 tower = { version = "0.4.13", features = ["timeout"] }
-tower-http = { version = "0.3.5", features = ["auth", "compression-full", "decompression-full", "cors", "sensitive-headers", "trace", "add-extension", "request-id"] }
-hyper = "0.14.23"
-http-body = "0.4.5"
+tower-http = { version = "0.5.2", features = ["auth", "compression-full", "decompression-full", "cors", "sensitive-headers", "trace", "add-extension", "request-id", "util"] }
+hyper = "1.4.1"
+http-body = "1.0.1"
 iam-common = { path = "../iam-common" }
-base64 = "0.20.0"
-dotenvy = "0.15.6"
-uuid = { version = "1.2.2", features = ["v4"] }
-pin-project-lite = "0.2.9"
+base64 = "0.22.1"
+dotenvy = "0.15.7"
+uuid = { version = "1.10.0", features = ["v4"] }
+pin-project-lite = "0.2.14"
+headers = "0.4.0"
 
 [dev-dependencies]
-mime = "0.3.16"
+mime = "0.3.17"

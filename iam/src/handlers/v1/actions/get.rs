@@ -88,7 +88,7 @@ mod tests {
         let app = Router::new().route("/:id", get(get_action::<MockShared>));
         let shared = MockShared::builder()
             .db(MockDatabase::new(DatabaseBackend::MySql)
-                .append_query_results::<actions::Model>(vec![vec![]]))
+                .append_query_results::<actions::Model, _, _>(vec![vec![]]))
             .build();
 
         let res = app

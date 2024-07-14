@@ -8,7 +8,7 @@ pub fn routes<S: SharedTrait>() -> Router {
     Router::new()
         .route(
             "/",
-            get(get::get_user::<S>).layer(permissions![S, "iam.user.get"]),
+            get(get::get_user::<S>).layer(permissions::<S>(&["iam.user.get"])),
         )
         .route("/actions", get(actions::get_actions::<S>))
 }

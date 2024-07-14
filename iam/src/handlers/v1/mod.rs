@@ -16,7 +16,7 @@ pub fn routes<S: SharedTrait>() -> Router {
         .nest("/apps", apps::routes::<S>())
         .route(
             "/assign",
-            post(assign::assign::<S>.layer(permissions![S, "iam.policy.assign"])),
+            post(assign::assign::<S>.layer(permissions::<S>(&["iam.policy.assign"]))),
         )
         .route("/decision", post(decision::decision::<S>))
 }

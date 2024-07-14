@@ -1,12 +1,8 @@
-use axum::body::HttpBody;
+use axum::body::{to_bytes, Body};
 use serde_json::Value;
 
-pub async fn body_to_json<B>(body: B) -> Value
-where
-    B: HttpBody,
-    B::Error: std::fmt::Debug,
-{
-    let bytes = hyper::body::to_bytes(body).await.unwrap();
+pub async fn body_to_json(body: Body) -> Value {
+    let bytes = to_bytes(body, 1024 * 1024 * 8).await.unwrap();
     serde_json::from_slice(&bytes).unwrap()
 }
 

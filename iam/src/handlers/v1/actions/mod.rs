@@ -15,14 +15,14 @@ pub fn routes<S: SharedTrait>() -> Router {
     Router::new()
         .route(
             "/:action_id",
-            get(get::get_action::<S>.layer(permissions![S, "iam.action.get"])),
+            get(get::get_action::<S>.layer(permissions::<S>(&["iam.action.get"]))),
         )
         .route(
             "/",
             MethodRouter::new()
-                .get(gets::list_actions::<S>.layer(permissions![S, "iam.action.list"]))
-                .post(post::update_action::<S>.layer(permissions![S, "iam.action.update"]))
-                .put(put::add_action::<S>.layer(permissions![S, "iam.action.add"]))
-                .delete(delete::delete_action::<S>.layer(permissions![S, "iam.action.delete"])),
+                .get(gets::list_actions::<S>.layer(permissions::<S>(&["iam.action.list"])))
+                .post(post::update_action::<S>.layer(permissions::<S>(&["iam.action.update"])))
+                .put(put::add_action::<S>.layer(permissions::<S>(&["iam.action.add"])))
+                .delete(delete::delete_action::<S>.layer(permissions::<S>(&["iam.action.delete"]))),
         )
 }

@@ -56,4 +56,13 @@ impl ConnectionTrait for Database {
         let this: &'static Self = unsafe { std::mem::transmute(self) };
         self.runtime.spawn(this.conn.query_all(stmt)).await.unwrap()
     }
+
+    async fn execute_unprepared(&self, sql: &str) -> Result<ExecResult, DbErr> {
+        let this: &'static Self = unsafe { std::mem::transmute(self) };
+        let sql: &'static str = unsafe { std::mem::transmute(sql) };
+        self.runtime
+            .spawn(this.conn.execute_unprepared(sql))
+            .await
+            .unwrap()
+    }
 }

@@ -1,18 +1,6 @@
 use crate::error::{self, Result};
-use argon2::{Config, ThreadMode, Variant, Version};
+use argon2::Config;
 use rand::Rng;
-
-static ARGON2_CONFIG: Config = Config {
-    ad: &[],
-    hash_length: 32,
-    lanes: 1,
-    mem_cost: 37 * 1024,
-    secret: &[],
-    thread_mode: ThreadMode::Sequential,
-    time_cost: 1,
-    variant: Variant::Argon2id,
-    version: Version::Version13,
-};
 
 pub enum HashType {
     Bcrypt,
@@ -25,7 +13,7 @@ pub fn hash(password: &str) -> Result<String> {
     let mut salt = [0u8; 16];
     rand::thread_rng().fill(&mut salt);
 
-    argon2::hash_encoded(password.as_bytes(), &salt, &ARGON2_CONFIG)
+    argon2::hash_encoded(password.as_bytes(), &salt, &Config::owasp5())
         .map_err(|_| error::FAILED_PASSWORD_HASH)
 }
 

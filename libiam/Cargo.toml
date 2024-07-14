@@ -5,16 +5,16 @@ edition = "2021"
 license-file.workspace = true
 
 [dependencies]
-reqwest = { version = "0.11.14", default-features = false, features = ["json", "rustls-tls"] }
-serde = { version = "1.0.152", features = ["derive"] }
-serde_json = "1.0.93"
-thiserror = "1.0.38"
+reqwest = { version = "0.12.5", default-features = false, features = ["json", "rustls-tls"] }
+serde = { version = "1.0.204", features = ["derive"] }
+serde_json = "1.0.120"
+thiserror = "1.0.62"
 iam-common = { path = "../iam-common" }
 iam-entity = { path = "../iam-entity" }
-sea-orm = { version = "0.10.6", default-features = false, features = ["runtime-tokio-rustls", "sqlx-mysql", "macros"] }
-tracing = "0.1.37"
-tokio = { version = "1.25.0", features = ["rt"] }
-futures = "0.3.26"
-async-trait = "0.1.64"
-jsonwebtoken = "9.1.0"
+sea-orm = { version = "0.12.15", default-features = false, features = ["runtime-tokio-rustls", "sqlx-mysql", "macros"] }
+tracing = "0.1.40"
+tokio = { version = "1.38.0", features = ["rt"] }
+futures = "0.3.30"
+async-trait = "0.1.81"
+jsonwebtoken = "9.3.0"
 anyhow = "1.0.86"

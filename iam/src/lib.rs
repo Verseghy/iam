@@ -4,6 +4,7 @@ mod handlers;
 mod json;
 mod middlewares;
 mod shared;
+mod signal;
 mod utils;
 
 use axum::{
@@ -15,6 +16,7 @@ use axum::{
 };
 use middlewares::TraceRequestIdLayer;
 use shared::{Shared, SharedTrait};
+use signal::TerminateSignal;
 use std::{
     error::Error,
     iter::once,
@@ -35,24 +37,6 @@ async fn handle_error(err: BoxError) -> Response {
     } else {
         tracing::error!("Internal server error: {}", err);
         StatusCode::INTERNAL_SERVER_ERROR.into_response()
-    }
-}
-
-async fn shutdown_signals() {
-    #[cfg(unix)]
-    {
-        use tokio::signal::unix::{signal, SignalKind};
-
-        signal(SignalKind::terminate())
-            .expect("fail to set signal handler")
-            .recv()
-            .await
-            .expect("fail SIGTERM")
-    }
-
-    #[cfg(not(unix))]
-    {
-        std::future::pending().await
     }
 }
 
@@ -91,7 +75,7 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
     let listener = TcpListener::bind(&addr).await?;
 
     Ok(axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown_signals())
+        .with_graceful_shutdown(TerminateSignal::new())
         .await?)
 }
 

@@ -1327,6 +1327,7 @@ dependencies = [
  "sea-orm",
  "serde",
  "serde_json",
+ "smallvec",
  "tokio",
  "tower",
  "tower-http",

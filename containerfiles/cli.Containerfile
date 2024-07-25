@@ -26,12 +26,11 @@ COPY --from=planner /planner/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 # Build application
 COPY . .
-RUN cargo build --bin iam-setup --release
+RUN cargo build --bin iam-cli --release
 
 
 
 FROM registry.access.redhat.com/ubi9/ubi-micro
 WORKDIR /app
-COPY --from=builder /builder/target/release/iam-setup ./
-CMD ["./iam-setup"]
+COPY --from=builder /builder/target/release/iam-cli /usr/bin/iam-cli
 

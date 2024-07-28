@@ -1,20 +1,50 @@
-use std::{collections::BTreeMap, env};
-
 use anyhow::Context;
+use clap::{Arg, ArgAction, ArgMatches, Command};
 use k8s_openapi::api::core::v1::Secret;
 use kube::{
     api::{ObjectMeta, PostParams},
     Api, Client,
 };
-use libiam::{
-    testing::{self, actions::assign_action_to_user},
-    Iam, User,
-};
+use libiam::{testing::actions::assign_action_to_user, Iam, User};
 use rand::{
     distributions::{Alphanumeric, DistString},
     rngs::OsRng,
 };
+use sea_orm::Database;
+use std::collections::BTreeMap;
 use url::Url;
+
+pub fn command() -> Command {
+    Command::new("setup")
+        .about("Creates mysql password and admin user")
+        .arg(
+            Arg::new("database")
+                .long("database")
+                .short('D')
+                .env("DATABASE_URL")
+                .action(ArgAction::Set)
+                .required(true)
+                .help("URL of the database. Defaults to the environment variable DATABASE_URL"),
+        )
+        .arg(
+            Arg::new("iam")
+                .long("iam")
+                .short('I')
+                .env("IAM_URL")
+                .action(ArgAction::Set)
+                .required(true)
+                .help("URL of the IAM. Defaults to the environment variable IAM_URL"),
+        )
+}
+
+pub async fn run(matches: &ArgMatches) -> anyhow::Result<()> {
+    let client = Client::try_default().await?;
+
+    generate_mysql_password(client.clone()).await?;
+    create_admin_user(matches, client).await?;
+
+    Ok(())
+}
 
 const MYSQL_SECRET_NAME: &str = "mysql";
 const MYSQL_SECRET_KEY: &str = "MYSQL_ROOT_PASSWORD";
@@ -56,7 +86,7 @@ async fn generate_mysql_password(client: Client) -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn create_admin_user(client: Client) -> anyhow::Result<()> {
+async fn create_admin_user(matches: &ArgMatches, client: Client) -> anyhow::Result<()> {
     const SECRET_NAME: &str = "iam";
     const ADMIN_EMAIL: &str = "admin@admin.admin";
 
@@ -72,8 +102,8 @@ async fn create_admin_user(client: Client) -> anyhow::Result<()> {
         return Ok(());
     }
 
-    let iam_url = env::var("IAM_URL").context("IAM_URL is not set")?;
-    let database_url = env::var("DATABASE_URL").context("DATABASE_URL is not set")?;
+    let iam_url = matches.get_one::<String>("iam").unwrap();
+    let database_url = matches.get_one::<String>("database").unwrap();
 
     let database_password = {
         let secret = secrets
@@ -95,13 +125,13 @@ async fn create_admin_user(client: Client) -> anyhow::Result<()> {
     };
 
     let database_url = {
-        let mut url = Url::parse(&database_url).context("invalid url")?;
+        let mut url = Url::parse(database_url).context("invalid url")?;
         url.set_password(Some(&database_password)).unwrap();
         url
     };
 
-    let iam = Iam::new(&iam_url);
-    let db = testing::Database::connect(database_url.as_str()).await;
+    let iam = Iam::new(iam_url);
+    let db = Database::connect(database_url.as_str()).await?;
 
     let admin_password = Alphanumeric.sample_string(&mut OsRng, 64);
     let user = User::register(&iam, "admin", ADMIN_EMAIL, &admin_password).await?;
@@ -127,16 +157,6 @@ async fn create_admin_user(client: Client) -> anyhow::Result<()> {
         )
         .await
         .context("Failed to create secret")?;
-
-    Ok(())
-}
-
-#[tokio::main(flavor = "current_thread")]
-async fn main() -> anyhow::Result<()> {
-    let client = Client::try_default().await?;
-
-    generate_mysql_password(client.clone()).await?;
-    create_admin_user(client).await?;
 
     Ok(())
 }

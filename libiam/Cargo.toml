@@ -13,7 +13,7 @@ iam-common = { path = "../iam-common" }
 iam-entity = { path = "../iam-entity" }
 sea-orm = { version = "0.12.15", default-features = false, features = ["runtime-tokio-rustls", "sqlx-mysql", "macros"] }
 tracing = "0.1.40"
-tokio = { version = "1.38.0", features = ["rt"] }
+tokio = { version = "1.38.0", features = ["rt-multi-thread"] }
 futures = "0.3.30"
 async-trait = "0.1.81"
 jsonwebtoken = "9.3.0"

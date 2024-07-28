@@ -7,7 +7,7 @@ use sea_orm::{ActiveModelTrait, Database, DbConn, Set};
 
 pub fn command() -> Command {
     Command::new("seed")
-        .about("Filles the database with random test data")
+        .about("Fills the database with random test data")
         .arg(
             Arg::new("database")
                 .long("database")

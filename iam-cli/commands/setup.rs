@@ -33,7 +33,7 @@ pub fn command() -> Command {
                 .env("IAM_URL")
                 .action(ArgAction::Set)
                 .required(true)
-                .help("URL of the IAM. Default to the environment variable IAM_URL"),
+                .help("URL of the IAM. Defaults to the environment variable IAM_URL"),
         )
 }
 

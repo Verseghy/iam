@@ -21,3 +21,24 @@ resolver = "2"
 
 [workspace.package]
 license-file = "./LICENSE"
+
+[workspace.dependencies]
+anyhow = "1.0.86"
+async-trait = "0.1.81"
+axum = { version = "0.7.5", default-features = false, features = ["http2", "json", "macros", "tokio", "tracing"] }
+base64 = "0.22.1"
+chrono = { version = "0.4.38", default-features = false }
+dotenvy = "0.15.7"
+iam-common = { path = "./iam-common" }
+iam-entity = { path = "./iam-entity" }
+iam-macros = { path = "./iam-macros" }
+jsonwebtoken = "9.3.0"
+mime = "0.3.17"
+once_cell = "1.19.0"
+rand = { version = "0.8.5", default-features = false, features = ["std", "std_rng"] }
+sea-orm = { version = "0.12.15", default-features = false, features = ["macros", "mock", "runtime-actix-rustls", "sqlx-mysql", "with-chrono"] }
+serde = { version = "1.0.204", features = ["derive"] }
+serde_json = "1.0.120"
+tokio = { version = "1.38.0", features = ["macros", "rt-multi-thread", "signal"] }
+tracing = { version = "0.1.40", default-features = false }
+uuid = { version = "1.10.0", features = ["v1", "v4", "rng"] }

@@ -7,31 +7,31 @@ default-run = "iam"
 license-file.workspace = true
 
 [dependencies]
-iam-entity = { path = "../iam-entity" }
-sea-orm = { version = "0.12.15", default-features = false, features = ["runtime-actix-rustls", "sqlx-mysql", "macros", "mock"] }
-axum = { version = "0.7.5", features = ["http2", "macros"] }
-serde = { version = "1.0.204", features = ["derive"] }
-serde_json = "1.0.120"
-tracing = "0.1.40"
+iam-entity.workspace = true
+sea-orm.workspace = true
+axum.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
 tracing-subscriber = { version = "0.3.18", features = ["json"] }
-rand = { version = "0.8.5", default-features = false, features = ["std", "std_rng"] }
-chrono = { version = "0.4.38", default-features = false }
+rand.workspace = true
+chrono.workspace = true
 validator = { version = "0.18.1", features = ["derive"] }
-async-trait = "0.1.81"
+async-trait.workspace = true
 futures-util = "0.3.30"
-once_cell = "1.19.0"
-tokio = { version = "1.38.0", features = ["rt-multi-thread", "macros", "signal"] }
+once_cell.workspace = true
+tokio.workspace = true
 tower = { version = "0.4.13", features = ["timeout"] }
-tower-http = { version = "0.5.2", features = ["auth", "compression-full", "decompression-full", "cors", "sensitive-headers", "trace", "add-extension", "request-id", "util"] }
+tower-http = { version = "0.5.2", features = ["add-extension", "auth", "compression-full", "cors", "decompression-full", "request-id", "sensitive-headers", "trace", "util"] }
 hyper = "1.4.1"
 http-body = "1.0.1"
-iam-common = { path = "../iam-common" }
-base64 = "0.22.1"
-dotenvy = "0.15.7"
-uuid = { version = "1.10.0", features = ["v4"] }
+iam-common.workspace = true
+base64.workspace = true
+dotenvy.workspace = true
+uuid.workspace = true
 pin-project-lite = "0.2.14"
 headers = "0.4.0"
 smallvec = "1.13.2"
 
 [dev-dependencies]
-mime = "0.3.17"
+mime.workspace = true

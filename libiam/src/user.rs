@@ -4,7 +4,7 @@ use crate::{
 };
 use iam_common::{keys::jwt::Claims, Id};
 use jsonwebtoken::{Algorithm, DecodingKey, Validation};
-use std::sync::Arc;
+use std::{str::FromStr, sync::Arc};
 
 #[derive(Debug)]
 pub struct UserInner {
@@ -48,31 +48,20 @@ impl User {
 
         let api = iam.inner.api.with_token(token.clone());
 
+        // TODO: this should be done with `Jwt::get_claims()`
+        let claims =
+            jsonwebtoken::decode::<Claims>(token.as_str(), &DecodingKey::from_secret(&[]), &{
+                let mut v = Validation::new(Algorithm::EdDSA);
+                v.insecure_disable_signature_validation();
+                v.set_audience(&["https://verseghy-gimnazium.net"]);
+                v
+            })?
+            .claims;
+
         Ok(Self {
             inner: Arc::new(UserInner {
                 token: token.clone(),
-                id: serde_json::from_str::<Id>(
-                    format!(
-                        // HACK: impl FromStr
-                        "\"{}\"",
-                        jsonwebtoken::decode::<Claims>(
-                            token.as_str(),
-                            &DecodingKey::from_secret(&[]),
-                            &{
-                                let mut v = Validation::new(Algorithm::RS256);
-                                v.insecure_disable_signature_validation();
-                                v.set_audience(&["https://verseghy-gimnazium.net"]);
-                                v
-                            },
-                        )
-                        .unwrap()
-                        .claims
-                        .sub
-                        .as_str()
-                    )
-                    .as_str(),
-                )
-                .unwrap(),
+                id: Id::from_str(&claims.sub)?,
                 _api: api,
             }),
         })

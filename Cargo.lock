@@ -207,15 +207,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "atomic"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d818003e740b63afc82337e3160717f4f63078720a810b7b903e70a5d1d2994"
-dependencies = [
- "bytemuck",
-]
-
-[[package]]
 name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -411,12 +402,6 @@ name = "bumpalo"
 version = "3.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "79296716171880943b8470b5f8d03aa55eb2e645a4874bdbb28adb49162e012c"
-
-[[package]]
-name = "bytemuck"
-version = "1.16.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b236fc92302c97ed75b38da1f4917b5cdda4984745740f153a5d3059e48d725e"
 
 [[package]]
 name = "byteorder"
@@ -1234,7 +1219,6 @@ dependencies = [
  "iam-common",
  "iam-entity",
  "mime",
- "once_cell",
  "pin-project-lite",
  "rand",
  "sea-orm",
@@ -1272,6 +1256,7 @@ dependencies = [
 name = "iam-common"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "axum",
  "base64 0.22.1",
  "bcrypt",
@@ -1283,7 +1268,6 @@ dependencies = [
  "jose-jwk",
  "jsonwebtoken",
  "mime",
- "once_cell",
  "rand",
  "rust-argon2",
  "sea-orm",
@@ -3471,7 +3455,6 @@ version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "81dfa00651efa65069b0b6b651f4aaa31ba9e3c3ce0137aaad053604ee7e0314"
 dependencies = [
- "atomic",
  "getrandom",
 ]
 

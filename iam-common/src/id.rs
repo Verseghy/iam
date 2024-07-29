@@ -1,18 +1,44 @@
-use once_cell::sync::Lazy;
+use anyhow::bail;
 use serde::{Deserialize, Serialize};
-use std::fmt::{self, Display};
-use uuid::{
-    v1::{Context, Timestamp},
-    Uuid,
+use std::{
+    fmt::{self, Display},
+    str::FromStr,
 };
+use uuid::Uuid;
 
-#[derive(Debug, Clone, Copy)]
-#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IdType {
     Action,
     Group,
     User,
     App,
+}
+
+impl IdType {
+    const fn as_str(&self) -> &'static str {
+        match self {
+            IdType::Action => "ActionID",
+            IdType::Group => "GroupID",
+            IdType::User => "UserID",
+            IdType::App => "AppID",
+        }
+    }
+}
+
+impl FromStr for IdType {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let ty = match s {
+            "ActionID" => IdType::Action,
+            "UserID" => IdType::User,
+            "AppID" => IdType::App,
+            "GroupID" => IdType::Group,
+            _ => bail!("invalid type"),
+        };
+
+        Ok(ty)
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -21,32 +47,10 @@ pub struct Id {
     ty: IdType,
 }
 
-static CONTEXT: Lazy<Context> = Lazy::new(Context::new_random);
-
 impl Id {
     fn new(ty: IdType) -> Self {
-        let date = chrono::Utc::now();
-        let timestamp = Timestamp::from_unix(
-            &*CONTEXT,
-            date.timestamp() as u64,
-            date.timestamp_subsec_nanos(),
-        );
-        let hostname = std::env::var("HOSTNAME").unwrap_or_else(|_| "dev".to_string());
-
-        let mut buf = [0u8; 6];
-        let mut buf_iter = buf.iter_mut();
-        let mut iter = hostname.as_bytes().iter();
-
-        while let Some(x) = iter.next_back() {
-            if let Some(y) = buf_iter.next() {
-                *y = *x;
-            } else {
-                break;
-            }
-        }
-
         Self {
-            uuid: Uuid::new_v1(timestamp, &buf),
+            uuid: Uuid::new_v4(),
             ty,
         }
     }
@@ -72,26 +76,37 @@ impl Id {
     }
 
     #[inline]
-    const fn get_prefix(&self) -> &'static str {
-        match self.ty {
-            IdType::Action => "ActionID",
-            IdType::Group => "GroupID",
-            IdType::User => "UserID",
-            IdType::App => "AppID",
-        }
+    pub const fn get_type(&self) -> IdType {
+        self.ty
     }
 }
 
 impl Display for Id {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}-{}",
-            self.get_prefix(),
-            self.uuid
-                .as_hyphenated()
-                .encode_lower(&mut Uuid::encode_buffer())
-        )
+        let ty = self.get_type().as_str();
+
+        let mut buf = Uuid::encode_buffer();
+        let uuid = self.uuid.as_hyphenated().encode_lower(&mut buf);
+
+        write!(f, "{}-{}", ty, uuid)
+    }
+}
+
+impl FromStr for Id {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let Some((ty, id_str)) = s.split_once('-') else {
+            bail!("invalid format");
+        };
+
+        let ty = IdType::from_str(ty)?;
+
+        let Ok(uuid) = Uuid::parse_str(id_str) else {
+            bail!("invalid uuid");
+        };
+
+        Ok(Self { uuid, ty })
     }
 }
 
@@ -125,25 +140,74 @@ impl<'de> Deserialize<'de> for Id {
             where
                 E: de::Error,
             {
-                let (ty, id_str) = if let Some(i) = v.strip_prefix("ActionID-") {
-                    (IdType::Action, i)
-                } else if let Some(i) = v.strip_prefix("GroupID-") {
-                    (IdType::Group, i)
-                } else if let Some(i) = v.strip_prefix("UserID-") {
-                    (IdType::User, i)
-                } else if let Some(i) = v.strip_prefix("AppID-") {
-                    (IdType::App, i)
-                } else {
-                    return Err(de::Error::invalid_value(de::Unexpected::Str(v), &self));
-                };
-
-                let uuid = Uuid::parse_str(id_str)
-                    .map_err(|_| de::Error::invalid_value(de::Unexpected::Str(id_str), &self))?;
-
-                Ok(Id { ty, uuid })
+                match Id::from_str(v) {
+                    Ok(id) => Ok(id),
+                    Err(err) => Err(de::Error::custom(err)),
+                }
             }
         }
 
         deserializer.deserialize_str(Visitor)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn from_str() {
+        let id = Id::from_str("UserID-00000000-0000-0000-0000-000000000000").unwrap();
+        assert_eq!(id.get_type(), IdType::User);
+
+        let id = Id::from_str("ActionID-00000000-0000-0000-0000-000000000000").unwrap();
+        assert_eq!(id.get_type(), IdType::Action);
+
+        let id = Id::from_str("UserID-00000000-0000-0000-0000-000000000000").unwrap();
+        assert_eq!(id.get_type(), IdType::User);
+
+        let id = Id::from_str("GroupID-00000000-0000-0000-0000-000000000000").unwrap();
+        assert_eq!(id.get_type(), IdType::Group);
+    }
+
+    #[test]
+    fn from_str_invalid_type() {
+        let id = Id::from_str("Invalid-00000000-0000-0000-0000-000000000000");
+        assert!(id.is_err());
+    }
+
+    #[test]
+    fn from_str_invalid_uuid() {
+        let id = Id::from_str("UserID-invalid");
+        assert!(id.is_err());
+    }
+
+    #[test]
+    fn from_str_invalid_format() {
+        let id = Id::from_str("invalid");
+        assert!(id.is_err());
+    }
+
+    #[test]
+    fn to_string() {
+        let str_id = "UserID-00000000-0000-0000-0000-000000000000";
+        let id = Id::from_str(str_id).unwrap();
+
+        assert_eq!(id.to_string(), str_id);
+
+        let str_id = "ActionID-00000000-0000-0000-0000-000000000000";
+        let id = Id::from_str(str_id).unwrap();
+
+        assert_eq!(id.to_string(), str_id);
+
+        let str_id = "AppID-00000000-0000-0000-0000-000000000000";
+        let id = Id::from_str(str_id).unwrap();
+
+        assert_eq!(id.to_string(), str_id);
+
+        let str_id = "GroupID-00000000-0000-0000-0000-000000000000";
+        let id = Id::from_str(str_id).unwrap();
+
+        assert_eq!(id.to_string(), str_id);
     }
 }

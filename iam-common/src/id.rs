@@ -1,10 +1,6 @@
-use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};
-use uuid::{
-    v1::{Context, Timestamp},
-    Uuid,
-};
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Copy)]
 #[repr(u8)]
@@ -21,32 +17,10 @@ pub struct Id {
     ty: IdType,
 }
 
-static CONTEXT: Lazy<Context> = Lazy::new(Context::new_random);
-
 impl Id {
     fn new(ty: IdType) -> Self {
-        let date = chrono::Utc::now();
-        let timestamp = Timestamp::from_unix(
-            &*CONTEXT,
-            date.timestamp() as u64,
-            date.timestamp_subsec_nanos(),
-        );
-        let hostname = std::env::var("HOSTNAME").unwrap_or_else(|_| "dev".to_string());
-
-        let mut buf = [0u8; 6];
-        let mut buf_iter = buf.iter_mut();
-        let mut iter = hostname.as_bytes().iter();
-
-        while let Some(x) = iter.next_back() {
-            if let Some(y) = buf_iter.next() {
-                *y = *x;
-            } else {
-                break;
-            }
-        }
-
         Self {
-            uuid: Uuid::new_v1(timestamp, &buf),
+            uuid: Uuid::new_v4(),
             ty,
         }
     }

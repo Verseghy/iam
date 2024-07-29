@@ -19,7 +19,6 @@ chrono.workspace = true
 validator = { version = "0.18.1", features = ["derive"] }
 async-trait.workspace = true
 futures-util = "0.3.30"
-once_cell.workspace = true
 tokio.workspace = true
 tower = { version = "0.4.13", features = ["timeout"] }
 tower-http = { version = "0.5.2", features = ["add-extension", "auth", "compression-full", "cors", "decompression-full", "request-id", "sensitive-headers", "trace", "util"] }

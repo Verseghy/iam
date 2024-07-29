@@ -13,7 +13,6 @@ rand.workspace = true
 rust-argon2 = { version = "2.1.0", default-features = false }
 bcrypt = "0.15.1"
 serde.workspace = true
-once_cell.workspace = true
 jsonwebtoken.workspace = true
 axum.workspace = true
 iam-macros.workspace = true

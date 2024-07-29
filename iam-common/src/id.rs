@@ -97,7 +97,7 @@ impl FromStr for Id {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let Some((ty, id_str)) = s.split_once('-') else {
-            bail!("missing type");
+            bail!("invalid format");
         };
 
         let ty = IdType::from_str(ty)?;

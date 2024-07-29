@@ -5,4 +5,4 @@ edition = "2021"
 license-file.workspace = true
 
 [dependencies]
-sea-orm = { version = "0.12.15", default-features = false, features = ["runtime-actix-rustls", "sqlx-mysql", "macros", "with-chrono"] }
+sea-orm.workspace = true

@@ -9,15 +9,15 @@ name = "iam-cli"
 path = "main.rs"
 
 [dependencies]
-anyhow = "1.0.86"
+anyhow.workspace = true
 clap = { version = "4.5.11", features = ["cargo", "env"] }
-dotenvy = "0.15.7"
-iam-common = { version = "0.1.0", path = "../iam-common" }
-iam-entity = { version = "0.1.0", path = "../iam-entity" }
+dotenvy.workspace = true
+iam-common.workspace = true
+iam-entity.workspace = true
 k8s-openapi = { version = "0.22.0", features = ["earliest"] }
 kube = "0.93.1"
 libiam = { version = "0.1.0", path = "../libiam" }
-rand = "0.8.5"
-sea-orm = { version = "0.12.15", default-features = false, features = ["runtime-actix-rustls", "sqlx-mysql"] }
-tokio = { version = "1.39.1", features = ["rt", "macros"] }
+rand.workspace = true
+sea-orm.workspace = true
+tokio.workspace = true
 url = "2.5.2"

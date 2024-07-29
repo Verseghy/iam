@@ -8,7 +8,7 @@ license-file.workspace = true
 
 [dependencies]
 iam-entity.workspace = true
-sea-orm.workspace = true
+sea-orm = { workspace = true, features = ["mock"] }
 axum.workspace = true
 serde.workspace = true
 serde_json.workspace = true

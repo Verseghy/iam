@@ -183,6 +183,12 @@ mod tests {
     }
 
     #[test]
+    #[should_panic]
+    fn from_str_invalid_format() {
+        Id::from_str("invalid").unwrap();
+    }
+
+    #[test]
     fn to_string() {
         let str_id = "UserID-00000000-0000-0000-0000-000000000000";
         let id = Id::from_str(str_id).unwrap();

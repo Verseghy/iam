@@ -171,21 +171,21 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn from_str_invalid_type() {
-        Id::from_str("Invalid-00000000-0000-0000-0000-000000000000").unwrap();
+        let id = Id::from_str("Invalid-00000000-0000-0000-0000-000000000000");
+        assert!(id.is_err());
     }
 
     #[test]
-    #[should_panic]
     fn from_str_invalid_uuid() {
-        Id::from_str("UserID-invalid").unwrap();
+        let id = Id::from_str("UserID-invalid");
+        assert!(id.is_err());
     }
 
     #[test]
-    #[should_panic]
     fn from_str_invalid_format() {
-        Id::from_str("invalid").unwrap();
+        let id = Id::from_str("invalid");
+        assert!(id.is_err());
     }
 
     #[test]

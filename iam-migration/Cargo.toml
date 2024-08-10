@@ -10,7 +10,7 @@ name = "migration"
 path = "src/lib.rs"
 
 [dependencies]
-sea-orm-migration = { version = "0.12.15" }
+sea-orm-migration = { version = "1.0.0" }
 tokio.workspace = true
 iam-entity.workspace = true
 iam-common.workspace = true

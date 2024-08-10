@@ -1,6 +1,6 @@
 [profile.release]
 strip = true
-lto = true
+lto = "thin"
 
 [workspace]
 members = [

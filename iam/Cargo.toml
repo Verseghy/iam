@@ -6,6 +6,9 @@ publish = false
 default-run = "iam"
 license-file.workspace = true
 
+[lib]
+path = "./lib.rs"
+
 [dependencies]
 iam-entity.workspace = true
 sea-orm = { workspace = true, features = ["mock"] }

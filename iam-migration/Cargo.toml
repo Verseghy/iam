@@ -7,7 +7,7 @@ license-file.workspace = true
 
 [lib]
 name = "migration"
-path = "src/lib.rs"
+path = "lib.rs"
 
 [dependencies]
 sea-orm-migration = { version = "1.0.0" }

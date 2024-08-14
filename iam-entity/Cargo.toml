@@ -4,5 +4,8 @@ version = "0.1.0"
 edition = "2021"
 license-file.workspace = true
 
+[lib]
+path = "./lib.rs"
+
 [dependencies]
 sea-orm.workspace = true

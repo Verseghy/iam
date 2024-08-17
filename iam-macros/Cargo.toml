@@ -5,6 +5,7 @@ edition = "2021"
 license-file.workspace = true
 
 [lib]
+path = "./lib.rs"
 proc-macro = true
 
 [dependencies]

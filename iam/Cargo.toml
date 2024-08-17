@@ -3,8 +3,10 @@ name = "iam"
 version = "0.1.0"
 edition = "2021"
 publish = false
-default-run = "iam"
 license-file.workspace = true
+
+[lib]
+path = "./lib.rs"
 
 [dependencies]
 iam-entity.workspace = true

@@ -8,6 +8,10 @@ license-file.workspace = true
 [lib]
 path = "./lib.rs"
 
+[[bin]]
+name = "iam"
+path = "main.rs"
+
 [dependencies]
 iam-entity.workspace = true
 sea-orm = { workspace = true, features = ["mock"] }

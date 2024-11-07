@@ -9,6 +9,10 @@ license-file.workspace = true
 name = "migration"
 path = "lib.rs"
 
+[[bin]]
+name = "iam-migration"
+path = "main.rs"
+
 [dependencies]
 sea-orm-migration = { version = "1.0.0" }
 tokio.workspace = true

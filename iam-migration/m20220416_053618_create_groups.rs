@@ -24,13 +24,13 @@ impl MigrationTrait for Migration {
                         ColumnDef::new(Column::CreatedAt)
                             .date_time()
                             .not_null()
-                            .extra("DEFAULT CURRENT_TIMESTAMP"),
+                            .default(Expr::current_timestamp()),
                     )
                     .col(
                         ColumnDef::new(Column::UpdatedAt)
                             .date_time()
                             .not_null()
-                            .extra("DEFAULT CURRENT_TIMESTAMP")
+                            .default(Expr::current_timestamp())
                             .extra("ON UPDATE CURRENT_TIMESTAMP"),
                     )
                     .col(

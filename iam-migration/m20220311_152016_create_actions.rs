@@ -31,8 +31,7 @@ impl MigrationTrait for Migration {
                         ColumnDef::new(Column::UpdatedAt)
                             .date_time()
                             .not_null()
-                            .default(Expr::current_timestamp())
-                            .extra("ON UPDATE CURRENT_TIMESTAMP"),
+                            .default(Expr::current_timestamp()),
                     )
                     .col(
                         ColumnDef::new(Column::DeletedAt)

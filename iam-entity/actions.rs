@@ -1,5 +1,7 @@
+use async_trait::async_trait;
+use chrono::Utc;
 use sea_orm::entity::prelude::*;
-use sea_orm::{JoinType, QuerySelect};
+use sea_orm::{JoinType, QuerySelect, Set};
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
 #[sea_orm(table_name = "actions")]
@@ -43,7 +45,16 @@ impl Related<super::groups::Entity> for Entity {
     }
 }
 
-impl ActiveModelBehavior for ActiveModel {}
+#[async_trait]
+impl ActiveModelBehavior for ActiveModel {
+    async fn before_save<C>(mut self, _db: &C, _insert: bool) -> Result<Self, DbErr>
+    where
+        C: ConnectionTrait,
+    {
+        self.updated_at = Set(Utc::now().naive_utc());
+        Ok(self)
+    }
+}
 
 impl Entity {
     pub fn get_actions_for_user_id_through_groups(id: &str) -> Select<super::actions::Entity> {

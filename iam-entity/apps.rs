@@ -1,4 +1,6 @@
-use sea_orm::entity::prelude::*;
+use async_trait::async_trait;
+use chrono::Utc;
+use sea_orm::{entity::prelude::*, Set};
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
 #[sea_orm(table_name = "apps")]
@@ -14,8 +16,6 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
-
-impl ActiveModelBehavior for ActiveModel {}
 
 impl Related<super::actions::Entity> for Entity {
     fn to() -> RelationDef {
@@ -34,5 +34,16 @@ impl Related<super::groups::Entity> for Entity {
 
     fn via() -> Option<RelationDef> {
         Some(super::pivot_apps_groups::Relation::App.def())
+    }
+}
+
+#[async_trait]
+impl ActiveModelBehavior for ActiveModel {
+    async fn before_save<C>(mut self, _db: &C, _insert: bool) -> Result<Self, DbErr>
+    where
+        C: ConnectionTrait,
+    {
+        self.updated_at = Set(Utc::now().naive_utc());
+        Ok(self)
     }
 }

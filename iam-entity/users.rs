@@ -1,4 +1,6 @@
-use sea_orm::entity::prelude::*;
+use async_trait::async_trait;
+use chrono::Utc;
+use sea_orm::{entity::prelude::*, Set};
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
 #[sea_orm(table_name = "users")]
@@ -43,4 +45,13 @@ impl Related<super::groups::Entity> for Entity {
     }
 }
 
-impl ActiveModelBehavior for ActiveModel {}
+#[async_trait]
+impl ActiveModelBehavior for ActiveModel {
+    async fn before_save<C>(mut self, _db: &C, _insert: bool) -> Result<Self, DbErr>
+    where
+        C: ConnectionTrait,
+    {
+        self.updated_at = Set(Utc::now().naive_utc());
+        Ok(self)
+    }
+}

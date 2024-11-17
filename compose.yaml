@@ -1,11 +1,9 @@
 services:
-  database:
-    image: docker.io/mysql:8.0
+  db:
+    image: docker.io/postgres:16
     environment:
-      MYSQL_DATABASE: iam
-      MYSQL_USER: iam
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: secret
-      TZ: Europe/Budapest
+      POSTGRES_USER: iam
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: iam
     ports:
-        - "3306:3306"
+      - 5432:5432

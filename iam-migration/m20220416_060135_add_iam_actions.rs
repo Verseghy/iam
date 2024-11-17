@@ -1,5 +1,6 @@
 use iam_common::Id;
-use iam_entity::actions::{Column, Entity};
+use iam_entity::actions::{self, Entity};
+use sea_orm::{ActiveModelTrait, Set};
 use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
@@ -8,99 +9,38 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        manager
-            .exec_stmt(
-                Query::insert()
-                    .into_table(Entity)
-                    .columns(vec![Column::Id, Column::Name, Column::Secure])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.action.add".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.action.get".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.action.update".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.action.list".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.action.delete".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.group.add".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.group.get".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.group.list".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.group.delete".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.group.edit".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.user.add".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.user.get".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.user.list".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.user.update".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.user.invite".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.user.delete".into(),
-                        true.into(),
-                    ])
-                    .values_panic(vec![
-                        Id::new_action().to_string().into(),
-                        "iam.policy.assign".into(),
-                        true.into(),
-                    ])
-                    .to_owned(),
-            )
-            .await
+        let actions = [
+            ("iam.action.add", true),
+            ("iam.action.get", true),
+            ("iam.action.update", true),
+            ("iam.action.list", true),
+            ("iam.action.delete", true),
+            ("iam.group.add", true),
+            ("iam.group.get", true),
+            ("iam.group.list", true),
+            ("iam.group.delete", true),
+            ("iam.group.edit", true),
+            ("iam.user.add", true),
+            ("iam.user.get", true),
+            ("iam.user.list", true),
+            ("iam.user.update", true),
+            ("iam.user.invite", true),
+            ("iam.user.delete", true),
+            ("iam.policy.assign", true),
+        ];
+
+        for (name, secure) in actions {
+            let model = actions::ActiveModel {
+                id: Set(Id::new_action().to_string()),
+                name: Set(name.to_string()),
+                secure: Set(secure),
+                ..Default::default()
+            };
+
+            model.insert(manager.get_connection()).await?;
+        }
+
+        Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {

@@ -1,9 +1,9 @@
-use std::env;
 use base64::{prelude::BASE64_STANDARD, Engine};
 use ed25519_dalek::{pkcs8::EncodePrivateKey, SecretKey, SigningKey, SECRET_KEY_LENGTH};
 use jose_jwk::{Jwk, Okp, OkpCurves, Parameters};
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey};
 use rand::rngs::OsRng;
+use std::env;
 
 pub struct Key {
     pub(super) jwk: Jwk,

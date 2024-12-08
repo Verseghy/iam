@@ -10,7 +10,7 @@ pub struct KeyManager {
 impl KeyManager {
     pub fn new() -> Self {
         Self {
-            jwt_key: Key::generate(),
+            jwt_key: Key::from_env(),
         }
     }
 

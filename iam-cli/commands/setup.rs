@@ -1,5 +1,7 @@
 use anyhow::Context;
+use base64::{prelude::BASE64_STANDARD, Engine};
 use clap::{Arg, ArgAction, ArgMatches, Command};
+use ed25519_dalek::SigningKey;
 use k8s_openapi::api::core::v1::Secret;
 use kube::{
     api::{ObjectMeta, PostParams},
@@ -39,7 +41,8 @@ pub fn command() -> Command {
 pub async fn run(matches: &ArgMatches) -> anyhow::Result<()> {
     let client = Client::try_default().await?;
 
-    create_admin_user(matches, client).await?;
+    create_jwt_secret_key(client.clone()).await?;
+    create_admin_user(matches, client.clone()).await?;
 
     Ok(())
 }
@@ -83,6 +86,46 @@ async fn create_admin_user(matches: &ArgMatches, client: Client) -> anyhow::Resu
                     let mut map = BTreeMap::new();
                     map.insert("IAM_EMAIL".to_owned(), ADMIN_EMAIL.to_owned());
                     map.insert("IAM_PASSWORD".to_owned(), admin_password);
+                    map
+                }),
+                ..Default::default()
+            },
+        )
+        .await
+        .context("Failed to create secret")?;
+
+    Ok(())
+}
+
+async fn create_jwt_secret_key(client: Client) -> anyhow::Result<()> {
+    const SECRET_NAME: &str = "iam-jwt";
+
+    let key = SigningKey::generate(&mut OsRng);
+    let bytes = BASE64_STANDARD.encode(key.to_bytes());
+
+    let secrets: Api<Secret> = Api::default_namespaced(client);
+
+    if secrets
+        .get_opt(SECRET_NAME)
+        .await
+        .context("Failed to query iam-jwt secret")?
+        .is_some()
+    {
+        println!("iam-jwt secret already exists.");
+        return Ok(());
+    }
+
+    secrets
+        .create(
+            &PostParams::default(),
+            &Secret {
+                metadata: ObjectMeta {
+                    name: Some(SECRET_NAME.to_owned()),
+                    ..Default::default()
+                },
+                string_data: Some({
+                    let mut map = BTreeMap::new();
+                    map.insert("IAM_JWT_SECRET_KEY".to_owned(), bytes);
                     map
                 }),
                 ..Default::default()

@@ -24,6 +24,6 @@ bytes = "1.6.1"
 serde_json.workspace = true
 mime.workspace = true
 base64.workspace = true
-ed25519-dalek = { version = "2.1.1", features = ["pkcs8", "rand_core"] }
+ed25519-dalek.workspace = true
 jose-jwk = { version = "0.1.2", default-features = false }
 anyhow.workspace = true

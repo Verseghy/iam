@@ -9,10 +9,11 @@ mod utils;
 
 use axum::{
     error_handling::HandleErrorLayer,
+    extract::Request,
     http::{header::AUTHORIZATION, StatusCode},
     middleware,
     response::{IntoResponse, Response},
-    BoxError, Router,
+    BoxError, Router, ServiceExt,
 };
 use middlewares::TraceRequestIdLayer;
 use shared::{Shared, SharedTrait};
@@ -25,10 +26,7 @@ use std::{
 };
 use tokio::net::TcpListener;
 use tower::{timeout::error::Elapsed, ServiceBuilder};
-use tower_http::{
-    cors::{Any, CorsLayer},
-    ServiceBuilderExt,
-};
+use tower_http::{cors::CorsLayer, normalize_path::NormalizePath, ServiceBuilderExt};
 use utils::MakeUuidRequestId;
 
 async fn handle_error(err: BoxError) -> Response {
@@ -41,11 +39,6 @@ async fn handle_error(err: BoxError) -> Response {
 }
 
 fn middlewares<S: SharedTrait>(shared: S, router: Router) -> Router {
-    let cors_layer = CorsLayer::new()
-        .allow_origin(Any)
-        .allow_methods(Any)
-        .allow_headers(Any);
-
     let middlewares = ServiceBuilder::new()
         .layer(HandleErrorLayer::new(handle_error))
         .timeout(Duration::from_secs(10))
@@ -55,7 +48,7 @@ fn middlewares<S: SharedTrait>(shared: S, router: Router) -> Router {
         .layer(TraceRequestIdLayer)
         .compression()
         .decompression()
-        .layer(cors_layer)
+        .layer(CorsLayer::permissive())
         .add_extension(shared)
         .layer(middleware::from_fn(auth::get_claims::<S>))
         .propagate_x_request_id()
@@ -69,14 +62,17 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
     let shared = shared::create_shared().await;
 
     let app = middlewares(shared, handlers::routes::<Shared>());
+    let app = NormalizePath::trim_trailing_slash(app);
 
     tracing::info!("Listening on port {}", addr.port());
 
     let listener = TcpListener::bind(&addr).await?;
 
-    Ok(axum::serve(listener, app)
-        .with_graceful_shutdown(TerminateSignal::new())
-        .await?)
+    Ok(
+        axum::serve(listener, ServiceExt::<Request>::into_make_service(app))
+            .with_graceful_shutdown(TerminateSignal::new())
+            .await?,
+    )
 }
 
 #[cfg(test)]

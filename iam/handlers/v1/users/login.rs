@@ -37,8 +37,13 @@ pub async fn login<S: SharedTrait>(
     let res = users::Entity::find()
         .filter(users::Column::Email.eq(req.email.clone()))
         .one(shared.db())
-        .await?
-        .ok_or(error::INVALID_EMAIL_OR_PASSWORD)?;
+        .await?;
+
+    let Some(res) = res else {
+        // Still compute hash if the user is not in the database to avoid timing attacks
+        _ = password::hash(&req.password);
+        return Err(error::INVALID_EMAIL_OR_PASSWORD);
+    };
 
     let (valid, rehash) = password::validate(&res.password, &req.password)?;
 

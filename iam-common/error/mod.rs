@@ -1,4 +1,5 @@
 mod constants;
+pub mod oauth;
 
 pub use constants::*;
 

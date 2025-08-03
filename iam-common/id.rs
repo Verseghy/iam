@@ -88,7 +88,7 @@ impl Display for Id {
         let mut buf = Uuid::encode_buffer();
         let uuid = self.uuid.as_hyphenated().encode_lower(&mut buf);
 
-        write!(f, "{}-{}", ty, uuid)
+        write!(f, "{ty}-{uuid}")
     }
 }
 

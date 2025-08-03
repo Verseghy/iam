@@ -48,7 +48,7 @@ impl Api {
         let mut r = self.client.request(method, self.base.join(path).unwrap());
 
         if let Some(token) = &self.token {
-            r = r.header(AUTHORIZATION, &format!("Bearer {}", token));
+            r = r.header(AUTHORIZATION, &format!("Bearer {token}"));
         }
 
         if let Some(req) = req {

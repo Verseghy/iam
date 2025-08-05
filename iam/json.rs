@@ -1,5 +1,4 @@
 use axum::{
-    async_trait,
     extract::{rejection::JsonRejection, FromRequest, Request},
     response::{IntoResponse, Response},
 };
@@ -9,7 +8,6 @@ use validator::Validate;
 
 pub struct Json<T>(pub T);
 
-#[async_trait]
 impl<T, S> FromRequest<S> for Json<T>
 where
     T: DeserializeOwned,
@@ -42,7 +40,6 @@ where
 
 pub struct ValidatedJson<T>(pub T);
 
-#[async_trait]
 impl<T, S> FromRequest<S> for ValidatedJson<T>
 where
     T: DeserializeOwned + Validate,

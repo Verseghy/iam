@@ -13,14 +13,14 @@ uuid.workspace = true
 sea-orm.workspace = true
 tracing.workspace = true
 rand.workspace = true
-rust-argon2 = { version = "2.1.0", default-features = false }
-bcrypt = "0.15.1"
+rust-argon2 = { version = "3.0.0", default-features = false }
+bcrypt = "0.17.0"
 serde.workspace = true
 jsonwebtoken.workspace = true
 axum.workspace = true
 iam-macros.workspace = true
 iam-entity.workspace = true
-bytes = "1.6.1"
+bytes = "1.10.1"
 serde_json.workspace = true
 mime.workspace = true
 base64.workspace = true

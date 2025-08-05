@@ -48,7 +48,7 @@ mod tests {
 
     #[tokio::test]
     async fn has_in_db() {
-        let app = Router::new().route("/:id", get(get_action::<MockShared>));
+        let app = Router::new().route("/{id}", get(get_action::<MockShared>));
         let shared = MockShared::builder()
             .db(
                 MockDatabase::new(DatabaseBackend::MySql).append_query_results(vec![vec![
@@ -85,7 +85,7 @@ mod tests {
 
     #[tokio::test]
     async fn not_found() {
-        let app = Router::new().route("/:id", get(get_action::<MockShared>));
+        let app = Router::new().route("/{id}", get(get_action::<MockShared>));
         let shared = MockShared::builder()
             .db(MockDatabase::new(DatabaseBackend::MySql)
                 .append_query_results::<actions::Model, _, _>(vec![vec![]]))

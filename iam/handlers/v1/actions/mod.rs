@@ -14,7 +14,7 @@ use axum::{
 pub fn routes<S: SharedTrait>() -> Router {
     Router::new()
         .route(
-            "/:action_id",
+            "/{action_id}",
             get(get::get_action::<S>.layer(permissions::<S>(&["iam.action.get"]))),
         )
         .route(

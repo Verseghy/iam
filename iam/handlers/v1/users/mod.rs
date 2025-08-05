@@ -23,5 +23,5 @@ pub fn routes<S: SharedTrait>() -> Router {
                 .delete(delete::delete_user::<S>.layer(permissions::<S>(&["iam.user.delete"]))),
         )
         .route("/register", post(register::register::<S>))
-        .nest("/:user_id", id::routes::<S>())
+        .nest("/{user_id}", id::routes::<S>())
 }

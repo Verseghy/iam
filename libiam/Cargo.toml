@@ -8,16 +8,16 @@ license-file.workspace = true
 path = "./lib.rs"
 
 [dependencies]
-reqwest = { version = "0.12.5", default-features = false, features = ["json", "rustls-tls"] }
+reqwest = { version = "0.12.22", default-features = false, features = ["json", "rustls-tls"] }
 serde.workspace = true
 serde_json.workspace = true
-thiserror = "1.0.62"
+thiserror = "2.0.12"
 iam-common.workspace = true
 iam-entity.workspace = true
 sea-orm.workspace = true
 tracing.workspace = true
 tokio.workspace = true
-futures = "0.3.30"
+futures = "0.3.31"
 async-trait.workspace = true
 jsonwebtoken.workspace = true
 anyhow.workspace = true

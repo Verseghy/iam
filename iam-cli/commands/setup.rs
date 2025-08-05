@@ -1,7 +1,7 @@
 use anyhow::Context;
 use base64::{prelude::BASE64_STANDARD, Engine};
 use clap::{Arg, ArgAction, ArgMatches, Command};
-use ed25519_dalek::SigningKey;
+use ed25519_dalek::SecretKey;
 use k8s_openapi::api::core::v1::Secret;
 use kube::{
     api::{ObjectMeta, PostParams},
@@ -9,8 +9,8 @@ use kube::{
 };
 use libiam::{testing::actions::assign_action_to_user, Iam, User};
 use rand::{
-    distributions::{Alphanumeric, DistString},
-    rngs::OsRng,
+    distr::{Alphanumeric, SampleString},
+    RngCore,
 };
 use sea_orm::Database;
 use std::collections::BTreeMap;
@@ -69,7 +69,7 @@ async fn create_admin_user(matches: &ArgMatches, client: Client) -> anyhow::Resu
     let iam = Iam::new(iam_url);
     let db = Database::connect(database_url.as_str()).await?;
 
-    let admin_password = Alphanumeric.sample_string(&mut OsRng, 64);
+    let admin_password = Alphanumeric.sample_string(&mut rand::rng(), 64);
     let user = User::register(&iam, "admin", ADMIN_EMAIL, &admin_password).await?;
 
     assign_action_to_user(&db, "iam.policy.assign", &user.id().to_string()).await;
@@ -100,8 +100,9 @@ async fn create_admin_user(matches: &ArgMatches, client: Client) -> anyhow::Resu
 async fn create_jwt_secret_key(client: Client) -> anyhow::Result<()> {
     const SECRET_NAME: &str = "iam-jwt";
 
-    let key = SigningKey::generate(&mut OsRng);
-    let bytes = BASE64_STANDARD.encode(key.to_bytes());
+    let mut key = SecretKey::default();
+    rand::rng().fill_bytes(&mut key);
+    let bytes = BASE64_STANDARD.encode(key);
 
     let secrets: Api<Secret> = Api::default_namespaced(client);
 

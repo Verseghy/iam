@@ -4,7 +4,7 @@ use crate::{
 };
 use base64::prelude::*;
 use iam_entity::apps;
-use rand::distributions::{Alphanumeric, DistString};
+use rand::distr::{Alphanumeric, SampleString};
 use sea_orm::{ConnectionTrait, EntityTrait, Set};
 
 pub fn parse_token(token: &str) -> Result<(String, String)> {
@@ -32,11 +32,7 @@ where
 {
     let id = Id::new_app();
 
-    let password = {
-        let mut rng = rand::thread_rng();
-        Alphanumeric.sample_string(&mut rng, 32)
-    };
-
+    let password = Alphanumeric.sample_string(&mut rand::rng(), 32);
     let hashed_password = crate::password::hash(&password)?;
 
     let app = apps::ActiveModel {

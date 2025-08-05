@@ -1,8 +1,6 @@
 [advisories]
 version = 2
 ignore = [
-    # RSA Marvin Attack
-    "RUSTSEC-2023-0071",
 ]
 
 [licenses]
@@ -15,9 +13,11 @@ allow = [
     "MPL-2.0",
     "BSD-3-Clause",
     "BSD-2-Clause",
+    "Zlib",
+    "Unicode-3.0",
 ]
 exceptions = [
-    { allow = ["Unicode-DFS-2016"], name = "unicode-ident" },
+    { allow = ["CDLA-Permissive-2.0"], crate = "webpki-roots" },
 ]
 private.ignore = false
 

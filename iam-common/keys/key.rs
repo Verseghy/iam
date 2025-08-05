@@ -2,7 +2,7 @@ use base64::{prelude::BASE64_STANDARD, Engine};
 use ed25519_dalek::{pkcs8::EncodePrivateKey, SecretKey, SigningKey, SECRET_KEY_LENGTH};
 use jose_jwk::{Jwk, Okp, OkpCurves, Parameters};
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey};
-use rand::rngs::OsRng;
+use rand::RngCore;
 use std::env;
 
 pub struct Key {
@@ -14,8 +14,9 @@ pub struct Key {
 impl Key {
     #[allow(unused)]
     pub(super) fn generate() -> Self {
-        let private_key = SigningKey::generate(&mut OsRng);
-        Self::from_private_key(private_key.as_bytes())
+        let mut secret = SecretKey::default();
+        rand::rng().fill_bytes(&mut secret);
+        Self::from_private_key(&secret)
     }
 
     pub(super) fn from_private_key(secret_key: &SecretKey) -> Self {

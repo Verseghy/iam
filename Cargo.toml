@@ -23,22 +23,22 @@ resolver = "2"
 license-file = "./LICENSE"
 
 [workspace.dependencies]
-anyhow = "1.0.86"
-async-trait = "0.1.81"
-axum = { version = "0.7.5", default-features = false, features = ["http2", "json", "macros", "tokio", "tracing"] }
+anyhow = "1.0.98"
+async-trait = "0.1.88"
+axum = { version = "0.8.4", default-features = false, features = ["http2", "json", "macros", "tokio", "tracing"] }
 base64 = "0.22.1"
-chrono = { version = "0.4.38", default-features = false }
+chrono = { version = "0.4.41", default-features = false }
 dotenvy = "0.15.7"
 iam-common = { path = "./iam-common" }
 iam-entity = { path = "./iam-entity" }
 iam-macros = { path = "./iam-macros" }
-jsonwebtoken = "9.3.0"
+jsonwebtoken = "9.3.1"
 mime = "0.3.17"
-rand = { version = "0.8.5", default-features = false, features = ["std", "std_rng"] }
-sea-orm = { version = "1.0.0", default-features = false, features = ["macros", "runtime-actix-rustls", "sqlx-postgres", "with-chrono"] }
-serde = { version = "1.0.204", features = ["derive"] }
-serde_json = "1.0.120"
-tokio = { version = "1.38.0", features = ["macros", "rt-multi-thread", "signal"] }
-tracing = { version = "0.1.40", default-features = false }
-uuid = { version = "1.10.0", default-features = false, features = ["v4"] }
-ed25519-dalek = { version = "2.1.1", features = ["pkcs8", "rand_core"] }
+rand = { version = "0.9.2", default-features = false, features = ["std", "std_rng", "thread_rng"] }
+sea-orm = { version = "1.1.14", default-features = false, features = ["macros", "runtime-actix-rustls", "sqlx-postgres", "with-chrono"] }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.142"
+tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread", "signal"] }
+tracing = { version = "0.1.41", default-features = false }
+uuid = { version = "1.17.0", default-features = false, features = ["v4"] }
+ed25519-dalek = { version = "2.2.0", features = ["pkcs8"] }

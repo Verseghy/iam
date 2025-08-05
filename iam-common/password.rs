@@ -11,7 +11,7 @@ pub type HashError = argon2::Error;
 
 pub fn hash(password: &str) -> Result<String> {
     let mut salt = [0u8; 16];
-    rand::thread_rng().fill(&mut salt);
+    rand::rng().fill(&mut salt);
 
     argon2::hash_encoded(password.as_bytes(), &salt, &Config::owasp5())
         .map_err(|_| error::FAILED_PASSWORD_HASH)

@@ -1,8 +1,8 @@
 use crate::{
     json::{Json, ValidatedJson},
-    SharedTrait,
+    StateTrait,
 };
-use axum::{http::StatusCode, Extension};
+use axum::{extract::State, http::StatusCode};
 use iam_common::{error::Result, Id};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -19,11 +19,11 @@ pub struct Response {
     secret: String,
 }
 
-pub async fn create_app<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn create_app<S: StateTrait>(
+    State(state): State<S>,
     ValidatedJson(req): ValidatedJson<Request>,
 ) -> Result<(StatusCode, Json<Response>)> {
-    let (id, secret) = iam_common::app::create(shared.db(), &req.name).await?;
+    let (id, secret) = iam_common::app::create(state.db(), &req.name).await?;
 
     Ok((StatusCode::CREATED, Json(Response { id, secret })))
 }

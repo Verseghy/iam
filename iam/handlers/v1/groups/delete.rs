@@ -1,5 +1,5 @@
-use crate::{json::Json, shared::SharedTrait};
-use axum::{http::StatusCode, Extension};
+use crate::{json::Json, state::StateTrait};
+use axum::{extract::State, http::StatusCode};
 use iam_common::error::{self, Result};
 use iam_entity::groups;
 use sea_orm::entity::EntityTrait;
@@ -10,12 +10,12 @@ pub struct DeleteGroupRequest {
     id: String,
 }
 
-pub async fn delete_group<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn delete_group<S: StateTrait>(
+    State(state): State<S>,
     Json(req): Json<DeleteGroupRequest>,
 ) -> Result<StatusCode> {
     let res = groups::Entity::delete_by_id(req.id)
-        .exec(shared.db())
+        .exec(state.db())
         .await?;
 
     if res.rows_affected == 0 {

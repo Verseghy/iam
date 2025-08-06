@@ -2,24 +2,24 @@ use iam_common::{database, keys::KeyManager};
 use sea_orm::DbConn;
 use std::sync::Arc;
 
-pub trait SharedTrait: Clone + Send + Sync + 'static {
+pub trait StateTrait: Clone + Send + Sync + 'static {
     type Db: sea_orm::ConnectionTrait + sea_orm::TransactionTrait;
 
     fn db(&self) -> &Self::Db;
     fn key_manager(&self) -> &KeyManager;
 }
 
-pub struct SharedInner {
+pub struct StateInner {
     pub db: DbConn,
     pub key_manager: KeyManager,
 }
 
 #[derive(Clone)]
-pub struct Shared {
-    inner: Arc<SharedInner>,
+pub struct State {
+    inner: Arc<StateInner>,
 }
 
-impl SharedTrait for Shared {
+impl StateTrait for State {
     type Db = DbConn;
 
     fn db(&self) -> &DbConn {
@@ -31,9 +31,9 @@ impl SharedTrait for Shared {
     }
 }
 
-pub async fn create_shared() -> Shared {
-    Shared {
-        inner: Arc::new(SharedInner {
+pub async fn create_state() -> State {
+    State {
+        inner: Arc::new(StateInner {
             db: database::connect().await,
             key_manager: KeyManager::new(),
         }),
@@ -47,18 +47,18 @@ pub mod mock {
     use super::*;
     use sea_orm::MockDatabase;
 
-    pub struct MockSharedInner {
+    pub struct MockStateInner {
         db: Option<DbConn>,
     }
 
     #[derive(Clone)]
-    pub struct MockShared {
-        inner: Arc<MockSharedInner>,
+    pub struct MockState {
+        inner: Arc<MockStateInner>,
     }
 
-    impl MockShared {
-        pub fn builder() -> MockSharedInner {
-            MockSharedInner { db: None }
+    impl MockState {
+        pub fn builder() -> MockStateInner {
+            MockStateInner { db: None }
         }
 
         pub fn empty() -> Self {
@@ -66,20 +66,20 @@ pub mod mock {
         }
     }
 
-    impl MockSharedInner {
+    impl MockStateInner {
         pub fn db(mut self, db: MockDatabase) -> Self {
             self.db = Some(db.into_connection());
             self
         }
 
-        pub fn build(mut self) -> MockShared {
-            MockShared {
+        pub fn build(mut self) -> MockState {
+            MockState {
                 inner: Arc::new(self),
             }
         }
     }
 
-    impl SharedTrait for MockShared {
+    impl StateTrait for MockState {
         type Db = DbConn;
 
         fn db(&self) -> &DbConn {

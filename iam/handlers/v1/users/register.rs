@@ -1,5 +1,5 @@
-use crate::{json::Json, json::ValidatedJson, shared::SharedTrait, utils::DatabaseErrorType};
-use axum::{http::StatusCode, Extension};
+use crate::{json::Json, json::ValidatedJson, state::StateTrait, utils::DatabaseErrorType};
+use axum::{extract::State, http::StatusCode};
 use iam_common::{
     error::{self, Result},
     Id,
@@ -24,8 +24,8 @@ pub struct Response {
     id: Id,
 }
 
-pub async fn register<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn register<S: StateTrait>(
+    State(state): State<S>,
     ValidatedJson(req): ValidatedJson<Request>,
 ) -> Result<(StatusCode, Json<Response>)> {
     let id = Id::new_user();
@@ -38,7 +38,7 @@ pub async fn register<S: SharedTrait>(
         ..Default::default()
     };
 
-    let result = users::Entity::insert(model).exec(shared.db()).await;
+    let result = users::Entity::insert(model).exec(state.db()).await;
 
     if let Err(err) = result {
         if err.is_duplicate_entry() {
@@ -56,11 +56,11 @@ mod tests {
     use super::*;
 
     use crate::{
-        shared::mock::MockShared,
+        state::mock::MockState,
         utils::testing::{assert_error, body_to_json, json_body},
     };
     use axum::{
-        handler::HandlerWithoutStateExt,
+        handler::Handler,
         http::{self, Request, StatusCode},
     };
     use sea_orm::{DatabaseBackend, MockDatabase, MockExecResult};
@@ -68,8 +68,7 @@ mod tests {
 
     #[tokio::test]
     async fn correct() {
-        let app = register::<MockShared>.into_service();
-        let shared = MockShared::builder()
+        let state = MockState::builder()
             .db(
                 MockDatabase::new(DatabaseBackend::MySql).append_exec_results(vec![
                     MockExecResult {
@@ -79,11 +78,11 @@ mod tests {
                 ]),
             )
             .build();
+        let app = register::<MockState>.with_state(state);
 
         let res = app
             .oneshot(
                 Request::post("/")
-                    .extension(shared)
                     .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
                     .body(json_body!({
                         "name": "test",
@@ -105,12 +104,12 @@ mod tests {
 
     #[tokio::test]
     async fn invalid_email() {
-        let app = register::<MockShared>.into_service();
+        let state = MockState::empty();
+        let app = register::<MockState>.with_state(state);
 
         let res = app
             .oneshot(
                 Request::post("/")
-                    .extension(MockShared::empty())
                     .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
                     .body(json_body!({
                         "name": "test",
@@ -127,12 +126,12 @@ mod tests {
 
     #[tokio::test]
     async fn long_name() {
-        let app = register::<MockShared>.into_service();
+        let state = MockState::empty();
+        let app = register::<MockState>.with_state(state);
 
         let res = app
             .oneshot(
                 Request::post("/")
-                    .extension(MockShared::empty())
                     .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
                     .body(json_body!({
                         "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -149,12 +148,12 @@ mod tests {
 
     #[tokio::test]
     async fn long_email() {
-        let app = register::<MockShared>.into_service();
+        let state = MockState::empty();
+        let app = register::<MockState>.with_state(state);
 
         let res = app
             .oneshot(
                 Request::post("/")
-                    .extension(MockShared::empty())
                     .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
                     .body(json_body!({
                         "name": "test",
@@ -171,12 +170,12 @@ mod tests {
 
     #[tokio::test]
     async fn long_password() {
-        let app = register::<MockShared>.into_service();
+        let state = MockState::empty();
+        let app = register::<MockState>.with_state(state);
 
         let res = app
             .oneshot(
                 Request::post("/")
-                    .extension(MockShared::empty())
                     .header(http::header::CONTENT_TYPE, mime::APPLICATION_JSON.as_ref())
                     .body(json_body!({
                         "name": "test",

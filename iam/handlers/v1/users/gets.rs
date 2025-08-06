@@ -1,5 +1,5 @@
-use crate::{json::Json, shared::SharedTrait};
-use axum::Extension;
+use crate::{json::Json, state::StateTrait};
+use axum::extract::State;
 use iam_common::error::Result;
 use iam_entity::users;
 use sea_orm::{entity::EntityTrait, FromQueryResult, QuerySelect};
@@ -12,16 +12,14 @@ pub struct User {
     email: String,
 }
 
-pub async fn list_users<S: SharedTrait>(
-    Extension(shared): Extension<S>,
-) -> Result<Json<Vec<User>>> {
+pub async fn list_users<S: StateTrait>(State(state): State<S>) -> Result<Json<Vec<User>>> {
     let res = users::Entity::find()
         .select_only()
         .column(users::Column::Id)
         .column(users::Column::Name)
         .column(users::Column::Email)
         .into_model::<User>()
-        .all(shared.db())
+        .all(state.db())
         .await?;
 
     Ok(Json(res))

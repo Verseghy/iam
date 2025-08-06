@@ -1,5 +1,5 @@
-use crate::{json::Json, shared::SharedTrait};
-use axum::{extract::Path, Extension};
+use crate::{json::Json, state::StateTrait};
+use axum::extract::{Path, State};
 use iam_common::error::{self, Result};
 use iam_entity::actions;
 use sea_orm::entity::EntityTrait;
@@ -12,12 +12,12 @@ pub struct GetResponse {
     secure: bool,
 }
 
-pub async fn get_action<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn get_action<S: StateTrait>(
+    State(state): State<S>,
     Path(id): Path<String>,
 ) -> Result<Json<GetResponse>> {
     let res = actions::Entity::find_by_id(id)
-        .one(shared.db())
+        .one(state.db())
         .await?
         .ok_or(error::ACTION_NOT_FOUND)?;
 
@@ -33,7 +33,7 @@ mod tests {
     use super::*;
 
     use crate::{
-        shared::mock::MockShared,
+        state::mock::MockState,
         utils::testing::{assert_error, body_to_json},
     };
     use axum::{
@@ -48,8 +48,7 @@ mod tests {
 
     #[tokio::test]
     async fn has_in_db() {
-        let app = Router::new().route("/{id}", get(get_action::<MockShared>));
-        let shared = MockShared::builder()
+        let state = MockState::builder()
             .db(
                 MockDatabase::new(DatabaseBackend::MySql).append_query_results(vec![vec![
                     actions::Model {
@@ -64,13 +63,12 @@ mod tests {
             )
             .build();
 
+        let app = Router::new()
+            .route("/{id}", get(get_action::<MockState>))
+            .with_state(state);
+
         let res = app
-            .oneshot(
-                Request::get("/TestID-0")
-                    .extension(shared)
-                    .body(Body::empty())
-                    .unwrap(),
-            )
+            .oneshot(Request::get("/TestID-0").body(Body::empty()).unwrap())
             .await
             .unwrap();
 
@@ -85,19 +83,17 @@ mod tests {
 
     #[tokio::test]
     async fn not_found() {
-        let app = Router::new().route("/{id}", get(get_action::<MockShared>));
-        let shared = MockShared::builder()
+        let state = MockState::builder()
             .db(MockDatabase::new(DatabaseBackend::MySql)
                 .append_query_results::<actions::Model, _, _>(vec![vec![]]))
             .build();
 
+        let app = Router::new()
+            .route("/{id}", get(get_action::<MockState>))
+            .with_state(state);
+
         let res = app
-            .oneshot(
-                Request::get("/TestID-0")
-                    .extension(shared)
-                    .body(Body::empty())
-                    .unwrap(),
-            )
+            .oneshot(Request::get("/TestID-0").body(Body::empty()).unwrap())
             .await
             .unwrap();
 

@@ -1,13 +1,18 @@
-use crate::shared::SharedTrait;
-use axum::{extract::Request, http::StatusCode, middleware::Next, response::Response, Extension};
+use crate::state::StateTrait;
+use axum::{
+    extract::{Request, State},
+    http::StatusCode,
+    middleware::Next,
+    response::Response,
+};
 use headers::{
     authorization::{Authorization, Bearer},
     HeaderMapExt,
 };
 use std::sync::Arc;
 
-pub async fn get_claims<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn get_claims<S: StateTrait>(
+    State(state): State<S>,
     request: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
@@ -16,7 +21,7 @@ pub async fn get_claims<S: SharedTrait>(
     let mut request = Request::from_parts(parts, body);
 
     if let Some(token) = token {
-        if let Ok(claims) = shared.key_manager().jwt().get_claims(token.token()) {
+        if let Ok(claims) = state.key_manager().jwt().get_claims(token.token()) {
             request.extensions_mut().insert(Arc::new(claims));
         }
     }

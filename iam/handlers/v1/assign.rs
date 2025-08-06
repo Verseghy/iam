@@ -1,5 +1,5 @@
-use crate::{json::Json, SharedTrait};
-use axum::{http::StatusCode, Extension};
+use crate::{json::Json, StateTrait};
+use axum::{extract::State, http::StatusCode};
 use iam_common::error::{self, Result};
 use iam_entity::{pivot_actions_users, pivot_users_groups};
 use sea_orm::{EntityTrait, Set};
@@ -12,8 +12,8 @@ pub struct Request {
     group: Option<String>,
 }
 
-pub async fn assign<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn assign<S: StateTrait>(
+    State(state): State<S>,
     Json(request): Json<Request>,
 ) -> Result<StatusCode> {
     if request.action.is_none() && request.group.is_none() {
@@ -31,7 +31,7 @@ pub async fn assign<S: SharedTrait>(
         };
 
         pivot_actions_users::Entity::insert(model)
-            .exec(shared.db())
+            .exec(state.db())
             .await?;
 
         return Ok(StatusCode::NO_CONTENT);
@@ -42,7 +42,7 @@ pub async fn assign<S: SharedTrait>(
         };
 
         pivot_users_groups::Entity::insert(model)
-            .exec(shared.db())
+            .exec(state.db())
             .await?;
 
         return Ok(StatusCode::NO_CONTENT);

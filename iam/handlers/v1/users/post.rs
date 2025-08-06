@@ -1,5 +1,5 @@
-use crate::{json::Json, shared::SharedTrait, utils::set_option};
-use axum::{http::StatusCode, Extension};
+use crate::{json::Json, state::StateTrait, utils::set_option};
+use axum::{extract::State, http::StatusCode};
 use iam_common::{error::Result, password};
 use iam_entity::users;
 use sea_orm::{entity::EntityTrait, Set};
@@ -14,8 +14,8 @@ pub struct UpdateUserRequest {
     password: Option<String>,
 }
 
-pub async fn update_user<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn update_user<S: StateTrait>(
+    State(state): State<S>,
     Json(req): Json<UpdateUserRequest>,
 ) -> Result<StatusCode> {
     let hash = match req.password {
@@ -31,7 +31,7 @@ pub async fn update_user<S: SharedTrait>(
         ..Default::default()
     };
 
-    users::Entity::insert(user).exec(shared.db()).await?;
+    users::Entity::insert(user).exec(state.db()).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }

@@ -1,5 +1,5 @@
-use crate::{json::Json, shared::SharedTrait};
-use axum::Extension;
+use crate::{json::Json, state::StateTrait};
+use axum::extract::State;
 use iam_common::error::Result;
 use iam_entity::actions;
 use sea_orm::entity::EntityTrait;
@@ -12,10 +12,8 @@ pub struct Action {
     secure: bool,
 }
 
-pub async fn list_actions<S: SharedTrait>(
-    Extension(shared): Extension<S>,
-) -> Result<Json<Vec<Action>>> {
-    let res = actions::Entity::find().all(shared.db()).await?;
+pub async fn list_actions<S: StateTrait>(State(state): State<S>) -> Result<Json<Vec<Action>>> {
+    let res = actions::Entity::find().all(state.db()).await?;
 
     Ok(Json(
         res.into_iter()

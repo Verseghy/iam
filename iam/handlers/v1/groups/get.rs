@@ -1,5 +1,5 @@
-use crate::{json::Json, shared::SharedTrait};
-use axum::{extract::Path, Extension};
+use crate::{json::Json, state::StateTrait};
+use axum::extract::{Path, State};
 use iam_common::error::{self, Result};
 use iam_entity::groups;
 use sea_orm::{entity::EntityTrait, FromQueryResult};
@@ -10,13 +10,13 @@ pub struct GetResponse {
     id: String,
     name: String,
 }
-pub async fn get_group<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn get_group<S: StateTrait>(
+    State(state): State<S>,
     Path(id): Path<String>,
 ) -> Result<Json<GetResponse>> {
     let res = groups::Entity::find_by_id(id)
         .into_model::<GetResponse>()
-        .one(shared.db())
+        .one(state.db())
         .await?
         .ok_or(error::GROUP_NOT_FOUND)?;
 

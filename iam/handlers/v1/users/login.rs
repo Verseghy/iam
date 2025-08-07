@@ -1,8 +1,8 @@
 use crate::{
     json::{Json, ValidatedJson},
-    shared::SharedTrait,
+    state::StateTrait,
 };
-use axum::Extension;
+use axum::extract::State;
 use iam_common::{
     error::{self, Result},
     keys::jwt::Claims,
@@ -30,13 +30,13 @@ pub struct LoginResponse {
     token: String,
 }
 
-pub async fn login<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn login<S: StateTrait>(
+    State(state): State<S>,
     ValidatedJson(req): ValidatedJson<LoginRequest>,
 ) -> Result<Json<LoginResponse>> {
     let res = users::Entity::find()
         .filter(users::Column::Email.eq(req.email.clone()))
-        .one(shared.db())
+        .one(state.db())
         .await?;
 
     let Some(res) = res else {
@@ -51,7 +51,7 @@ pub async fn login<S: SharedTrait>(
         let mut action: users::ActiveModel = res.clone().into();
         action.password = ActiveValue::Set(hash);
 
-        action.update(shared.db()).await?;
+        action.update(state.db()).await?;
     }
 
     if !valid {
@@ -60,7 +60,7 @@ pub async fn login<S: SharedTrait>(
 
     crate::audit!(action = "login", user = res.id);
 
-    let token = shared.key_manager().jwt().encode(&Claims::new(res.id));
+    let token = state.key_manager().jwt().encode(&Claims::new(res.id));
 
     Ok(Json(LoginResponse { token }))
 }

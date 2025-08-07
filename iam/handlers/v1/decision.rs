@@ -1,5 +1,5 @@
-use crate::{auth, json::Json, shared::SharedTrait};
-use axum::{http::StatusCode, Extension};
+use crate::{auth, json::Json, state::StateTrait};
+use axum::{extract::State, http::StatusCode};
 use iam_common::{error::Result, Id};
 use serde::Deserialize;
 
@@ -9,13 +9,13 @@ pub struct Request {
     user: Id,
 }
 
-pub async fn decision<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn decision<S: StateTrait>(
+    State(state): State<S>,
     Json(req): Json<Request>,
 ) -> Result<StatusCode> {
     let actions: Vec<&str> = req.actions.iter().map(|x| x.as_str()).collect();
 
-    auth::check(&req.user.to_string(), &actions, shared.db()).await?;
+    auth::check(&req.user.to_string(), &actions, state.db()).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }

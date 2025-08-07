@@ -1,5 +1,5 @@
-use crate::{json::Json, shared::SharedTrait};
-use axum::Extension;
+use crate::{json::Json, state::StateTrait};
+use axum::extract::State;
 use iam_common::{error::Result, Id};
 use iam_entity::actions;
 use sea_orm::{entity::EntityTrait, Set};
@@ -17,8 +17,8 @@ pub struct AddActionResponse {
     id: Id,
 }
 
-pub async fn add_action<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn add_action<S: StateTrait>(
+    State(state): State<S>,
     Json(req): Json<AddActionRequest>,
 ) -> Result<Json<AddActionResponse>> {
     let id = Id::new_action();
@@ -30,7 +30,7 @@ pub async fn add_action<S: SharedTrait>(
         ..Default::default()
     };
 
-    actions::Entity::insert(action).exec(shared.db()).await?;
+    actions::Entity::insert(action).exec(state.db()).await?;
 
     Ok(Json(AddActionResponse { id }))
 }

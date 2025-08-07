@@ -1,5 +1,5 @@
-use crate::{json::Json, shared::SharedTrait};
-use axum::Extension;
+use crate::{json::Json, state::StateTrait};
+use axum::extract::State;
 use iam_common::error::Result;
 use iam_entity::groups;
 use sea_orm::{entity::EntityTrait, FromQueryResult, QuerySelect};
@@ -11,15 +11,13 @@ pub struct Group {
     name: String,
 }
 
-pub async fn list_groups<S: SharedTrait>(
-    Extension(shared): Extension<S>,
-) -> Result<Json<Vec<Group>>> {
+pub async fn list_groups<S: StateTrait>(State(state): State<S>) -> Result<Json<Vec<Group>>> {
     let res = groups::Entity::find()
         .select_only()
         .column(groups::Column::Id)
         .column(groups::Column::Name)
         .into_model::<Group>()
-        .all(shared.db())
+        .all(state.db())
         .await?;
 
     Ok(Json(res))

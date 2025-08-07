@@ -1,5 +1,5 @@
-use crate::{json::Json, shared::SharedTrait, utils::set_option};
-use axum::{http::StatusCode, Extension};
+use crate::{json::Json, state::StateTrait, utils::set_option};
+use axum::{extract::State, http::StatusCode};
 use iam_common::error::Result;
 use iam_entity::actions;
 use sea_orm::{entity::EntityTrait, Set};
@@ -13,8 +13,8 @@ pub struct UpdateActionRequest {
     secure: Option<bool>,
 }
 
-pub async fn update_action<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn update_action<S: StateTrait>(
+    State(state): State<S>,
     Json(req): Json<UpdateActionRequest>,
 ) -> Result<StatusCode> {
     let action = actions::ActiveModel {
@@ -24,7 +24,7 @@ pub async fn update_action<S: SharedTrait>(
         ..Default::default()
     };
 
-    actions::Entity::update(action).exec(shared.db()).await?;
+    actions::Entity::update(action).exec(state.db()).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }

@@ -1,5 +1,5 @@
-use crate::{json::Json, SharedTrait};
-use axum::Extension;
+use crate::{json::Json, StateTrait};
+use axum::extract::State;
 use iam_common::{
     error::{self, Result},
     keys::jwt::Claims,
@@ -18,8 +18,8 @@ pub struct Response {
     token: String,
 }
 
-pub async fn login_app<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn login_app<S: StateTrait>(
+    State(state): State<S>,
     Json(request): Json<Request>,
 ) -> Result<Json<Response>> {
     let (id, password) = iam_common::app::parse_token(&request.token)?;
@@ -27,7 +27,7 @@ pub async fn login_app<S: SharedTrait>(
     tracing::debug!(id, "app login");
 
     let res = apps::Entity::find_by_id(id.clone())
-        .one(shared.db())
+        .one(state.db())
         .await?
         .ok_or(error::APP_INVALID_TOKEN)?;
 
@@ -37,7 +37,7 @@ pub async fn login_app<S: SharedTrait>(
         return Err(error::APP_INVALID_TOKEN);
     }
 
-    let token = shared.key_manager().jwt().encode(&Claims::new(id));
+    let token = state.key_manager().jwt().encode(&Claims::new(id));
 
     Ok(Json(Response { token }))
 }

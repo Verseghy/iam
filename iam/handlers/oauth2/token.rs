@@ -1,8 +1,8 @@
-use crate::{json::Json, shared::SharedTrait};
+use crate::{json::Json, state::StateTrait};
 use axum::{
     body::Bytes,
+    extract::State,
     response::{IntoResponse, Response},
-    Extension,
 };
 use iam_common::{
     error::{oauth::OAuthError, Error},
@@ -26,8 +26,8 @@ pub struct TokenResponse {
     scope: Option<String>,
 }
 
-pub async fn token<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn token<S: StateTrait>(
+    State(state): State<S>,
     body: Bytes,
 ) -> Result<Json<TokenResponse>, Response> {
     #[derive(Deserialize)]
@@ -44,7 +44,7 @@ pub async fn token<S: SharedTrait>(
             serde_urlencoded::from_bytes::<ResourceOwnerPasswordCredentialsGrantRequest<'_>>(&body)
                 .map_err(|_| OAuthError::invalid_request().into_response())?;
 
-        return resource_owner_password_credentials_grant(&shared, request).await;
+        return resource_owner_password_credentials_grant(&state, request).await;
     }
 
     Err(OAuthError::unsupported_grant_type().into_response())
@@ -58,13 +58,13 @@ struct ResourceOwnerPasswordCredentialsGrantRequest<'a> {
     password: Cow<'a, str>,
 }
 
-async fn resource_owner_password_credentials_grant<S: SharedTrait>(
-    shared: &S,
+async fn resource_owner_password_credentials_grant<S: StateTrait>(
+    state: &S,
     request: ResourceOwnerPasswordCredentialsGrantRequest<'_>,
 ) -> Result<Json<TokenResponse>, Response> {
     let res = users::Entity::find()
         .filter(users::Column::Email.eq(request.username.as_ref()))
-        .one(shared.db())
+        .one(state.db())
         .await
         .map_err(|err| Error::from(err).into_response())?;
 
@@ -82,7 +82,7 @@ async fn resource_owner_password_credentials_grant<S: SharedTrait>(
         action.password = ActiveValue::Set(hash);
 
         action
-            .update(shared.db())
+            .update(state.db())
             .await
             .map_err(|err| Error::from(err).into_response())?;
     }
@@ -93,7 +93,7 @@ async fn resource_owner_password_credentials_grant<S: SharedTrait>(
 
     crate::audit!(action = "login", user = res.id);
 
-    let token = shared.key_manager().jwt().encode(&Claims::new(res.id));
+    let token = state.key_manager().jwt().encode(&Claims::new(res.id));
 
     Ok(Json(TokenResponse {
         access_token: token,

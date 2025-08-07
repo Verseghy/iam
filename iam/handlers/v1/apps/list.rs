@@ -1,5 +1,5 @@
-use crate::{json::Json, shared::SharedTrait};
-use axum::Extension;
+use crate::{json::Json, state::StateTrait};
+use axum::extract::State;
 use iam_common::{error::Result, Id};
 use iam_entity::apps;
 use sea_orm::EntityTrait;
@@ -12,9 +12,9 @@ pub struct App {
     name: String,
 }
 
-pub async fn list_apps<S: SharedTrait>(Extension(shared): Extension<S>) -> Result<Json<Vec<App>>> {
+pub async fn list_apps<S: StateTrait>(State(state): State<S>) -> Result<Json<Vec<App>>> {
     let apps = apps::Entity::find()
-        .all(shared.db())
+        .all(state.db())
         .await?
         .into_iter()
         .map(|app| App {

@@ -3,8 +3,8 @@ mod auth;
 mod handlers;
 mod json;
 mod middlewares;
-mod shared;
 mod signal;
+mod state;
 mod utils;
 
 use axum::{
@@ -16,8 +16,8 @@ use axum::{
     BoxError, Router, ServiceExt,
 };
 use middlewares::TraceRequestIdLayer;
-use shared::{Shared, SharedTrait};
 use signal::TerminateSignal;
+use state::{State, StateTrait};
 use std::{
     error::Error,
     iter::once,
@@ -38,7 +38,7 @@ async fn handle_error(err: BoxError) -> Response {
     }
 }
 
-fn middlewares<S: SharedTrait>(shared: S, router: Router) -> Router {
+fn middlewares<S: StateTrait>(state: S, router: Router<S>) -> Router {
     let middlewares = ServiceBuilder::new()
         .layer(HandleErrorLayer::new(handle_error))
         .timeout(Duration::from_secs(10))
@@ -49,19 +49,22 @@ fn middlewares<S: SharedTrait>(shared: S, router: Router) -> Router {
         .compression()
         .decompression()
         .layer(CorsLayer::permissive())
-        .add_extension(shared)
-        .layer(middleware::from_fn(auth::get_claims::<S>))
+        .layer(middleware::from_fn_with_state(
+            state.clone(),
+            auth::get_claims::<S>,
+        ))
         .propagate_x_request_id()
         .into_inner();
 
-    router.layer(middlewares)
+    router.layer(middlewares).with_state(state)
 }
 
 pub async fn run() -> Result<(), Box<dyn Error>> {
     let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 3001));
-    let shared = shared::create_shared().await;
+    let state = state::create_state().await;
 
-    let app = middlewares(shared, handlers::routes::<Shared>());
+    let app = handlers::routes::<State>(state.clone());
+    let app = middlewares::<State>(state, app);
     let app = NormalizePath::trim_trailing_slash(app);
 
     tracing::info!("Listening on port {}", addr.port());
@@ -78,16 +81,17 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::shared::mock::MockShared;
+    use crate::state::mock::MockState;
     use axum::{body::Body, routing::get};
     use hyper::Request;
     use tower::ServiceExt;
 
     #[tokio::test]
     async fn has_x_request_id() {
+        let state = MockState::empty();
         let svc = middlewares(
-            MockShared::empty(),
-            Router::new().route("/", get(|| async {})),
+            state.clone(),
+            Router::new().route("/", get(|| async {})).with_state(state),
         );
 
         let res = svc.oneshot(Request::new(Body::empty())).await.unwrap();
@@ -99,9 +103,10 @@ mod tests {
 
     #[tokio::test]
     async fn custom_x_request_id() {
+        let state = MockState::empty();
         let svc = middlewares(
-            MockShared::empty(),
-            Router::new().route("/", get(|| async {})),
+            state.clone(),
+            Router::new().route("/", get(|| async {})).with_state(state),
         );
 
         let res = svc

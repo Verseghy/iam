@@ -1,5 +1,5 @@
-use crate::{json::Json, shared::SharedTrait};
-use axum::Extension;
+use crate::{json::Json, state::StateTrait};
+use axum::extract::State;
 use iam_common::{error::Result, Id};
 use iam_entity::groups;
 use sea_orm::{entity::EntityTrait, Set};
@@ -16,8 +16,8 @@ pub struct AddGroupResponse {
     id: Id,
 }
 
-pub async fn add_group<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn add_group<S: StateTrait>(
+    State(state): State<S>,
     Json(req): Json<AddGroupRequest>,
 ) -> Result<Json<AddGroupResponse>> {
     let id = Id::new_group();
@@ -27,7 +27,7 @@ pub async fn add_group<S: SharedTrait>(
         ..Default::default()
     };
 
-    groups::Entity::insert(group).exec(shared.db()).await?;
+    groups::Entity::insert(group).exec(state.db()).await?;
 
     Ok(Json(AddGroupResponse { id }))
 }

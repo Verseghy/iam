@@ -1,5 +1,8 @@
-use crate::{json::Json, SharedTrait};
-use axum::{extract::Path, Extension};
+use crate::{json::Json, StateTrait};
+use axum::{
+    extract::{Path, State},
+    Extension,
+};
 use iam_common::{
     error::{self, Result},
     keys::jwt::Claims,
@@ -16,8 +19,8 @@ pub struct Action {
     secure: bool,
 }
 
-pub async fn get_actions<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn get_actions<S: StateTrait>(
+    State(state): State<S>,
     Path(id): Path<String>,
     Extension(claims): Extension<Arc<Claims>>,
 ) -> Result<Json<Vec<Action>>> {
@@ -29,7 +32,7 @@ pub async fn get_actions<S: SharedTrait>(
         <users::Entity as Related<actions::Entity>>::find_related()
             .filter(users::Column::Id.eq(id))
             .into_model::<Action>()
-            .all(shared.db())
+            .all(state.db())
             .await?,
     ))
 }

@@ -1,5 +1,5 @@
-use crate::{json::Json, shared::SharedTrait, utils::set_option};
-use axum::{http::StatusCode, Extension};
+use crate::{json::Json, state::StateTrait, utils::set_option};
+use axum::{extract::State, http::StatusCode};
 use iam_common::error::Result;
 use iam_entity::groups;
 use sea_orm::{entity::EntityTrait, Set};
@@ -12,8 +12,8 @@ pub struct UpdateGroupRequest {
     name: Option<String>,
 }
 
-pub async fn update_group<S: SharedTrait>(
-    Extension(shared): Extension<S>,
+pub async fn update_group<S: StateTrait>(
+    State(state): State<S>,
     Json(req): Json<UpdateGroupRequest>,
 ) -> Result<StatusCode> {
     let group = groups::ActiveModel {
@@ -22,7 +22,7 @@ pub async fn update_group<S: SharedTrait>(
         ..Default::default()
     };
 
-    groups::Entity::update(group).exec(shared.db()).await?;
+    groups::Entity::update(group).exec(state.db()).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }

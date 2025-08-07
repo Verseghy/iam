@@ -2,21 +2,16 @@ mod create;
 mod list;
 mod login;
 
-use crate::{auth::permissions, state::StateTrait};
-use axum::{
-    routing::{get, post},
-    Router,
+use crate::{
+    auth::routing::{auth_get, auth_post},
+    state::StateTrait,
 };
+use axum::{routing::post, Router};
 
-pub fn routes<S: StateTrait>(state: S) -> Router<S> {
+#[rustfmt::skip]
+pub fn routes<S: StateTrait>() -> Router<S> {
     Router::new()
-        .route(
-            "/create",
-            post(create::create_app::<S>).layer(permissions(state.clone(), &["iam.apps.create"])),
-        )
+        .route("/create", auth_post(create::create_app::<S>, &["iam.apps.create"]))
         .route("/login", post(login::login_app::<S>))
-        .route(
-            "/",
-            get(list::list_apps::<S>).layer(permissions(state, &["iam.apps.list"])),
-        )
+        .route("/", auth_get(list::list_apps::<S>, &["iam.apps.list"]))
 }

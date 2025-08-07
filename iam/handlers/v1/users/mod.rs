@@ -5,28 +5,19 @@ mod login;
 mod post;
 mod register;
 
-use crate::{auth::permissions, state::StateTrait};
-use axum::{
-    handler::Handler,
-    routing::{post, MethodRouter},
-    Router,
+use crate::{
+    auth::routing::{auth_delete, auth_get, auth_post},
+    state::StateTrait,
 };
+use axum::{routing::post, Router};
 
-pub fn routes<S: StateTrait>(state: S) -> Router<S> {
+#[rustfmt::skip]
+pub fn routes<S: StateTrait>() -> Router<S> {
     Router::new()
         .route("/login", post(login::login::<S>))
-        .route(
-            "/",
-            MethodRouter::new()
-                .get(gets::list_users::<S>.layer(permissions(state.clone(), &["iam.user.list"])))
-                .post(
-                    post::update_user::<S>.layer(permissions(state.clone(), &["iam.user.update"])),
-                )
-                .delete(
-                    delete::delete_user::<S>
-                        .layer(permissions(state.clone(), &["iam.user.delete"])),
-                ),
-        )
+        .route("/", auth_get(gets::list_users::<S>, &["iam.user.list"]))
+        .route("/", auth_post(post::update_user::<S>, &["iam.user.update"]))
+        .route("/", auth_delete(delete::delete_user::<S>, &["iam.user.delete"]))
         .route("/register", post(register::register::<S>))
-        .nest("/{user_id}", id::routes(state))
+        .nest("/{user_id}", id::routes::<S>())
 }

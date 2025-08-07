@@ -63,7 +63,7 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
     let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 3001));
     let state = state::create_state().await;
 
-    let app = handlers::routes::<State>(state.clone());
+    let app = handlers::routes::<State>();
     let app = middlewares::<State>(state, app);
     let app = NormalizePath::trim_trailing_slash(app);
 

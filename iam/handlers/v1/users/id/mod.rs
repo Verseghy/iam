@@ -1,14 +1,12 @@
 mod actions;
 mod get;
 
-use crate::{auth::permissions, state::StateTrait};
+use crate::{auth::routing::auth_get, state::StateTrait};
 use axum::{routing::get, Router};
 
-pub fn routes<S: StateTrait>(state: S) -> Router<S> {
+#[rustfmt::skip]
+pub fn routes<S: StateTrait>() -> Router<S> {
     Router::new()
-        .route(
-            "/",
-            get(get::get_user::<S>).layer(permissions(state, &["iam.user.get"])),
-        )
+        .route("/", auth_get(get::get_user::<S>, &["iam.user.get"]))
         .route("/actions", get(actions::get_actions::<S>))
 }

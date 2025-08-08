@@ -1,7 +1,6 @@
 mod claims;
-mod layer;
 mod permission;
+pub mod routing;
 
 pub use claims::*;
-pub use layer::permissions;
 pub use permission::check;

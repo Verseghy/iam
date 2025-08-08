@@ -1242,7 +1242,6 @@ dependencies = [
  "dotenvy",
  "futures-util",
  "headers",
- "http-body",
  "hyper",
  "iam-common",
  "iam-entity",

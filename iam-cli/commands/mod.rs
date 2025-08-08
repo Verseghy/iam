@@ -1,4 +1,5 @@
 pub mod create_app;
+pub mod migrate;
 pub mod password_hash;
 pub mod seed;
 pub mod setup;
@@ -15,6 +16,7 @@ pub fn commands() -> Command {
         .subcommand(password_hash::command())
         .subcommand(seed::command())
         .subcommand(setup::command())
+        .subcommand(migrate::command())
 }
 
 #[test]

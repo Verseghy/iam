@@ -1273,6 +1273,7 @@ dependencies = [
  "ed25519-dalek",
  "iam-common",
  "iam-entity",
+ "iam-migration",
  "k8s-openapi",
  "kube",
  "libiam",

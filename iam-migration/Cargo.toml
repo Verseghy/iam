@@ -6,7 +6,6 @@ publish = false
 license-file.workspace = true
 
 [lib]
-name = "migration"
 path = "lib.rs"
 
 [[bin]]

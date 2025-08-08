@@ -4,7 +4,7 @@ use sea_orm::Database;
 
 pub fn command() -> Command {
     Command::new("migrate")
-        .about("Apply the pending migrations on to the database")
+        .about("Apply the pending migrations on the database")
         .arg(
             Arg::new("database")
                 .long("database")

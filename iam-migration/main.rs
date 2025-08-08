@@ -1,4 +1,4 @@
-use migration::Migrator;
+use iam_migration::Migrator;
 use sea_orm_migration::*;
 
 #[tokio::main]

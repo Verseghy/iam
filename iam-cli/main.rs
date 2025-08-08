@@ -15,6 +15,7 @@ async fn main() -> anyhow::Result<()> {
         Some(("password-hash", matches)) => commands::password_hash::run(matches),
         Some(("seed", matches)) => commands::seed::run(matches).await,
         Some(("setup", matches)) => commands::setup::run(matches).await,
+        Some(("migrate", matches)) => commands::migrate::run(matches).await,
         e => unreachable!("{:?}", e),
     }
 }

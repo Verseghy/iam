@@ -16,6 +16,7 @@ dotenvy.workspace = true
 ed25519-dalek.workspace = true
 iam-common.workspace = true
 iam-entity.workspace = true
+iam-migration = { version = "0.1.0", path = "../iam-migration" }
 k8s-openapi = { version = "0.25.0", features = ["earliest"] }
 kube = "1.1.0"
 libiam = { version = "0.1.0", path = "../libiam" }

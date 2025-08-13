@@ -1,4 +1,5 @@
 use dotenvy::dotenv;
+use iam_common::Config;
 use std::{error::Error, fs::File};
 use tracing_subscriber::{filter, layer::SubscriberExt, prelude::*, util::SubscriberInitExt};
 
@@ -12,6 +13,8 @@ fn audit_filter(metadata: &tracing::Metadata<'_>) -> bool {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     dotenv().ok();
+
+    let config = Config::from_env()?;
 
     let stdout_log = tracing_subscriber::fmt::layer()
         .compact()
@@ -33,5 +36,5 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .with(json_log)
         .init();
 
-    iam::run().await
+    iam::run(config).await
 }

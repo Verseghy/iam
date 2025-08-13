@@ -1,9 +1,6 @@
 use crate::{json::Json, StateTrait};
 use axum::extract::State;
-use iam_common::{
-    error::{self, Result},
-    keys::jwt::Claims,
-};
+use iam_common::error::{self, Result};
 use iam_entity::apps;
 use sea_orm::EntityTrait;
 use serde::{Deserialize, Serialize};
@@ -37,7 +34,7 @@ pub async fn login_app<S: StateTrait>(
         return Err(error::APP_INVALID_TOKEN);
     }
 
-    let token = state.key_manager().jwt().encode(&Claims::new(id));
+    let token = state.key_manager().jwt().encode(&id);
 
     Ok(Json(Response { token }))
 }

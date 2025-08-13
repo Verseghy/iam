@@ -15,15 +15,11 @@ use axum::{
     response::{IntoResponse, Response},
     BoxError, Router, ServiceExt,
 };
+use iam_common::Config;
 use middlewares::TraceRequestIdLayer;
 use signal::TerminateSignal;
 use state::{State, StateTrait};
-use std::{
-    error::Error,
-    iter::once,
-    net::{Ipv4Addr, SocketAddr},
-    time::Duration,
-};
+use std::{error::Error, iter::once, time::Duration};
 use tokio::net::TcpListener;
 use tower::{timeout::error::Elapsed, ServiceBuilder};
 use tower_http::{cors::CorsLayer, normalize_path::NormalizePath, ServiceBuilderExt};
@@ -59,17 +55,16 @@ fn middlewares<S: StateTrait>(state: S, router: Router<S>) -> Router {
     router.layer(middlewares).with_state(state)
 }
 
-pub async fn run() -> Result<(), Box<dyn Error>> {
-    let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 3001));
-    let state = state::create_state().await;
+pub async fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let addr = config.listen_addr;
+    let state = state::create_state(config).await;
 
     let app = handlers::routes::<State>();
     let app = middlewares::<State>(state, app);
     let app = NormalizePath::trim_trailing_slash(app);
 
-    tracing::info!("Listening on port {}", addr.port());
-
     let listener = TcpListener::bind(&addr).await?;
+    tracing::info!("Listening on port {}", listener.local_addr()?.port());
 
     Ok(
         axum::serve(listener, ServiceExt::<Request>::into_make_service(app))

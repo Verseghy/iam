@@ -1,4 +1,4 @@
-use iam_common::{database, keys::KeyManager};
+use iam_common::{database, keys::KeyManager, Config};
 use sea_orm::DbConn;
 use std::sync::Arc;
 
@@ -31,11 +31,11 @@ impl StateTrait for State {
     }
 }
 
-pub async fn create_state() -> State {
+pub async fn create_state(config: Config) -> State {
     State {
         inner: Arc::new(StateInner {
-            db: database::connect().await,
-            key_manager: KeyManager::new(),
+            db: database::connect(&config.database_url).await,
+            key_manager: KeyManager::new(&config),
         }),
     }
 }

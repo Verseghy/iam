@@ -1,21 +1,31 @@
 pub use jose_jwk::JwkSet;
 
-use crate::keys::{jwt::Jwt, Key};
+use crate::{
+    keys::{jwt::Jwt, Key},
+    Config,
+};
 use std::iter;
 
 pub struct KeyManager {
+    jwt_issuer: String,
     jwt_key: Key,
 }
 
 impl KeyManager {
-    pub fn new() -> Self {
+    pub fn new(config: &Config) -> Self {
+        let jwt_key = match config.jwt_secret_key {
+            Some(ref key) => Key::from_base64(key),
+            None => Key::generate(),
+        };
+
         Self {
-            jwt_key: Key::from_env(),
+            jwt_issuer: config.issuer_host.clone(),
+            jwt_key,
         }
     }
 
     pub fn jwt(&self) -> Jwt<'_> {
-        Jwt::new(&self.jwt_key)
+        Jwt::new(&self.jwt_key, &self.jwt_issuer)
     }
 
     pub fn jwks(&self) -> JwkSet {
@@ -24,11 +34,5 @@ impl KeyManager {
         JwkSet {
             keys: keys.collect(),
         }
-    }
-}
-
-impl Default for KeyManager {
-    fn default() -> Self {
-        Self::new()
     }
 }

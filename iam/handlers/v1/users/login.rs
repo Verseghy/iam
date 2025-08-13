@@ -5,7 +5,6 @@ use crate::{
 use axum::extract::State;
 use iam_common::{
     error::{self, Result},
-    keys::jwt::Claims,
     password,
 };
 use iam_entity::users;
@@ -60,7 +59,7 @@ pub async fn login<S: StateTrait>(
 
     crate::audit!(action = "login", user = res.id);
 
-    let token = state.key_manager().jwt().encode(&Claims::new(res.id));
+    let token = state.key_manager().jwt().encode(&res.id);
 
     Ok(Json(LoginResponse { token }))
 }

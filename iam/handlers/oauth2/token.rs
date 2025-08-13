@@ -6,7 +6,6 @@ use axum::{
 };
 use iam_common::{
     error::{oauth::OAuthError, Error},
-    keys::jwt::Claims,
     password,
 };
 use iam_entity::users;
@@ -93,7 +92,7 @@ async fn resource_owner_password_credentials_grant<S: StateTrait>(
 
     crate::audit!(action = "login", user = res.id);
 
-    let token = state.key_manager().jwt().encode(&Claims::new(res.id));
+    let token = state.key_manager().jwt().encode(&res.id);
 
     Ok(Json(TokenResponse {
         access_token: token,

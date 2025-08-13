@@ -3,7 +3,6 @@ use ed25519_dalek::{pkcs8::EncodePrivateKey, SecretKey, SigningKey, SECRET_KEY_L
 use jose_jwk::{Jwk, Okp, OkpCurves, Parameters};
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey};
 use rand::RngCore;
-use std::env;
 
 pub struct Key {
     pub(super) jwk: Jwk,
@@ -48,8 +47,7 @@ impl Key {
     }
 
     // TODO: this is a temporary solution
-    pub(super) fn from_env() -> Self {
-        let key = env::var("IAM_JWT_SECRET_KEY").unwrap();
+    pub(super) fn from_base64(key: &str) -> Self {
         let key = BASE64_STANDARD.decode(key).unwrap();
         assert_eq!(key.len(), SECRET_KEY_LENGTH);
         Self::from_private_key(&key.try_into().unwrap())

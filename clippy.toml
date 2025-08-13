@@ -1,0 +1,4 @@
+disallowed-methods = [
+    { path = "std::env::var", reason = "Use iam_common::config::Config" },
+    { path = "std::env::var_os", reason = "Use iam_common::config::Config" },
+]

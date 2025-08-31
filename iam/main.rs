@@ -1,6 +1,6 @@
 use dotenvy::dotenv;
 use iam_common::Config;
-use std::{error::Error, fs::File};
+use std::fs::File;
 use tracing_subscriber::{filter, layer::SubscriberExt, prelude::*, util::SubscriberInitExt};
 
 fn audit_filter(metadata: &tracing::Metadata<'_>) -> bool {
@@ -11,7 +11,7 @@ fn audit_filter(metadata: &tracing::Metadata<'_>) -> bool {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+async fn main() -> anyhow::Result<()> {
     dotenv().ok();
 
     let config = Config::from_env()?;

@@ -51,7 +51,7 @@ impl User {
         // TODO: this should be done with `Jwt::get_claims()`
         let claims =
             jsonwebtoken::decode::<Claims>(token.as_str(), &DecodingKey::from_secret(&[]), &{
-                let mut v = Validation::new(Algorithm::EdDSA);
+                let mut v = Validation::new(Algorithm::ES256);
                 v.insecure_disable_signature_validation();
                 v.set_audience(&["https://verseghy-gimnazium.net"]);
                 v

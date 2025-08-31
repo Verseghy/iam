@@ -28,3 +28,5 @@ ed25519-dalek.workspace = true
 jose-jwk = { version = "0.1.2", default-features = false }
 anyhow.workspace = true
 envconfig = "0.11.0"
+tokio = { workspace = true, features = ["fs"] }
+ring = "0.17.14"

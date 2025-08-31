@@ -39,7 +39,7 @@ impl Jwt {
 
     fn decode(&self, key: &DecodingKey, token: &str) -> anyhow::Result<Claims> {
         // TODO: set audience
-        let validation = Validation::new(Algorithm::EdDSA);
+        let validation = Validation::new(Algorithm::ES256);
 
         jsonwebtoken::decode(token, key, &validation)
             .map(|decoded| decoded.claims)

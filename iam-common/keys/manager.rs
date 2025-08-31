@@ -12,16 +12,13 @@ pub struct KeyManager {
 }
 
 impl KeyManager {
-    pub fn new(config: &Config) -> Self {
-        let jwt_key = match config.jwt_secret_key {
-            Some(ref key) => Key::from_base64(key),
-            None => Key::generate(),
-        };
+    pub async fn new(config: &Config) -> anyhow::Result<Self> {
+        let jwt_key = Key::from_file(&config.iam_signing_key_file).await?;
 
-        Self {
+        Ok(Self {
             jwt_issuer: config.issuer_host.clone(),
             jwt_key,
-        }
+        })
     }
 
     pub fn jwt(&self) -> Jwt<'_> {

@@ -7,8 +7,8 @@ pub struct Config {
     pub listen_addr: SocketAddr,
     #[envconfig(from = "DATABASE_URL")]
     pub database_url: String,
-    #[envconfig(from = "IAM_JWT_SECRET_KEY")]
-    pub jwt_secret_key: Option<String>,
+    #[envconfig(from = "IAM_SIGNING_KEY_FILE")]
+    pub iam_signing_key_file: String,
     #[envconfig(from = "IAM_ISSUER_HOST", default = "localhost")]
     pub issuer_host: String,
 }

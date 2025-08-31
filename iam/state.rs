@@ -31,13 +31,13 @@ impl StateTrait for State {
     }
 }
 
-pub async fn create_state(config: Config) -> State {
-    State {
+pub async fn create_state(config: Config) -> anyhow::Result<State> {
+    Ok(State {
         inner: Arc::new(StateInner {
             db: database::connect(&config.database_url).await,
-            key_manager: KeyManager::new(&config),
+            key_manager: KeyManager::new(&config).await?,
         }),
-    }
+    })
 }
 
 #[cfg(test)]

@@ -19,7 +19,7 @@ use iam_common::Config;
 use middlewares::TraceRequestIdLayer;
 use signal::TerminateSignal;
 use state::{State, StateTrait};
-use std::{error::Error, iter::once, time::Duration};
+use std::{iter::once, time::Duration};
 use tokio::net::TcpListener;
 use tower::{timeout::error::Elapsed, ServiceBuilder};
 use tower_http::{cors::CorsLayer, normalize_path::NormalizePath, ServiceBuilderExt};
@@ -55,9 +55,9 @@ fn middlewares<S: StateTrait>(state: S, router: Router<S>) -> Router {
     router.layer(middlewares).with_state(state)
 }
 
-pub async fn run(config: Config) -> Result<(), Box<dyn Error>> {
+pub async fn run(config: Config) -> anyhow::Result<()> {
     let addr = config.listen_addr;
-    let state = state::create_state(config).await;
+    let state = state::create_state(config).await?;
 
     let app = handlers::routes::<State>();
     let app = middlewares::<State>(state, app);

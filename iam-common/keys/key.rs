@@ -1,8 +1,11 @@
-use base64::{prelude::BASE64_STANDARD, Engine};
-use ed25519_dalek::{pkcs8::EncodePrivateKey, SecretKey, SigningKey, SECRET_KEY_LENGTH};
-use jose_jwk::{Jwk, Okp, OkpCurves, Parameters};
+use jose_jwk::{Ec, EcCurves, Jwk, Parameters};
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey};
-use rand::RngCore;
+use ring::{
+    rand::SystemRandom,
+    signature::{EcdsaKeyPair, KeyPair, ECDSA_P256_SHA256_ASN1_SIGNING},
+};
+use std::path::Path;
+use tokio::fs;
 
 pub struct Key {
     pub(super) jwk: Jwk,
@@ -11,57 +14,42 @@ pub struct Key {
 }
 
 impl Key {
-    #[allow(unused)]
-    pub(super) fn generate() -> Self {
-        let mut secret = SecretKey::default();
-        rand::rng().fill_bytes(&mut secret);
-        Self::from_private_key(&secret)
+    pub async fn from_file<P: AsRef<Path>>(path: P) -> anyhow::Result<Self> {
+        let file_content = fs::read(path).await?;
+        Self::from_pkcs8_der(&file_content)
     }
 
-    pub(super) fn from_private_key(secret_key: &SecretKey) -> Self {
-        let private_key = SigningKey::from_bytes(secret_key);
-        let public_key = private_key.verifying_key();
+    fn from_pkcs8_der(der: &[u8]) -> anyhow::Result<Self> {
+        let key_pair =
+            EcdsaKeyPair::from_pkcs8(&ECDSA_P256_SHA256_ASN1_SIGNING, der, &SystemRandom::new())?;
 
-        let bytes = Box::new(public_key.to_bytes()) as Box<[u8]>;
+        let public_key = key_pair.public_key().as_ref();
 
         let jwk = Jwk {
-            key: jose_jwk::Key::Okp(Okp {
-                crv: OkpCurves::Ed25519,
-                x: bytes.into(),
+            key: jose_jwk::Key::Ec(Ec {
+                crv: EcCurves::P256,
+                x: public_key[1..33].to_vec().into(),
+                y: public_key[33..65].to_vec().into(),
                 d: None,
             }),
             prm: Parameters {
+                // TODO: figure out keyid
                 kid: Some("jwt".to_owned()),
                 ..Default::default()
             },
         };
 
-        let encoding = EncodingKey::from_ed_der(private_key.to_pkcs8_der().unwrap().as_bytes());
-        let decoding = DecodingKey::from_ed_der(public_key.as_bytes());
+        let encoding = EncodingKey::from_ec_der(der);
+        let decoding = DecodingKey::from_ec_der(public_key);
 
-        Key {
+        Ok(Key {
             jwk,
             encoding,
             decoding,
-        }
-    }
-
-    // TODO: this is a temporary solution
-    pub(super) fn from_base64(key: &str) -> Self {
-        let key = BASE64_STANDARD.decode(key).unwrap();
-        assert_eq!(key.len(), SECRET_KEY_LENGTH);
-        Self::from_private_key(&key.try_into().unwrap())
+        })
     }
 
     pub fn get_alg(&self) -> Algorithm {
-        match self.jwk.key {
-            jose_jwk::Key::Okp(Okp {
-                crv: OkpCurves::Ed25519,
-                ..
-            }) => Algorithm::EdDSA,
-            _ => {
-                panic!("unsupported key type");
-            }
-        }
+        Algorithm::ES256
     }
 }

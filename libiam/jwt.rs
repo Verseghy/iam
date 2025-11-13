@@ -1,12 +1,18 @@
 use crate::api::{self, Api};
 pub use iam_common::keys::jwt::Claims;
 use jsonwebtoken::{Algorithm, DecodingKey, Validation};
+use std::fmt;
 use tokio::sync::RwLock;
 
-#[derive(Debug)]
 pub struct Jwt {
     keys: RwLock<Vec<DecodingKey>>,
     api: Api,
+}
+
+impl fmt::Debug for Jwt {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Jwt").field("api", &self.api).finish()
+    }
 }
 
 impl Jwt {

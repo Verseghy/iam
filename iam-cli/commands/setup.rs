@@ -66,7 +66,7 @@ async fn create_admin_user(matches: &ArgMatches, client: Client) -> anyhow::Resu
     let iam_url = matches.get_one::<String>("iam").unwrap();
     let database_url = matches.get_one::<String>("database").unwrap();
 
-    let iam = Iam::new(iam_url);
+    let iam = Iam::new(iam_url).await?;
     let db = Database::connect(database_url.as_str()).await?;
 
     let admin_password = Alphanumeric.sample_string(&mut rand::rng(), 64);

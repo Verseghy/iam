@@ -3,6 +3,7 @@ pub use iam_common::keys::jwt::Claims;
 use jsonwebtoken::{Algorithm, DecodingKey, Validation};
 use tokio::sync::RwLock;
 
+#[derive(Debug)]
 pub struct Jwt {
     keys: RwLock<Vec<DecodingKey>>,
     api: Api,

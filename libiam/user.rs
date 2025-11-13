@@ -2,8 +2,7 @@ use crate::{
     api::{self, Api},
     Iam,
 };
-use iam_common::{keys::jwt::Claims, Id};
-use jsonwebtoken::{Algorithm, DecodingKey, Validation};
+use iam_common::Id;
 use std::{str::FromStr, sync::Arc};
 
 #[derive(Debug)]
@@ -47,16 +46,7 @@ impl User {
         .token;
 
         let api = iam.inner.api.with_token(token.clone());
-
-        // TODO: this should be done with `Jwt::get_claims()`
-        let claims =
-            jsonwebtoken::decode::<Claims>(token.as_str(), &DecodingKey::from_secret(&[]), &{
-                let mut v = Validation::new(Algorithm::ES256);
-                v.insecure_disable_signature_validation();
-                v.set_audience(&["https://verseghy-gimnazium.net"]);
-                v
-            })?
-            .claims;
+        let claims = iam.inner.jwt.get_claims(&token).await?;
 
         Ok(Self {
             inner: Arc::new(UserInner {

@@ -13,7 +13,7 @@ name = "iam-migration"
 path = "main.rs"
 
 [dependencies]
-sea-orm-migration = { version = "1.1.15" }
+sea-orm-migration = { version = "1.1.19" }
 tokio.workspace = true
 iam-entity.workspace = true
 iam-common.workspace = true

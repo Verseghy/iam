@@ -11,16 +11,16 @@ path = "main.rs"
 [dependencies]
 anyhow.workspace = true
 base64.workspace = true
-clap = { version = "4.5.42", features = ["cargo", "env"] }
+clap = { version = "4.5.51", features = ["cargo", "env"] }
 dotenvy.workspace = true
 ed25519-dalek.workspace = true
 iam-common.workspace = true
 iam-entity.workspace = true
 iam-migration = { version = "0.1.0", path = "../iam-migration" }
-k8s-openapi = { version = "0.25.0", features = ["earliest"] }
-kube = "1.1.0"
+k8s-openapi = { version = "0.26.0", features = ["earliest"] }
+kube = "2.0.1"
 libiam = { version = "0.1.0", path = "../libiam" }
 rand.workspace = true
 sea-orm.workspace = true
 tokio.workspace = true
-url = "2.5.4"
+url = "2.5.7"

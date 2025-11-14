@@ -1,6 +1,10 @@
 [advisories]
 version = 2
 ignore = [
+    # RSA Marvin attack
+    # It's the dependency of the jsonwebtoken library, and since we don't use rsa jwt tokens,
+    # we don't use code from this crate
+    "RUSTSEC-2023-0071"
 ]
 
 [licenses]

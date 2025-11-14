@@ -8,10 +8,10 @@ license-file.workspace = true
 path = "./lib.rs"
 
 [dependencies]
-reqwest = { version = "0.12.22", default-features = false, features = ["json", "rustls-tls"] }
+reqwest = { version = "0.12.24", default-features = false, features = ["json", "rustls-tls"] }
 serde.workspace = true
 serde_json.workspace = true
-thiserror = "2.0.12"
+thiserror = "2.0.17"
 iam-common.workspace = true
 iam-entity.workspace = true
 sea-orm.workspace = true

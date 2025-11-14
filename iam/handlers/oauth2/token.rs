@@ -5,7 +5,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use iam_common::{
-    error::{oauth::OAuthError, Error},
+    error::{Error, oauth::OAuthError},
     password,
 };
 use iam_entity::users;

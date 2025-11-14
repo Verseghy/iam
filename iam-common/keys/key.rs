@@ -2,7 +2,7 @@ use jose_jwk::{Ec, EcCurves, Jwk, Parameters};
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey};
 use ring::{
     rand::SystemRandom,
-    signature::{EcdsaKeyPair, KeyPair, ECDSA_P256_SHA256_ASN1_SIGNING},
+    signature::{ECDSA_P256_SHA256_ASN1_SIGNING, EcdsaKeyPair, KeyPair},
 };
 use std::path::Path;
 use tokio::fs;

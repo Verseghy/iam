@@ -1,9 +1,9 @@
 use axum::{
-    extract::{rejection::JsonRejection, FromRequest, Request},
+    extract::{FromRequest, Request, rejection::JsonRejection},
     response::{IntoResponse, Response},
 };
 use iam_common::error::{self, Error};
-use serde::{de::DeserializeOwned, Serialize};
+use serde::{Serialize, de::DeserializeOwned};
 use validator::Validate;
 
 pub struct Json<T>(pub T);

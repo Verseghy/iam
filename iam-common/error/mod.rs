@@ -4,7 +4,7 @@ pub mod oauth;
 pub use constants::*;
 
 use axum::{
-    http::{header, HeaderValue, StatusCode},
+    http::{HeaderValue, StatusCode, header},
     response::{IntoResponse, Response},
 };
 use bytes::{BufMut, BytesMut};

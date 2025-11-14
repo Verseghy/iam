@@ -5,9 +5,9 @@ use iam_entity::{
     users::{self, Entity as Users},
 };
 use sea_orm::{
+    ColumnTrait, ConnectionTrait, FromQueryResult, QueryTrait, Related, StatementBuilder,
     query::{QueryFilter, QuerySelect},
     sea_query::UnionType,
-    ColumnTrait, ConnectionTrait, FromQueryResult, QueryTrait, Related, StatementBuilder,
 };
 
 #[derive(FromQueryResult)]

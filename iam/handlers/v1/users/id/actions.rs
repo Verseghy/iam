@@ -1,14 +1,14 @@
-use crate::{json::Json, StateTrait};
+use crate::{StateTrait, json::Json};
 use axum::{
-    extract::{Path, State},
     Extension,
+    extract::{Path, State},
 };
 use iam_common::{
     error::{self, Result},
     keys::jwt::Claims,
 };
 use iam_entity::{actions, users};
-use sea_orm::{query::QueryFilter, ColumnTrait, FromQueryResult, Related};
+use sea_orm::{ColumnTrait, FromQueryResult, Related, query::QueryFilter};
 use serde::Serialize;
 use std::sync::Arc;
 

@@ -1,7 +1,7 @@
 mod utils;
 
 pub use sea_orm_migration::MigratorTrait;
-use sea_orm_migration::{async_trait::async_trait, MigrationTrait};
+use sea_orm_migration::{MigrationTrait, async_trait::async_trait};
 
 mod m20220311_151913_create_users;
 mod m20220311_152016_create_actions;

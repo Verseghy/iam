@@ -1,5 +1,5 @@
 use crate::{auth, json::Json, state::StateTrait};
-use axum::{extract::State, http::StatusCode, Extension};
+use axum::{Extension, extract::State, http::StatusCode};
 use iam_common::{error::Result, keys::jwt::Claims};
 use serde::Deserialize;
 use std::sync::Arc;

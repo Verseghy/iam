@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use chrono::Utc;
-use sea_orm::{entity::prelude::*, Set};
+use sea_orm::{Set, entity::prelude::*};
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
 #[sea_orm(table_name = "groups")]

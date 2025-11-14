@@ -1,4 +1,4 @@
-use axum::body::{to_bytes, Body};
+use axum::body::{Body, to_bytes};
 use serde_json::Value;
 
 pub async fn body_to_json(body: Body) -> Value {

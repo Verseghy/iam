@@ -1,6 +1,6 @@
 use crate::{
-    error::{self, Result},
     Id,
+    error::{self, Result},
 };
 use base64::prelude::*;
 use iam_entity::apps;

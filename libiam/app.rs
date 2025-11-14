@@ -1,6 +1,6 @@
 use crate::{
-    api::{self, Api},
     Iam,
+    api::{self, Api},
 };
 use iam_common::user::UserInfo;
 use std::sync::Arc;

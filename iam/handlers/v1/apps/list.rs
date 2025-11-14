@@ -1,6 +1,6 @@
 use crate::{json::Json, state::StateTrait};
 use axum::extract::State;
-use iam_common::{error::Result, Id};
+use iam_common::{Id, error::Result};
 use iam_entity::apps;
 use sea_orm::EntityTrait;
 use serde::Serialize;

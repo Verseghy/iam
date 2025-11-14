@@ -4,7 +4,7 @@ pub mod password_hash;
 pub mod seed;
 pub mod setup;
 
-use clap::{crate_authors, crate_name, crate_version, Command};
+use clap::{Command, crate_authors, crate_name, crate_version};
 
 pub fn commands() -> Command {
     Command::new(crate_name!())

@@ -9,9 +9,9 @@ use iam_common::{
 };
 use iam_entity::users;
 use sea_orm::{
+    ActiveValue,
     entity::{ActiveModelTrait, ColumnTrait, EntityTrait},
     query::QueryFilter,
-    ActiveValue,
 };
 use serde::{Deserialize, Serialize};
 use validator::Validate;

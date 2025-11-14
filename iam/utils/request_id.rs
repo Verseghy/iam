@@ -1,6 +1,6 @@
-use hyper::{header::HeaderValue, Request};
+use hyper::{Request, header::HeaderValue};
 use tower_http::request_id::{MakeRequestId, RequestId};
-use uuid::{fmt::Simple, Uuid};
+use uuid::{Uuid, fmt::Simple};
 
 #[derive(Copy, Clone, Debug)]
 pub struct MakeUuidRequestId;

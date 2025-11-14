@@ -39,7 +39,7 @@ mod tests {
     use axum::{
         body::Body,
         http::{Request, StatusCode},
-        routing::{get, Router},
+        routing::{Router, get},
     };
     use chrono::Utc;
     use sea_orm::{DatabaseBackend, MockDatabase};

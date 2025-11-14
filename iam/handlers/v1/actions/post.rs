@@ -2,7 +2,7 @@ use crate::{json::Json, state::StateTrait, utils::set_option};
 use axum::{extract::State, http::StatusCode};
 use iam_common::error::Result;
 use iam_entity::actions;
-use sea_orm::{entity::EntityTrait, Set};
+use sea_orm::{Set, entity::EntityTrait};
 use serde::Deserialize;
 use std::default::Default;
 

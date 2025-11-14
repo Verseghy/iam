@@ -8,12 +8,12 @@ mod state;
 mod utils;
 
 use axum::{
+    BoxError, Router, ServiceExt,
     error_handling::HandleErrorLayer,
     extract::Request,
-    http::{header::AUTHORIZATION, StatusCode},
+    http::{StatusCode, header::AUTHORIZATION},
     middleware,
     response::{IntoResponse, Response},
-    BoxError, Router, ServiceExt,
 };
 use iam_common::Config;
 use middlewares::TraceRequestIdLayer;
@@ -21,8 +21,8 @@ use signal::TerminateSignal;
 use state::{State, StateTrait};
 use std::{iter::once, time::Duration};
 use tokio::net::TcpListener;
-use tower::{timeout::error::Elapsed, ServiceBuilder};
-use tower_http::{cors::CorsLayer, normalize_path::NormalizePath, ServiceBuilderExt};
+use tower::{ServiceBuilder, timeout::error::Elapsed};
+use tower_http::{ServiceBuilderExt, cors::CorsLayer, normalize_path::NormalizePath};
 use utils::MakeUuidRequestId;
 
 async fn handle_error(err: BoxError) -> Response {

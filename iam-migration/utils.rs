@@ -1,6 +1,6 @@
 use iam_common::Id;
 use iam_entity::{actions, pivot_actions_groups, pivot_actions_users, pivot_apps_actions};
-use sea_orm::{prelude::*, ConnectionTrait, Set};
+use sea_orm::{ConnectionTrait, Set, prelude::*};
 use sea_orm_migration::prelude::*;
 
 pub async fn add_action(

@@ -9,7 +9,7 @@ use crate::{
     auth::routing::{auth_delete, auth_get, auth_post},
     state::StateTrait,
 };
-use axum::{routing::post, Router};
+use axum::{Router, routing::post};
 
 #[rustfmt::skip]
 pub fn routes<S: StateTrait>() -> Router<S> {

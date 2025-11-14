@@ -1,6 +1,6 @@
 use crate::{auth, json::Json, state::StateTrait};
 use axum::{extract::State, http::StatusCode};
-use iam_common::{error::Result, Id};
+use iam_common::{Id, error::Result};
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]

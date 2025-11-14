@@ -1,4 +1,4 @@
-use iam_common::{database, keys::KeyManager, Config};
+use iam_common::{Config, database, keys::KeyManager};
 use sea_orm::DbConn;
 use std::sync::Arc;
 

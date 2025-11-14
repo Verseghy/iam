@@ -2,7 +2,7 @@ mod actions;
 mod get;
 
 use crate::{auth::routing::auth_get, state::StateTrait};
-use axum::{routing::get, Router};
+use axum::{Router, routing::get};
 
 #[rustfmt::skip]
 pub fn routes<S: StateTrait>() -> Router<S> {

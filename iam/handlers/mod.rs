@@ -4,7 +4,7 @@ mod v1;
 mod well_known;
 
 use crate::state::StateTrait;
-use axum::{routing::get, Router};
+use axum::{Router, routing::get};
 
 #[rustfmt::skip]
 pub fn routes<S: StateTrait>() -> Router<S> {

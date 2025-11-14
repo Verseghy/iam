@@ -2,7 +2,7 @@ use crate::{json::Json, state::StateTrait};
 use axum::extract::State;
 use iam_common::error::Result;
 use iam_entity::users;
-use sea_orm::{entity::EntityTrait, FromQueryResult, QuerySelect};
+use sea_orm::{FromQueryResult, QuerySelect, entity::EntityTrait};
 use serde::Serialize;
 
 #[derive(Serialize, Debug, FromQueryResult)]

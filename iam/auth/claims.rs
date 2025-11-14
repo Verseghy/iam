@@ -6,8 +6,8 @@ use axum::{
     response::Response,
 };
 use headers::{
-    authorization::{Authorization, Bearer},
     HeaderMapExt,
+    authorization::{Authorization, Bearer},
 };
 use std::sync::Arc;
 
@@ -20,10 +20,10 @@ pub async fn get_claims<S: StateTrait>(
     let token = parts.headers.typed_get::<Authorization<Bearer>>();
     let mut request = Request::from_parts(parts, body);
 
-    if let Some(token) = token {
-        if let Ok(claims) = state.key_manager().jwt().get_claims(token.token()) {
-            request.extensions_mut().insert(Arc::new(claims));
-        }
+    if let Some(token) = token
+        && let Ok(claims) = state.key_manager().jwt().get_claims(token.token())
+    {
+        request.extensions_mut().insert(Arc::new(claims));
     }
 
     Ok(next.run(request).await)

@@ -1,8 +1,8 @@
 pub use jose_jwk::JwkSet;
 
 use crate::{
-    keys::{jwt::Jwt, Key},
     Config,
+    keys::{Key, jwt::Jwt},
 };
 use std::iter;
 

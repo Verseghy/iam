@@ -2,8 +2,8 @@ pub mod app;
 pub mod user;
 pub mod well_known;
 
-use reqwest::{header::AUTHORIZATION, Client, Method, Url};
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use reqwest::{Client, Method, Url, header::AUTHORIZATION};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use thiserror::Error;
 use tokio::runtime::Handle;
 

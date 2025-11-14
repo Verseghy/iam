@@ -1,9 +1,9 @@
 use crate::{
-    json::{Json, ValidatedJson},
     StateTrait,
+    json::{Json, ValidatedJson},
 };
 use axum::{extract::State, http::StatusCode};
-use iam_common::{error::Result, Id};
+use iam_common::{Id, error::Result};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 

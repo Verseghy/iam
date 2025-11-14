@@ -1,4 +1,4 @@
-use crate::{json::Json, StateTrait};
+use crate::{StateTrait, json::Json};
 use axum::extract::State;
 use iam_common::error::{self, Result};
 use iam_entity::apps;

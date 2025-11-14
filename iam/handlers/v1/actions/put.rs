@@ -1,8 +1,8 @@
 use crate::{json::Json, state::StateTrait};
 use axum::extract::State;
-use iam_common::{error::Result, Id};
+use iam_common::{Id, error::Result};
 use iam_entity::actions;
-use sea_orm::{entity::EntityTrait, Set};
+use sea_orm::{Set, entity::EntityTrait};
 use serde::{Deserialize, Serialize};
 use std::default::Default;
 

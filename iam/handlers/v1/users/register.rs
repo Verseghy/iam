@@ -1,8 +1,8 @@
 use crate::{json::Json, json::ValidatedJson, state::StateTrait, utils::DatabaseErrorType};
 use axum::{extract::State, http::StatusCode};
 use iam_common::{
-    error::{self, Result},
     Id,
+    error::{self, Result},
 };
 use iam_entity::users;
 use sea_orm::{EntityTrait, Set};

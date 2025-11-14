@@ -1,5 +1,5 @@
 use clap::{Arg, ArgAction, ArgMatches, Command};
-use iam_common::{password, Id};
+use iam_common::{Id, password};
 use iam_entity::{
     actions, groups, pivot_actions_groups, pivot_actions_users, pivot_users_groups, users,
 };

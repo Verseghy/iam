@@ -1,16 +1,16 @@
 use anyhow::Context;
-use base64::{prelude::BASE64_STANDARD, Engine};
+use base64::{Engine, prelude::BASE64_STANDARD};
 use clap::{Arg, ArgAction, ArgMatches, Command};
 use ed25519_dalek::SecretKey;
 use k8s_openapi::api::core::v1::Secret;
 use kube::{
-    api::{ObjectMeta, PostParams},
     Api, Client,
+    api::{ObjectMeta, PostParams},
 };
-use libiam::{testing::actions::assign_action_to_user, Iam, User};
+use libiam::{Iam, User, testing::actions::assign_action_to_user};
 use rand::{
-    distr::{Alphanumeric, SampleString},
     RngCore,
+    distr::{Alphanumeric, SampleString},
 };
 use sea_orm::Database;
 use std::collections::BTreeMap;

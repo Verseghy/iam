@@ -20,7 +20,7 @@ async fn main() -> anyhow::Result<()> {
         .compact()
         .with_filter(filter::LevelFilter::DEBUG);
 
-    let file = File::create("audit.json")?;
+    let file = File::create(config.audit_file)?;
     let json_log = tracing_subscriber::fmt::layer()
         .json()
         .with_level(false)

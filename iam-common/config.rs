@@ -11,6 +11,8 @@ pub struct Config {
     pub iam_signing_key_file: String,
     #[envconfig(from = "IAM_ISSUER_HOST", default = "localhost")]
     pub issuer_host: String,
+    #[envconfig(from = "IAM_AUDIT_FILE", default = "./audit.json")]
+    pub audit_file: String,
 }
 
 impl Config {

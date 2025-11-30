@@ -22,6 +22,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
+          file: ./Containerfile
           push: true
           tags: verseghy/iam:latest
 
@@ -29,7 +30,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./dockerfiles/migration.Dockerfile
+          file: ./dockerfiles/migration.Containerfile
           push: true
           tags: verseghy/iam-migration:latest
 

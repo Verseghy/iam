@@ -30,7 +30,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./dockerfiles/migration.Containerfile
+          file: ./containerfiles/migration.Containerfile
           push: true
           tags: verseghy/iam-migration:latest
 

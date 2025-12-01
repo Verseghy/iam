@@ -13,9 +13,9 @@ jobs:
           - image: ghcr.io/verseghy/iam
             containerfile: ./Containerfile
           - image: ghcr.io/verseghy/iam-migration
-            containerfile: ./containerfiles/iam-migration
+            containerfile: ./containerfiles/migration.Containerfile
           - image: ghcr.io/verseghy/iam-cli
-            containerfile: ./containerfiles/iam-cli
+            containerfile: ./containerfiles/cli.Containerfile
 
     runs-on: ubuntu-latest
     steps:

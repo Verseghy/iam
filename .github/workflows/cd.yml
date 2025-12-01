@@ -14,11 +14,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - image: ghcr.io/verseghy/iam
+          - image: iam
             containerfile: ./Containerfile
-          - image: ghcr.io/verseghy/iam-migration
+          - image: iam-migration
             containerfile: ./containerfiles/migration.Containerfile
-          - image: ghcr.io/verseghy/iam-cli
+          - image: iam-cli
             containerfile: ./containerfiles/cli.Containerfile
 
     runs-on: ubuntu-latest

@@ -1,25 +1,31 @@
-use sea_orm::{DbErr, RuntimeErr};
+use sea_orm::{
+    DbErr, RuntimeErr,
+    sqlx::{self, postgres::PgDatabaseError},
+};
 
-fn get_error_msg(err: &DbErr) -> String {
+fn unwrap_to_sqlx_err(err: &DbErr) -> Option<&sqlx::Error> {
     match err {
-        DbErr::Exec(RuntimeErr::SqlxError(error)) => error.to_string(),
-        _ => unimplemented!(),
+        DbErr::Conn(RuntimeErr::SqlxError(error)) => Some(error),
+        DbErr::Exec(RuntimeErr::SqlxError(error)) => Some(error),
+        DbErr::Query(RuntimeErr::SqlxError(error)) => Some(error),
+        _ => None,
     }
 }
 
-fn get_code(err: &DbErr) -> Option<u32> {
-    let msg = get_error_msg(err);
-    let striped_msg = msg.strip_prefix("error returned from database: ")?;
-    let number_str = striped_msg.split_terminator(&[':', ' ']).next()?;
-    number_str.parse().ok()
-}
+fn is_code(err: &DbErr, code: &str) -> bool {
+    let Some(err) = unwrap_to_sqlx_err(err) else {
+        return false;
+    };
 
-fn is_code(err: &DbErr, code: u32) -> bool {
-    if let Some(c) = get_code(err) {
-        c == code
-    } else {
-        false
-    }
+    let sqlx::Error::Database(err) = err else {
+        return false;
+    };
+
+    let Some(err) = err.try_downcast_ref::<PgDatabaseError>() else {
+        return false;
+    };
+
+    err.code() == code
 }
 
 pub trait DatabaseErrorType {
@@ -28,6 +34,6 @@ pub trait DatabaseErrorType {
 
 impl DatabaseErrorType for DbErr {
     fn is_duplicate_entry(&self) -> bool {
-        is_code(self, 1062)
+        is_code(self, "23505")
     }
 }

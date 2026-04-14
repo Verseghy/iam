@@ -36,7 +36,7 @@ dotenvy = "0.15.7"
 iam-common = { path = "./iam-common" }
 iam-entity = { path = "./iam-entity" }
 iam-macros = { path = "./iam-macros" }
-jsonwebtoken = { version = "10.2.0", features = ["rust_crypto"] }
+jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
 mime = "0.3.17"
 rand = { version = "0.9.3", default-features = false, features = ["std", "std_rng", "thread_rng"] }
 sea-orm = { version = "1.1.19", default-features = false, features = ["macros", "runtime-actix-rustls", "sqlx-postgres", "with-chrono"] }
